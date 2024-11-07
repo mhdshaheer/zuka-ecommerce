@@ -149,6 +149,11 @@
     line-height: 1.6;
     color: #a67032;
   }
+  .error-message{
+    color:red;
+    font-size: 0.75em;
+    display: none;
+  }
   
   .button {
     width: 180px;
