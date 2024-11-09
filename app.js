@@ -3,12 +3,13 @@ const app = express();
 const session = require("express-session");
 const nodemailer = require("nodemailer");
 const path = require('path');
+const morgan = require('morgan')
 const env = require("dotenv").config();
 const userRouter = require('./routes/userRouter')
 const db = require('./config/db');
 db();
 
-
+app.use(morgan('common'))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 

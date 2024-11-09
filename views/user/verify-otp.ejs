@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zxx">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="description" content="Male_Fashion Template" />
@@ -7,7 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Male-Fashion</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
     <link rel="stylesheet" href="css/elegant-icons.css" type="text/css" />
@@ -18,19 +20,29 @@
     <link rel="stylesheet" href="css/style.css" type="text/css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+    <!-- =========================================================================== -->
+    <script src="sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="sweetalert2.min.css">
+    <!-- =========================================================================== -->
+
+
     <style>
-        body, html {
+        body,
+        html {
             height: 100%;
             margin: 0;
             font-family: "Nunito Sans", sans-serif;
             overflow: hidden;
         }
+
         .container {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
         }
+
         .login_wrap {
             width: 100%;
             max-width: 400px;
@@ -39,6 +51,7 @@
             background: #fff;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
         .heading_s1 h3 {
             margin: 0;
             font-size: 24px;
@@ -47,9 +60,11 @@
             text-align: center;
             margin-bottom: 30px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .otp-timer {
             display: inline-block;
             margin-left: 10px;
@@ -64,6 +79,7 @@
             border: 2px solid #ddd;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         #timerValue {
             display: block;
             font-size: 24px;
@@ -71,10 +87,12 @@
             color: #333;
             line-height: 60px;
         }
+
         #timerValue.expired {
             font-size: 14px;
             color: red;
         }
+
         .btn-primary {
             background-color: #007bff;
             border: none;
@@ -82,9 +100,11 @@
             margin-top: 10px;
             display: block;
         }
+
         .btn-primary:hover {
             background-color: #0056b3;
         }
+
         .btn-secondary {
             width: 100%;
             background-color: #6c757d;
@@ -92,79 +112,206 @@
             margin-top: 10px;
             display: block;
         }
+
         .btn-secondary:hover {
             background-color: #5a6268;
         }
+
         .alert-danger {
             margin-top: 15px;
             text-align: center;
         }
+
         .text-center {
             text-align: center;
             margin-top: 15px;
         }
+
         .text-muted {
             color: #6c757d;
             text-align: center;
         }
+
         .pt-25 {
             padding-top: 25px;
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <div class="login_wrap">
-        <div class="padding_eight_all bg-white">
-            <div class="heading_s1">
-                <h3>Email Verification Page</h3>
-            </div>
-            <form id="otpForm" action="" method="post" onsubmit="">
-                <div class="form-group">
-                    <label for="otp">Enter OTP:</label>
-                    <input type="text" id="otp" name="otp" class="form-control" required maxlength="6" pattern="\d*" />
+    <div class="container">
+        <div class="login_wrap">
+            <div class="padding_eight_all bg-white">
+                <div class="heading_s1">
+                    <h3>Email Verification Page</h3>
                 </div>
-                <button type="submit" class="btn btn-primary">Verify Email</button>
-                <div class="form-group text-center">
-                    <div id="otpTimer" class="otp-timer">
-                        <span id="timerValue">60</span>
+                <form id="otpForm">
+                    <div class="form-group">
+                        <label for="otp">Enter OTP:</label>
+                        <input type="text" id="otp" name="otp" class="form-control" required maxlength="6"
+                            pattern="\d*" />
                     </div>
-                    <button type="button" class="btn btn-secondary">Resend OTP</button>
+                    <button type="submit" class="btn btn-primary">Verify Email</button>
+                    <div class="form-group text-center">
+                        <div id="otpTimer" class="otp-timer">
+                            <span id="timerValue">60</span>
+                        </div>
+                        <button type="button" class="btn btn-secondary" id="resendOtpBtn" disabled>Resend OTP</button>
+                         <!-- <a href="/resentOtp" type="button" class="btn btn-secondary" id="resendOtpBtn" aria-disabled="">Resend OTP</a> -->
+                    </div>
+                    <% if (locals.message && message.length> 0) { %>
+                        <div class="alert alert-danger">
+                            <%= message %>
+                        </div>
+                        <% } %>
+                </form>
+                <div class="text-muted text-center pt-25">
+                    Already verified? <a href="/login">Login now</a>
                 </div>
-                <% if (locals.message && message.length > 0) { %>
-                <div class="alert alert-danger"><%= message %></div>
-                <% } %>
-            </form>
-            <div class="text-muted text-center pt-25">
-                Already verified? <a href="/login">Login now</a>
             </div>
         </div>
     </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.getElementById("otp").focus();
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    let timer = 60;
-    let timerInterval;
+    <script>
+        // Focus on the OTP input field when the page loads
+        document.getElementById("otp").focus();
 
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            timer--;
+        let timer = 60;
+        let timerInterval;
+        let resendOtpBtn = document.getElementById("resendOtpBtn");
+
+        // Function to start the countdown timer
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timer--;
+                document.getElementById("timerValue").textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("timerValue").classList.add("expired");
+                    document.getElementById("timerValue").textContent = "Expired";
+                    document.getElementById("otp").disabled = true; // Disable OTP input
+                    resendOtpBtn.disabled = false; // Enable the Resend OTP button
+                }
+            }, 1000);
+        }
+
+        // Function to resend OTP and reset timer
+        async function resendOtp() {
+     console.log('clicked');
+     
+            // Reset timer and UI elements
+            timer = 60;
             document.getElementById("timerValue").textContent = timer;
-            if (timer <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("timerValue").classList.add("expired");
-                document.getElementById("timerValue").textContent = "Expired";
-                document.getElementById("otp").disabled = true;
+            document.getElementById("timerValue").classList.remove("expired");
+            document.getElementById("otp").disabled = false; // Re-enable OTP input
+
+            try {
+                // let options = {
+                //     method: "POST",
+                //     headers: {
+                //         'Content-Type': 'application/json',
+                //     },
+                //     body: JSON.stringify({ email: email })
+                // }
+                console.log("before fetch")
+                let res = await fetch('/resentOtp', {
+                    method:'post'
+                })
+                let data = await res?.json();
+                console.log("response:",data?.success)
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: "info",
+                        title: "OTP Resent",
+                        text: "Please check your inbox for the new OTP."
+                    });
+                    // window.location.href = '';
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error",
+                        text: data.message
+                    });
+                }
+
+            } catch (error) {
+                console.log(error);
+                
+                console.log('error fetch');
+                
             }
-        }, 1000);
-    }
-    startTimer();
 
-</script>
-<%- include("../../views/partials/user/footer") %>
+
+            // Disable Resend OTP button until the next expiry
+            resendOtpBtn.disabled = true;
+
+
+            // Start the timer again
+            startTimer();
+
+            // Simulate resending the OTP (you can replace this with your actual OTP sending logic)
+            console.log("OTP Resent!");
+            Swal.fire({
+                icon: "info",
+                title: "OTP Resent",
+                text: "Please check your inbox for the new OTP."
+            });
+        }
+
+
+        // Event listener for Resend OTP button
+        resendOtpBtn.addEventListener("click", resendOtp);
+
+        // Start the timer when the page loads
+        startTimer();
+
+        // Form validation function
+        document.getElementById("otpForm").addEventListener("submit", validateOtpForm);
+
+        async function validateOtpForm(e) {
+            e.preventDefault();
+            console.log("Inside the validateOtpForm...");
+
+            const otpval1 = document.getElementById('otp').value;
+            console.log("OTP value:", otpval1);
+
+            let options = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ otp: otpval1 })
+            };
+
+            let res = await fetch("/verify-otp", options);
+            let data = await res.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: "success",
+                    title: "OTP Verified Success",
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = data.redirectUrl;
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message,
+                });
+            }
+
+            return false;
+        }
+
+    </script>
+
+    <%- include("../../views/partials/user/footer") %>
 </body>
-</html>
 
+</html>
