@@ -16,10 +16,15 @@ const loadSignup = async (req, res) => {
 }
 const loadLogin = async (req, res) => {
     try {
-        res.render('login')
+        if(!req.session.user){
+            res.render('login')
+        }else{
+            res.redirect('/');
+        }
+
     } catch (error) {
         console.log('Login page not found');
-        res.status(500).send('Server error')
+        res.redirect('/page_404')
     }
 }
 
@@ -29,21 +34,9 @@ function generateOtp() {
 }
 
 const resentOtp = async (req, res) => {
-    
-    // const { email } = req.session.userData;
-    // let otp = generateOtp();
-    // const emailSent = await sendEmailVerify(email,otp);
-    // if(!emailSent){
-    //     return res.json("email error");
-    // }
-    // req.session.userOtp = otp;
-    // console.log("resent otp is :",otp); 
+; 
     try {
-       
-        console.log( req?.session?.userData);
-        console.log(132);
-        console.log(req?.session,"hfsdjksdfigu",req?.body)
-
+ 
         const { email } = req?.session?.userData;
         
         if(!email){
@@ -129,7 +122,7 @@ console.log(req.session.userData);
 
     } catch (error) {
         console.error("signup error", error);
-        res.redirect('/page_404');
+        res.redirect('/pageNotFound');
     }
 }
 
