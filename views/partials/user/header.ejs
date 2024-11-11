@@ -11,7 +11,7 @@
 
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet">
+        rel="stylesheet">
 
     <!-- Css Styles -->
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
@@ -23,6 +23,41 @@
     <link rel="stylesheet" href="css/slicknav.min.css" type="text/css">
     <link rel="stylesheet" href="css/style.css" type="text/css">
 </head>
+<style>
+    .dropdown{
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-content{
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 2);
+        z-index: 1000;
+        right: 0;
+        
+    }
+
+    .dropdown-content a{
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        width: 100%;
+    }
+
+    .dropdown-content a:hover{
+        background-color: #f1f1f1;
+    }
+    .dropdown :hover .dropdown-content{
+        display: block;
+    }
+    .header{
+        position: relative;
+        z-index: 500
+    }
+</style>
 
 <body>
     <!-- Page Preloder -->
@@ -73,8 +108,20 @@
                     <div class="col-lg-6 col-md-5">
                         <div class="header__top__right">
                             <div class="header__top__links">
-                                <a href="/login">Sign in</a>
-                                <a href="/signup">Sign Up</a>
+                                <%if(locals.user){%>
+                                    <div class="dropdown">
+                                        <a href="#">
+                                            <%=locals.user.name%>
+                                        </a>
+                                        <div class="dropdown-content">
+                                            <a href="#">profile</a>
+                                            <a href="#">Logout</a>
+                                        </div>
+                                    </div>
+                                    <%}else {%>
+                                        <a href="/login">Sign in</a>
+                                        <a href="/signup">Sign Up</a>
+                                        <%}%>
                             </div>
                             <div class="header__top__hover">
                                 <span>Usd <i class="arrow_carrot-down"></i></span>

@@ -6,6 +6,8 @@ const env = require("dotenv").config()
 
 //===================================================
 
+//================sign up ===========================
+
 const loadSignup = async (req, res) => {
     try {
         res.render('signup')
@@ -14,10 +16,46 @@ const loadSignup = async (req, res) => {
         res.status(500).send('Server error')
     }
 }
+
+const signup = async (req, res) => {
+    try {
+        const { name, email, password, confirmPassword } = req.body;
+        if (password != confirmPassword) {
+            return res.render("signup", { message: "passwords do not match" });
+
+        }
+
+        const finduser = await User.findOne({ email });
+        if (finduser) {
+            return res.render("signup", { message: "User with this email already exist" })
+        }
+        const otp = generateOtp()
+
+        const emailSent = await sendEmailVerify(email, otp);
+        if (!emailSent) {
+            return res.json("email error");
+        }
+        req.session.userOtp = otp;
+        req.session.userData = { name, email, password };
+console.log(req.session.userData);
+
+        res.render("verify-otp");
+        console.log("otp sent", otp);
+
+    } catch (error) {
+        console.error("signup error", error);
+        res.redirect('/pageNotFound');
+    }
+}
+
+
+
+//=================== login ============================
+
 const loadLogin = async (req, res) => {
     try {
         if(!req.session.user){
-            res.render('login')
+            res.render('login',{message:''})
         }else{
             res.redirect('/');
         }
@@ -28,13 +66,48 @@ const loadLogin = async (req, res) => {
     }
 }
 
+const login = async (req,res)=>{
+    try {
+        const {email,password} = req.body;
+        console.log("login post",email,password)
+        const findUser = await User.findOne({isAdmin:0,email:email});
+        console.log(findUser)
+
+        if(!findUser){
+            console.log('not found')
+            return res.render('login',{message:"User not found"});
+        }else if(findUser.isBlocked){
+            console.log('blocked...')
+            return res.render('login',{message:"User is blocked by admin"})
+        }
+
+        const passwordMatch = await bcrypt.compare(password,findUser.password);
+        if(!passwordMatch){
+            console.log('not match pass....')
+            return res.render('login',{message:"Incorrect password"});
+        }
+
+        req.session.user = findUser._id;
+        console.log('time to redirect')
+        res.redirect('/');
+
+
+
+    } catch (error) {
+        console.log("Login error");
+        res.render('login',{message:"Login failed , Please try again later"})
+    }
+}
+
+//===================== otp ============================
 
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 90000).toString();
 }
 
+//================= sent & resent otp ================================
+
 const resentOtp = async (req, res) => {
-; 
     try {
  
         const { email } = req?.session?.userData;
@@ -95,36 +168,7 @@ async function sendEmailVerify(email, otp) {
     }
 }
 
-const signup = async (req, res) => {
-    try {
-        const { name, email, password, confirmPassword } = req.body;
-        if (password != confirmPassword) {
-            return res.render("signup", { message: "passwords do not match" });
-
-        }
-
-        const finduser = await User.findOne({ email });
-        if (finduser) {
-            return res.render("signup", { message: "User with this email already exist" })
-        }
-        const otp = generateOtp()
-
-        const emailSent = await sendEmailVerify(email, otp);
-        if (!emailSent) {
-            return res.json("email error");
-        }
-        req.session.userOtp = otp;
-        req.session.userData = { name, email, password };
-console.log(req.session.userData);
-
-        res.render("verify-otp");
-        console.log("otp sent", otp);
-
-    } catch (error) {
-        console.error("signup error", error);
-        res.redirect('/pageNotFound');
-    }
-}
+//==================bcrypt password =====================
 
 const securePassword = async (password) => {
     try {
@@ -134,6 +178,8 @@ const securePassword = async (password) => {
 
     }
 }
+
+//==================== verify otp ========================
 
 const verifyOtp = async (req, res) => {
     try {
@@ -165,12 +211,20 @@ const verifyOtp = async (req, res) => {
     }
 }
 
-
+//================== home page ========================
 
 const loadHomePage = async (req, res) => {
     try {
-
-        return res.render('home');
+        const user = req.session.user;
+        console.log('loaduser : ',user)
+        if(user){
+            const userData = await User.findOne({_id:user._id});
+            console.log("hai home")
+            res.render('home',{user:userData});
+        }else{
+            console.log("hai home iiii")
+            return res.render('home')
+        }
 
     } catch (error) {
         console.log('Home page not found!');
@@ -178,6 +232,9 @@ const loadHomePage = async (req, res) => {
     }
 
 }
+//=============== page not found ======================
+
+
 const pageNotFound = async (req, res) => {
     try {
         res.render('page_404')
@@ -186,6 +243,9 @@ const pageNotFound = async (req, res) => {
     }
 }
 
+//================= end =============================
+
+
 module.exports = {
     loadSignup,
     loadLogin,
@@ -193,6 +253,7 @@ module.exports = {
     pageNotFound,
     verifyOtp,
     resentOtp,
+    login,
     signup
 
 }
