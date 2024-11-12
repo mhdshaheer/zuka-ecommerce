@@ -37,7 +37,7 @@ const signup = async (req, res) => {
         }
         req.session.userOtp = otp;
         req.session.userData = { name, email, password };
-console.log(req.session.userData);
+        console.log(req.session.userData);
 
         res.render("verify-otp");
         console.log("otp sent", otp);
@@ -54,9 +54,9 @@ console.log(req.session.userData);
 
 const loadLogin = async (req, res) => {
     try {
-        if(!req.session.user){
-            res.render('login',{message:''})
-        }else{
+        if (!req.session.user) {
+            res.render('login', { message: '' })
+        } else {
             res.redirect('/');
         }
 
@@ -66,28 +66,29 @@ const loadLogin = async (req, res) => {
     }
 }
 
-const login = async (req,res)=>{
+const login = async (req, res) => {
     try {
-        const {email,password} = req.body;
-        console.log("login post",email,password)
-        const findUser = await User.findOne({isAdmin:0,email:email});
+        const { email, password } = req.body;
+        console.log("login post", email, password)
+        const findUser = await User.findOne({ isAdmin: 0, email: email });
         console.log(findUser)
 
-        if(!findUser){
+        if (!findUser) {
             console.log('not found')
-            return res.render('login',{message:"User not found"});
-        }else if(findUser.isBlocked){
+            return res.render('login', { message: "User not found" });
+        } else if (findUser.isBlocked) {
             console.log('blocked...')
-            return res.render('login',{message:"User is blocked by admin"})
+            return res.render('login', { message: "User is blocked by admin" })
         }
 
-        const passwordMatch = await bcrypt.compare(password,findUser.password);
-        if(!passwordMatch){
+        const passwordMatch = await bcrypt.compare(password, findUser.password);
+        if (!passwordMatch) {
             console.log('not match pass....')
-            return res.render('login',{message:"Incorrect password"});
+            return res.render('login', { message: "Incorrect password" });
         }
 
-        req.session.user = findUser._id;
+        // req.session.user = findUser._id;
+        req.session.user = findUser;
         console.log('time to redirect')
         res.redirect('/');
 
@@ -95,7 +96,25 @@ const login = async (req,res)=>{
 
     } catch (error) {
         console.log("Login error");
-        res.render('login',{message:"Login failed , Please try again later"})
+        res.render('login', { message: "Login failed , Please try again later" })
+    }
+}
+//===================== logout ============================
+
+const logout = async (req, res) => {
+    try {
+        req.session.destroy((err) => {
+            if (err) {
+                console.log("Session destroy error", err.message);
+                return res.redirect('/pageNotFound')
+            }
+            console.log("session destroyed")
+            res.redirect('/')
+        });
+
+    } catch (error) {
+        console.log("Logout error...",error);
+        return res.redirect('/pageNotFound');
     }
 }
 
@@ -109,28 +128,28 @@ function generateOtp() {
 
 const resentOtp = async (req, res) => {
     try {
- 
+
         const { email } = req?.session?.userData;
-        
-        if(!email){
-            return res.status(400).json({success:false,message:"Email not found in session"})
+
+        if (!email) {
+            return res.status(400).json({ success: false, message: "Email not found in session" })
         }
 
         let otp = generateOtp();
         req.session.userOtp = otp;
-        const emailSent = await sendEmailVerify(email,otp);
+        const emailSent = await sendEmailVerify(email, otp);
         console.log(emailSent);
-        
-        if(emailSent){
-            console.log("Resent otp",otp);
-            res.status(200).json({success:true,message:"otp resent successfully"})
-        }else{
-            res.status(500).json({success:false,message:"Failed to resent otp,Please try again"})
+
+        if (emailSent) {
+            console.log("Resent otp", otp);
+            res.status(200).json({ success: true, message: "otp resent successfully" })
+        } else {
+            res.status(500).json({ success: false, message: "Failed to resent otp,Please try again" })
         }
 
     } catch (error) {
         console.error("error resenting otp");
-        res.status(500).json({success:false,message:"Internal server error,please try again"})
+        res.status(500).json({ success: false, message: "Internal server error,please try again" })
     }
 }
 
@@ -216,12 +235,12 @@ const verifyOtp = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const user = req.session.user;
-        console.log('loaduser : ',user)
-        if(user){
-            const userData = await User.findOne({_id:user._id});
+        console.log('loaduser : ', user)
+        if (user) {
+            const userData = await User.findOne({ _id: user._id });
             console.log("hai home")
-            res.render('home',{user:userData});
-        }else{
+            res.render('home', { user: userData });
+        } else {
             console.log("hai home iiii")
             return res.render('home')
         }
@@ -254,6 +273,7 @@ module.exports = {
     verifyOtp,
     resentOtp,
     login,
+    logout,
     signup
 
 }

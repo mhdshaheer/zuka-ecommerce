@@ -8,6 +8,7 @@ router.get('/pageNotFound',userController.pageNotFound)
 router.get('/',userController.loadHomePage);
 router.get('/signup',userController.loadSignup)
 router.get('/login',userController.loadLogin);
+router.get('/logout',userController.logout)
 
 router.post('/login',userController.login)
 router.post('/signup',userController.signup)
