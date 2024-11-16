@@ -1,0 +1,156 @@
+<%-include('../../views/partials/admin/adminHeader')%>
+<style>
+    .unblockBtn {
+        background-color: red;
+    }
+</style>
+
+
+        <section class="content-main">
+            <div class="content-header">
+                <h2 class="content-title">Users list</h2>
+                <div>
+                    <a href="#" class="btn btn-primary"><i class="material-icons md-plus"></i> Create new</a>
+                </div>
+            </div>
+            <div class="card mb-4">
+                <header class="card-header">
+                    <div class="row gx-3">
+                        <div class="col-lg-4 col-md-6 me-auto">
+                            <input type="text" placeholder="Search..." class="form-control" />
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <select class="form-select">
+                                <option>Status</option>
+                                <option>Active</option>
+                                <option>Disabled</option>
+                                <option>Show all</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-6">
+                            <select class="form-select">
+                                <option>Show 20</option>
+                                <option>Show 30</option>
+                                <option>Show 40</option>
+                            </select>
+                        </div>
+                    </div>
+                </header>
+                <!-- card-header end// -->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%for(let i=0;i<userData.length;i++){%>
+                                    <tr>
+                                        <td width="40%">
+                                            <a href="#" class="itemside">
+
+                                                <div class="info pl-3">
+                                                    <h6 class="mb-0 title">
+                                                        <%=userData[i].name%>
+                                                    </h6>
+                                                    <small class="text-muted">Seller ID: #USER<%=(currentPage-1)*3+i+101%></small>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <%=userData[i].email%>
+                                        </td>
+                                        <td>
+                                            <%=userData[i].phone%>
+                                        </td>
+                                        <td><span class="badge rounded-pill alert-success">Active</span></td>
+                                        <td>
+                                            <%=userData[i].createdAt ? userData[i].createdAt.toLocaleDateString()
+                                                : 'N/A' %>
+                                        </td>
+                                        <td class="text-end">
+                                            <%if(userData[i].isBlocked==false){%>
+                                                <a href="/admin/blockUser?id=<%=userData[i]._id%>"
+                                                    onclick = "return confirmBlock()"
+                                                    class="btn btn-sm btn-brand rounded font-sm mt-15">BLOCK</a>
+                                                <%}else {%>
+                                                    <a href="/admin/unBlockUser?id=<%=userData[i]._id%>"
+                                                        onclick = "return confirmUnBlock()"
+                                                        class="btn btn-danger btn-sm btn-brand rounded font-sm mt-15 unblockBtn">UNBLOCK</a>
+                                                    <%}%>
+                                        </td>
+                                    </tr>
+                                    <%}%>
+                            </tbody>
+                        </table>
+                        <!-- table-responsive.// -->
+                    </div>
+                </div>
+                <!-- card-body end// -->
+            </div>
+            <!-- card end// -->
+            <div class="pagination-area mt-15 mb-50">
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-start">
+                        <% for (let i=1; i <=totalPages; i++) { %>
+                            <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                                <a class="page-link" href="?page=<%= i %>">
+                                    <%= i %>
+                                </a>
+                            </li>
+                            <% } %>
+                                <!-- Next page button, linking to the next page -->
+                                <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
+                                    <a class="page-link" href="?page=<%= currentPage + 1 %>">
+                                        <i class="material-icons md-chevron_right"></i>
+                                    </a>
+                                </li>
+                    </ul>
+                </nav>
+            </div>
+        </section>
+        <!-- content-main end// -->
+        <footer class="main-footer font-xs">
+            <div class="row pb-30 pt-15">
+                <div class="col-sm-6">
+                    <script>
+                        document.write(new Date().getFullYear());
+                    </script>
+                    &copy; Nest - HTML Ecommerce Template .
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end">All rights reserved</div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        function confirmBlock() {
+            var result = confirm("Are you sure you want to block this user?");
+            return result;
+        }
+        function confirmUnBlock() {
+            var result = confirm("Are you sure you want to unblock this user?");
+            return result;
+        }
+
+    </script>
+
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+</body>
+
+</html>

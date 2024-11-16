@@ -1,0 +1,189 @@
+
+
+<%-include('../../views/partials/admin/adminHeader')%>
+
+<style>
+  .text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+  }
+
+  .nameErr {
+    color: red;
+    display: none;
+    margin-top: -20px;
+    padding-bottom: 5px;
+    font-size: 13px;
+  }
+</style>
+    <section class="content-main">
+      <div class="content-header">
+        <div>
+          <h2 class="content-title card-title">Categories</h2>
+          <p>Add, edit or delete a category</p>
+        </div>
+        <div>
+          <input type="text" placeholder="Search Categories" class="form-control bg-white" />
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <form id="catForm">
+                <div class="mb-4">
+                  <label for="catName" class="form-label">Name</label>
+                  <input type="text" placeholder="Type here" class="form-control" id="catName" , name="catName" />
+                </div>
+                <div id="nameError" class="nameErr"></div>
+
+
+
+                <div class="mb-4">
+                  <label class="form-label">Description</label>
+                  <textarea placeholder="Type here" class="form-control" , id="description" ,
+                    name="description"></textarea>
+                </div>
+                <div id="descError" class="nameErr"></div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">Create category</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-9">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" />
+                        </div>
+                      </th>
+                      <th>ID</th>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Add Offer</th>
+                      <th>Status</th>
+                      <th>List/Unlist</th>
+                      <th>Edit</th>
+                      <th>Delete</th>
+
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <%for(let i=0;i<=categoryData.length;i++){%>
+                    <tr>
+                      <td class="text-center">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" value="" />
+                        </div>
+                      </td>
+                      <td>1</td>
+                      <td><b><%=categoryData[i]%></b></td>
+                      <td class="text-truncate">Cake & Milk d</td>
+                      <td><a class="btn btn-warning btn-sm" href="">Add</a></td>
+                      <td><span class="badge rounded-pill alert-success">Listed</span></td>
+                      <td><a class="btn btn-warning btn-sm" href="">List</a></td>
+                      <td><a class="btn btn-primary" href="">Edit</a></td>
+                      <td><a class="btn btn-danger btn-sm" href="">Delete</a></td>
+
+
+                    </tr>
+                    <%}%>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- .col// -->
+          </div>
+          <!-- .row // -->
+        </div>
+        <!-- card body .// -->
+      </div>
+      <!-- card .// -->
+    </section>
+    <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+      <div class="row pb-30 pt-15">
+        <div class="col-sm-6">
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          &copy; Zuka - Sports Ecommerce .
+        </div>
+        <div class="col-sm-6">
+          <div class="text-sm-end">All rights reserved</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+  <script>
+    const catName = document.getElementById('catName');
+    const description = document.getElementById('description')
+    document.getElementById('catForm').addEventListener('submit', (e) => {
+      e.preventDefault()
+      const nameError = document.getElementById('nameError')
+      const descError = document.getElementById('descError')
+      const catData = {
+        name: catName.value,
+        description: description.value
+      }
+
+
+      if (catName.value.trim() == "") {
+        console.log("inside null")
+        nameError.style.display = 'block',
+          nameError.innerHTML = "Name is required"
+      } else {
+        nameError.style.display = 'none',
+          nameError.innerHTML = ""
+      }
+
+      if (description.value.trim() == "") {
+        descError.style.display = "block",
+          descError.innerHTML = "Description is required"
+      } else {
+        descError.style.display = "none",
+          descError.innerHTML = "";
+      }
+
+      fetch('/admin/addCategory',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify(catData)
+      })
+      .then(res=>res.json())
+      .then(data=>{
+        console.log("Success:",data);
+      })
+      .catch(err=>{
+        console.log("Error :",err);
+      })
+      Swal.fire({
+        title: 'Success!',
+        text: 'Category added successfully!',
+        icon: 'success',
+        confirmButtonText: 'Okay'
+      });
+
+      console.log("catName is :", catName.value, description.value)
+    })
+  </script>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+  <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/vendors/select2.min.js"></script>
+  <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+  <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+  <!-- Main Script -->
+  <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+</body>
+
+</html>

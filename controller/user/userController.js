@@ -234,19 +234,25 @@ const verifyOtp = async (req, res) => {
 
 const loadHomePage = async (req, res) => {
     try {
+        const googleUser = req.user;
         const user = req.session.user;
         console.log('loaduser : ', user)
         if (user) {
-            const userData = await User.findOne({ _id: user._id });
+            const userData = await User.findOne({ _id: user });
+            console.log("userData is :",userData.name)
             console.log("hai home")
-            res.render('home', { user: userData });
-        } else {
+            res.render('home', { user: userData});
+        } else if(googleUser){
+            console.log("google user:",googleUser)
+            res.render('home', { user: googleUser});
+        }else {
             console.log("hai home iiii")
-            return res.render('home')
+            console.log("userData is :",user)
+            return res.render('home',{user})
         }
 
     } catch (error) {
-        console.log('Home page not found!');
+        console.log('Home page not found!',error);
         res.status(500).send('Server error')
     }
 

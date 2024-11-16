@@ -22,10 +22,10 @@ const userSchema = new Schema({
     //     sparse:true,
     //     default:null
     // },
-    // googleId : {
-    //     type:String,
-    //     unique:true
-    // },
+    googleId : {
+        type:String,
+        unique:true
+    },
     isBlocked:{
         type:Boolean,
         default:false
@@ -35,7 +35,7 @@ const userSchema = new Schema({
         default:false
     },
     // cart:[{
-    //     type:Schema.Types.ObjectId,
+        //     type:Schema.Types.ObjectId,
     //     ref:"Order"
     // }],
     // wallet:{
@@ -50,10 +50,6 @@ const userSchema = new Schema({
     //     type:Schema.Types.ObjectId,
     //     ref:'order'
     // }],
-    // createdAt:{
-    //     type:Date,
-    //     default:Date.now
-    // },
     // referalCode:{
     //     type:String
     // },
@@ -77,7 +73,7 @@ const userSchema = new Schema({
     //         default:Date.now
     //     }
     // }]
-})
+},{timestamps:true})
 
 const User = mongoose.model('User',userSchema);
 

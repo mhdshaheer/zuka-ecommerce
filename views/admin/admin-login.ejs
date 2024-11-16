@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="/css/admin-login.css">
 
-
+<form action="/admin/login" method="post">
 <div class="loginDiv" id="loginDiv">
 	<h1>Admin Login</h1>
 	<div class="inputField">
@@ -14,6 +14,9 @@
 	<div class="error" aria-errormessage="Invalid username or password." id="error">
 	<p>You have entered an invalid username or password.</p>
 </div>
-	<button id="login" class="login">Login</button>
+	<!-- <a href="/admin/dashboard"> -->
+		<button type="submit" id="login" class="login">Login</button>
+	<!-- </a> -->
 </div>
 </div>
+</form>
