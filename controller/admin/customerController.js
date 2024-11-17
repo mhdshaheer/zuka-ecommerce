@@ -47,7 +47,7 @@ const blockUser = async (req,res)=>{
     try {
         let id = req.query.id;
         await User.updateOne({_id:id},{$set:{isBlocked:true}});
-        res.redirect('/admin/users');
+        res.redirect(`/admin/users`);
     } catch (error) {
         res.redirect('/admin/admin-error');
         console.log("error in block user",error)

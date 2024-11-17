@@ -25,5 +25,14 @@ router.get('/unBlockUser',adminAuth,customerController.unBlockUser);
 
 //Category Mangement
 router.get('/category',adminAuth,categoryController.categoryInfo);
-router.post('/addCategory',adminAuth,categoryController.addCategory)
+router.post('/addCategory',adminAuth,categoryController.addCategory);
+router.delete('/delete/:id',adminAuth,categoryController.deleteCategory);
+router.patch('/addOffer/:id',adminAuth,categoryController.addOffer);
+router.patch('/removeOffer/:id',adminAuth,categoryController.removeOffer)
+router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
+
+//Product management
+// router.get('/products',adminAuth,c);
+
+
 module.exports = router;

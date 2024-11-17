@@ -1,124 +1,254 @@
-
-
 <%-include('../../views/partials/admin/adminHeader')%>
 
-<style>
-  .text-truncate {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-  }
+  <style>
+    .text-truncate {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
+    }
 
-  .nameErr {
-    color: red;
-    display: none;
-    margin-top: -20px;
-    padding-bottom: 5px;
-    font-size: 13px;
-  }
-</style>
-    <section class="content-main">
-      <div class="content-header">
-        <div>
-          <h2 class="content-title card-title">Categories</h2>
-          <p>Add, edit or delete a category</p>
-        </div>
-        <div>
-          <input type="text" placeholder="Search Categories" class="form-control bg-white" />
-        </div>
+    .nameErr {
+      color: red;
+      display: none;
+      margin-top: -20px;
+      padding-bottom: 5px;
+      font-size: 13px;
+    }
+  </style>
+  <section class="content-main">
+    <div class="content-header">
+      <div>
+        <h2 class="content-title card-title">Categories</h2>
+        <p>Add, edit or delete a category</p>
       </div>
-      <div class="card">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-3">
-              <form id="catForm">
-                <div class="mb-4">
-                  <label for="catName" class="form-label">Name</label>
-                  <input type="text" placeholder="Type here" class="form-control" id="catName" , name="catName" />
-                </div>
-                <div id="nameError" class="nameErr"></div>
+      <div>
+        <input type="text" placeholder="Search Categories" class="form-control bg-white" />
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3">
+            <form id="catForm">
+              <div class="mb-4">
+                <label for="catName" class="form-label">Name</label>
+                <input type="text" placeholder="Type here" class="form-control" id="catName" , name="catName" />
+              </div>
+              <div id="nameError" class="nameErr"></div>
 
 
 
-                <div class="mb-4">
-                  <label class="form-label">Description</label>
-                  <textarea placeholder="Type here" class="form-control" , id="description" ,
-                    name="description"></textarea>
-                </div>
-                <div id="descError" class="nameErr"></div>
-                <div class="d-grid">
-                  <button type="submit" class="btn btn-primary">Create category</button>
-                </div>
-              </form>
-            </div>
-            <div class="col-md-9">
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th class="text-center">
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" />
-                        </div>
-                      </th>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Description</th>
-                      <th>Add Offer</th>
-                      <th>Status</th>
-                      <th>List/Unlist</th>
-                      <th>Edit</th>
-                      <th>Delete</th>
+              <div class="mb-4">
+                <label class="form-label">Description</label>
+                <textarea placeholder="Type here" class="form-control" , id="description" ,
+                  name="description"></textarea>
+              </div>
+              <div id="descError" class="nameErr"></div>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Create category</button>
+              </div>
+            </form>
+          </div>
+          <div class="col-md-9">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" />
+                      </div>
+                    </th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Offer Price</th>
+                    <th>Add Offer</th>
+                    <th>Status</th>
+                    <!-- <th>List/Unlist</th> -->
+                    <th>Edit</th>
+                    <th>Delete</th>
 
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <%for(let i=0;i<=categoryData.length;i++){%>
+                  </tr>
+                </thead>
+                <tbody>
+                  <%categoryData.forEach((category,index)=>{%>
                     <tr>
                       <td class="text-center">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" value="" />
                         </div>
                       </td>
-                      <td>1</td>
-                      <td><b><%=categoryData[i]%></b></td>
-                      <td class="text-truncate">Cake & Milk d</td>
-                      <td><a class="btn btn-warning btn-sm" href="">Add</a></td>
-                      <td><span class="badge rounded-pill alert-success">Listed</span></td>
-                      <td><a class="btn btn-warning btn-sm" href="">List</a></td>
-                      <td><a class="btn btn-primary" href="">Edit</a></td>
-                      <td><a class="btn btn-danger btn-sm" href="">Delete</a></td>
+                      <td>
+                        <%=index+1%>
+                      </td>
+                      <td><b>
+                          <%=category.name%>
+                        </b></td>
+                      <td class="text-truncate">
+                        <%=category.description%>
+                      </td>
+                      <td>
+                        <%if(category.categoryOffer){%>
+                          <%=category.categoryOffer%>%
+                            <%}else{%>
+                              0%
+                              <%}%>
+                      </td>
+                      <td>
+                        <%if(category.categoryOffer==0){%>
+                          <a class="btn btn-warning btn-sm" href="javascript:void(0)"
+                            onclick="showAddOfferModal('<%=category._id%>')">Add Offer</a>
+                          <%}else{%>
+                            <a class="btn btn-danger btn-sm" href=""
+                              onclick="removeOffer('<%=category._id%>')">Remove</a>
+                            <%}%>
+                      </td>
+
+                      <td>
+                        <%if(category.isListed){%>
+                        <span class="badge rounded-pill alert-success">Listed</span>
+                        <%}else{%>
+                          <span class="badge rounded-pill alert-danger">Unlisted</span>
+                        <%}%>
+                      </td>
+                      <!-- <td><a class="btn btn-warning btn-sm" href="">List</a></td> -->
+                      <td>
+                        <a class="btn btn-primary" href="javascript:void(0)" onclick="editCategoryModal('<%=category._id%>')">Edit</a>
+                      </td>
+                      <td><a class="btn btn-danger btn-sm" href=""
+                          onclick="deleteCategory('<%= category._id %>')">Delete</a></td>
 
 
                     </tr>
-                    <%}%>
-                  </tbody>
-                </table>
-              </div>
+                    <%})%>
+                </tbody>
+              </table>
             </div>
-            <!-- .col// -->
           </div>
-          <!-- .row // -->
+          <!-- .col// -->
         </div>
-        <!-- card body .// -->
+        <!-- .row // -->
       </div>
-      <!-- card .// -->
-    </section>
-    <!-- content-main end// -->
-    <footer class="main-footer font-xs">
-      <div class="row pb-30 pt-15">
-        <div class="col-sm-6">
-          <script>
-            document.write(new Date().getFullYear());
-          </script>
-          &copy; Zuka - Sports Ecommerce .
-        </div>
-        <div class="col-sm-6">
-          <div class="text-sm-end">All rights reserved</div>
+      <!-- card body .// -->
+    </div>
+    
+    <div class="pagination-area">
+      <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+              <% if (currentPage > 1) { %>
+                  <li class="page-item">
+                      <a class="page-link" href="/admin/category?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+                  </li>
+              <% } %>
+  
+              <% for (let i = 1; i <= totalPages; i++) { %>
+                  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                      <a class="page-link" href="/admin/category?page=<%= i %>"><%= i %></a>
+                  </li>
+              <% } %>
+  
+              <% if (currentPage < totalPages) { %>
+                  <li class="page-item">
+                      <a class="page-link" href="/admin/category?page=<%= currentPage + 1 %>">&raquo; Next </a>
+                  </li>
+              <% } %>
+          </ul>
+      </nav>
+  </div>
+    <!-- card .// -->
+
+    <!-- ============modal for add offer ==================== -->
+
+    <!-- Modal for adding new offer -->
+    <div class="modal" id="addPriceModal" tabindex="-1" aria-labelledby="addPriceModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="addPriceModalLabel">Add New Offer</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form id="addOfferForm">
+              <!-- Hidden field to store category ID -->
+              <input type="hidden" id="categoryIdInput">
+
+              <div class="mb-3">
+                <label for="price" class="form-label">Offer Price</label>
+                <input type="number" class="form-control" id="offerPrice" name="price" required>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="saveOfferButton">Save Offer</button>
+          </div>
         </div>
       </div>
-    </footer>
+    </div>
+
+    <!-- ============modal end==================== -->
+
+    <!-- =============modal for edit category============ -->
+     <!-- Edit Category Modal -->
+<div class="modal" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="editCategoryModalLabel">Edit Category</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editCategoryForm">
+          <!-- Hidden field to store category ID -->
+          <input type="hidden" id="categoryIdInput">
+
+          <div class="mb-3">
+            <label for="categoryName" class="form-label">Category Name</label>
+            <input type="text" class="form-control" id="categoryName" name="name" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="categoryDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="categoryDescription" name="description" required></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="categoryStatus" class="form-label">Status</label>
+            <select class="form-control" id="categoryStatus" name="status" required>
+              <option value="listed">Listed</option>
+              <option value="unlisted">Unlisted</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" id="saveCategoryButton">Save Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==============Modal to Edit category end-->
+
+
+  </section>
+  <!-- content-main end// -->
+  <footer class="main-footer font-xs">
+    <div class="row pb-30 pt-15">
+      <div class="col-sm-6">
+        <script>
+          document.write(new Date().getFullYear());
+        </script>
+        &copy; Zuka - Sports Ecommerce .
+      </div>
+      <div class="col-sm-6">
+        <div class="text-sm-end">All rights reserved</div>
+      </div>
+    </div>
+  </footer>
   </main>
   <script>
     const catName = document.getElementById('catName');
@@ -127,52 +257,229 @@
       e.preventDefault()
       const nameError = document.getElementById('nameError')
       const descError = document.getElementById('descError')
+      let a = 0;
       const catData = {
         name: catName.value,
         description: description.value
       }
 
-
+      //validation check for name of the category form data
       if (catName.value.trim() == "") {
         console.log("inside null")
         nameError.style.display = 'block',
           nameError.innerHTML = "Name is required"
+        a = 1;
       } else {
         nameError.style.display = 'none',
           nameError.innerHTML = ""
+        a = 0;
       }
 
+      //validation check for description of the category form data
       if (description.value.trim() == "") {
         descError.style.display = "block",
           descError.innerHTML = "Description is required"
+        a = 1;
       } else {
         descError.style.display = "none",
           descError.innerHTML = "";
+        a = 0;
       }
 
-      fetch('/admin/addCategory',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json'
+      // sent the form data to backend '/addcategory'
+      fetch('/admin/addCategory', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        body:JSON.stringify(catData)
+        body: JSON.stringify(catData)
       })
-      .then(res=>res.json())
-      .then(data=>{
-        console.log("Success:",data);
-      })
-      .catch(err=>{
-        console.log("Error :",err);
-      })
-      Swal.fire({
-        title: 'Success!',
-        text: 'Category added successfully!',
-        icon: 'success',
-        confirmButtonText: 'Okay'
-      });
+        .then(res => res.json())
+        .then(data => {
+          console.log("Success:", data);
+        })
+        .catch(err => {
+          console.log("Error :", err);
+        })
+      if (a == 0) {
 
+        Swal.fire({
+          title: 'Success!',
+          text: 'Category added successfully!',
+          icon: 'success',
+          confirmButtonText: 'Okay'
+        })
+          .then((result) => {
+            console.log('Result:', result.isConfirmed)
+            if (result.isConfirmed) {
+              window.location.reload(); // Reload the page after clicking "Okay"
+            }
+          });
+      }
       console.log("catName is :", catName.value, description.value)
     })
+
+    //add offer 
+    function showAddOfferModal(id) {
+      const price = document.getElementById('offerPrice')
+      const saveOfferButton = document.getElementById('saveOfferButton')
+
+      // Show the modal using Bootstrap's Modal API
+      var modal = new bootstrap.Modal(document.getElementById('addPriceModal'));
+      modal.show();
+
+      saveOfferButton.addEventListener('click', (e) => {
+
+        e.preventDefault();
+        console.log("value is:", typeof price.value);
+
+        if (price.value !== '0' && price.value !== '' && price.value) {
+
+          //sent data to backend for update offerPrice of category
+          fetch(`/admin/addOffer/${id}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              newPrice: price.value
+            })
+          })
+            .then(res => { res.json() })
+            .then(data => {
+              Swal.fire({
+                title: 'Success!',
+                text: 'Offer added successfully!',
+                icon: 'success',
+                confirmButtonText: 'Okay'
+              })
+                .then(() => {
+                  window.location.reload(); // Reload the page after success
+                });
+            })
+            .catch(err => {
+              console.error('Error:', err);
+              Swal.fire({
+                title: 'Error!',
+                text: 'Failed to add the offer.',
+                icon: 'error',
+                confirmButtonText: 'Okay'
+              });
+            });
+        } else {
+          Swal.fire({
+            title: 'Error!',
+            text: 'Please enter an offer price.',
+            icon: 'error',
+            confirmButtonText: 'Okay'
+          });
+        }
+      })
+    }
+
+    // Remove offerPrice
+    function removeOffer(id) {
+      if (confirm('Are you sure you want to remove?')) {
+        fetch(`/admin/removeOffer/${id}`, {
+          method: "PATCH",
+        })
+          .then(res => { res.json() })
+          .then(data => {
+            Swal.fire({
+              title: 'Success!',
+              text: 'Offer Deleted successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            })
+              .then(() => {
+                window.location.reload(); // Reload the page after success
+              });
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to Remove the offer.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          });
+      }
+    }
+
+
+
+    //edit category
+
+    function editCategoryModal(id){
+      var modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+       modal.show();
+
+       const categoryName = document.getElementById('categoryName');
+       const categoryDescription = document.getElementById('categoryDescription');
+       const categoryStatus = document.getElementById('categoryStatus');
+       const saveCategoryButton = document.getElementById('saveCategoryButton');
+       saveCategoryButton.addEventListener('click',(e)=>{
+        e.preventDefault();
+        console.log("clicked....ok")
+        fetch(`/admin/editCategory/${id}`,{
+          method:'PUT',
+          headers:{
+            'Content-Type':'application/json'
+          },
+          body:JSON.stringify({
+            name:categoryName.value,
+            description:categoryDescription.value,
+            isListed:categoryStatus.value=='listed'?true:false
+          })
+        })
+        .then(res=>res.json())
+        .then(data => {
+          console.log("inside swal")
+            Swal.fire({
+              title: 'Success!',
+              text: 'Category Edited successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then(() => {
+              console.log('reloading page....')
+                window.location.reload(); // Reload the page after success
+              });
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to Edit category.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          });
+       })
+
+
+    }
+
+
+
+    //delete category
+    function deleteCategory(id) {
+      if (confirm('Are you sure you want to delete this category?')) {
+        fetch(`/admin/delete/${id}`, {
+          method: 'DELETE'
+        })
+          .then(response => {
+            if (response.ok) {
+              alert('Category deleted successfully');
+              window.location.reload(); // Reload the page to show changes
+            } else {
+              alert('Failed to delete the category');
+            }
+          })
+          .catch(err => console.error('Error:', err));
+      }
+    }
+
   </script>
 
 
@@ -184,6 +491,6 @@
   <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
   <!-- Main Script -->
   <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
-</body>
+  </body>
 
-</html>
+  </html>
