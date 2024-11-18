@@ -1,0 +1,438 @@
+<%-include('.. /../views/partials/admin/adminHeader')%>
+    <section class="content-main">
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product</h2>
+                    <div>
+                        <button class="btn btn-light rounded font-sm mr-5 text-body hover-up">Save to draft</button>
+                        <button class="btn btn-md rounded font-sm hover-up">Publich</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-9 ">
+
+                <div class="card ">
+                    <div class="card-body">
+                        <div class="row gx-5">
+
+                            <div class="col-lg-9">
+                                <section class="content-body  p-xl-4">
+                                    <form id="productForm">
+                                        <div class="row mb-4 ">
+                                            <label class="col-lg-3 col-form-label">Product name*</label>
+                                            <div class="col-lg-9">
+                                                <input id="productName" name="productName" type="text"
+                                                    class="form-control" placeholder="Type here" />
+
+                                                <div id="productError" class="text-danger"></div>
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <!-- row.// -->
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Description*</label>
+                                            <div class="col-lg-9">
+                                                <textarea id="description" name="description" class="form-control"
+                                                    placeholder="Type here" rows="4"></textarea>
+                                                <div id="descriptionError" class="text-danger"></div>
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Categories</label>
+                                            <div class="col-lg-9">
+                                                <select id="category" name="subcategoryf" class="form-control"
+                                                    aria-label="Product name">
+                                                    <option value="" disabled selected>Select a Category</option>
+                                                    <option value="product1">Category 1</option>
+                                                    <option value="product2">Category 2</option>
+                                                    <option value="product3">Category 3</option>
+                                                    <option value="product4">Category 4</option>
+                                                </select>
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Sub Categories</label>
+                                            <div class="col-lg-9">
+                                                <select id="subcategory" name="subcategory" class="form-control"
+                                                    aria-label="Product name">
+                                                    <option value="" disabled selected>Select a Sub Category</option>
+                                                    <option value="product1">Category 1</option>
+                                                    <option value="product2">Category 2</option>
+                                                    <option value="product3">Category 3</option>
+                                                    <option value="product4">Category 4</option>
+                                                </select>
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Total Stocks</label>
+                                            <div class="col-lg-4">
+                                                <input type="number" id="stock" name="stock" class="form-control"
+                                                    placeholder="Eg:123" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Price</label>
+                                            <div class="col-lg-4">
+                                                <input type="number" id="price" name="price" class="form-control"
+                                                    placeholder="Eg:123" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Offer Price</label>
+                                            <div class="col-lg-4">
+                                                <input type="number" id="offerPrice" name="offerPrice"
+                                                    class="form-control" placeholder="Eg:123" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <br />
+                                        <hr>
+                                        <br>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Colour*</label>
+                                            <div class="col-lg-9">
+                                                <input type="text" id="colour" name="colour" class="form-control"
+                                                    placeholder="Type here" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Product Images*</label>
+                                            <div class="col-lg-9">
+                                                <div id="image-container">
+                                                    <!-- Default image input field -->
+                                                    <div class="image-item mb-2">
+                                                        <input id="images" type="file" class="form-control"
+                                                            name="images[]" accept="image/*">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- row.// -->
+
+                                        <!-- <div class="container mt-5">
+
+                                            <div class="image-container">
+                                                <div class="image-item">
+                                                    <img src="image1.jpg" class="img-fluid" alt="Image 1">
+                                                </div>
+                                                <div class="image-item">
+                                                    <img src="image2.jpg" class="img-fluid" alt="Image 2">
+                                                </div>
+                                                <div class="image-item">
+                                                    <img src="image3.jpg" class="img-fluid" alt="Image 3">
+                                                </div>
+                                                <div class="image-item">
+                                                    <img src="image4.jpg" class="img-fluid" alt="Image 4">
+                                                </div>
+                                            </div>
+                                        </div> -->
+                                        <br>
+                                        <hr>
+                                        <br>
+
+                                        <div class="row mb-4">
+
+                                            <div class="col-lg-3">
+
+                                                <label class="col-form-label">Add Variant*</label>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <button type="button" class="btn btn-primary" id="editProductBtn"
+                                                    onclick="openEditModal()">Add Variant</button>
+                                            </div>
+                                        </div>
+                                        <br>
+                                        <!-- table -->
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Size</th>
+                                                    <th>Stocks</th>
+                                                    <th>Price</th>
+                                                    <th>Edit</th>
+                                                    <th>Delete</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Small</td>
+                                                    <td>100</td>
+                                                    <td>$20.00</td>
+                                                    <td>
+                                                        <button class="btn btn-warning btn-sm"
+                                                            onclick="editItem()">Edit</button>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm"
+                                                            onclick="deleteItem()">Delete</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Medium</td>
+                                                    <td>150</td>
+                                                    <td>$25.00</td>
+                                                    <td>
+                                                        <button class="btn btn-warning btn-sm"
+                                                            onclick="editItem()">Edit</button>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm"
+                                                            onclick="deleteItem()">Delete</button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Large</td>
+                                                    <td>80</td>
+                                                    <td>$30.00</td>
+                                                    <td>
+                                                        <button class="btn btn-warning btn-sm"
+                                                            onclick="editItem()">Edit</button>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-danger btn-sm"
+                                                            onclick="deleteItem()">Delete</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <!-- table end -->
+                                        <br>
+                                        <hr>
+                                        <br>
+
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Tax ID</label>
+                                            <div class="col-lg-4">
+                                                <input type="number" id="taxId" name="taxId" class="form-control"
+                                                    placeholder="012345678" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Tax Rate*</label>
+                                            <div class="col-lg-9">
+                                                <input type="text" id="taxRate" name="taxRate" class="form-control"
+                                                    placeholder="Type here" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Related tags</label>
+                                            <div class="col-lg-4">
+                                                <input type="text" id="tags" name="tags" class="form-control"
+                                                    placeholder="Type" />
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+
+                                        <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Status</label>
+                                            <div class="col-lg-9">
+                                                <label class="form-check my-2">
+                                                    <input id="status" name="status" type="checkbox"
+                                                        class="form-check-input" checked="" />
+                                                    <span class="form-check-label">Enable this product </span>
+                                                </label>
+                                            </div>
+                                            <!-- col.// -->
+                                        </div>
+                                        <!-- row.// -->
+                                        <br />
+                                        <button class="btn btn-primary" type="submit">Continue to next</button>
+                                    </form>
+                                </section>
+                                <hr>
+                                <!-- content-body .// -->
+                            </div>
+                            <!-- col.// -->
+                        </div>
+                        <!-- content-body .// -->
+                    </div>
+                    <!-- col.// -->
+                </div>
+                <!-- row.// -->
+            </div>
+            <!-- card body end// -->
+        </div>
+        </div>
+        </div>
+    </section>
+
+    <!--===========modal==============  -->
+    <!-- Modal to Edit Product -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Add Product Variants</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Edit Product Form -->
+                    <form id="editProductForm">
+                        <div class="mb-3">
+                            <label for="productSize" class="form-label">Size</label>
+                            <input type="text" class="form-control" id="productSize" placeholder="Enter size">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productStocks" class="form-label">Stocks</label>
+                            <input type="number" class="form-control" id="productStocks"
+                                placeholder="Enter stock quantity">
+                        </div>
+                        <div class="mb-3">
+                            <label for="productPrice" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="productPrice" placeholder="Enter price">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveProductChanges">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========modal end============== -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                    document.write(new Date().getFullYear());
+                </script>
+                &copy; Nest - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">All rights reserved</div>
+            </div>
+        </div>
+    </footer>
+    </main>
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+
+    <script>
+        function openEditModal() {
+            var myModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+            myModal.show();
+        }
+        const name = document.getElementById('productName')
+        const description = document.getElementById('description');
+        const category = document.getElementById('category');
+        const subcategory = document.getElementById('subcategory');
+        const stock = document.getElementById('stock');
+        const price = document.getElementById('price');
+        const offerPrice = document.getElementById('offerPrice');
+        const colour = document.getElementById('colour');
+        const images = document.getElementById('images');
+        const taxId = document.getElementById('taxId');
+        const taxRate = document.getElementById('taxRate');
+        const status = document.getElementById('status');
+
+        const productForm = document.getElementById('productForm');
+        const productError = document.getElementById('productError');
+
+
+        const validPattern = /^[A-Za-z0-9\s]+$/;
+        const validLetter = /^[A-Za-z]/;
+        const validCharsPattern = /^[A-Za-z0-9\s]+$/;
+
+        //Product Name Validation
+        function validateProductName(nameVal) {
+            console.log('inside validate')
+            const minLength = 3;
+            const maxLength = 30;
+
+            console.log("name value is :", nameVal)
+
+            if (nameVal.trim() == '') {
+                productError.style.display = 'block';
+                productError.innerHTML = 'Product name is required';
+            } else if (nameVal.length < minLength || nameVal.length > maxLength) {
+                productError.style.display = 'block';
+                productError.innerHTML = `Product name must be between ${minLength} and ${maxLength} characters`;
+            } else if (!validLetter.test(nameVal)) {
+                productError.style.display = 'block';
+                productError.innerHTML = 'Product name must start with a letter.';
+            } else if (!validCharsPattern.test(nameVal)) {
+                productError.style.display = 'block';
+                productError.innerHTML = 'Product name can only contain letters, numbers, and spaces.';
+            } else if (!validPattern.test(nameVal)) {
+                productError.style.display = 'block';
+                productError.innerHTML = 'Product name can only contain letters, numbers, and spaces';
+            } else {
+                productError.style.display = 'none';
+                productError.innerHTML = '';
+            }
+        }
+
+        //Product Description Validation
+        function validateProductDescription(descVal) {
+
+            const errorElement = document.getElementById('descriptionError');
+            // Validation rules
+            if (descVal.trim() == '') {
+                errorElement.style.display = 'block'
+                errorElement.innerHTML = 'Description cannot be empty.';
+            } else if (descVal.trim().length < 10) {
+                errorElement.style.display = 'block'
+                errorElement.innerHTML = 'Description must be at least 10 characters long.';
+            } else if (descVal.trim().length > 300) {
+                errorElement.style.display = 'block'
+                errorElement.innerHTML = 'Description cannot exceed 300 characters.';
+            } else {
+                errorElement.style.display = 'none'
+                errorElement.innerHTML = '';
+            }
+        }
+
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+            console.log('name is:', name.value)
+            validateProductName(name.value)
+            validateProductDescription(description.value)
+            const options = {
+                name: name.value,
+                description: description.value,
+                category: category.value,
+                subcategory: subcategory.value,
+                stock: stock.value,
+                price: price.value,
+                offerPrice: offerPrice.value,
+                colour: colour.value,
+                images: images.value,
+                taxId: taxId.value,
+                status: status.value
+            }
+            fetch('/admin/addProduct', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(options)
+            })
+
+        })
+
+
+
+
+    </script>
+    </body>
+
+    </html>

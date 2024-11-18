@@ -3,6 +3,7 @@ const router = express.Router();
 const adminController = require("../controller/admin/adminController")
 const customerController = require('../controller/admin/customerController')
 const categoryController = require('../controller/admin/categoryController');
+const productController = require('../controller/admin/productController')
 const {userAuth,adminAuth} = require("../middlewares/auth");
 
 
@@ -32,7 +33,8 @@ router.patch('/removeOffer/:id',adminAuth,categoryController.removeOffer)
 router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
 
 //Product management
-// router.get('/products',adminAuth,c);
+router.get('/products',adminAuth,productController.loadProduct);
+router.post('/addProduct',adminAuth,productController.addProduct)
 
 
 module.exports = router;

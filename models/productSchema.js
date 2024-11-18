@@ -13,7 +13,7 @@ const productSchema = new Schema({
     },
     brand: {
         type:String,
-        required:true,
+        default:'ZUKA'
     },
     category: {
         type:Schema.Types.ObjectId,
@@ -32,25 +32,59 @@ const productSchema = new Schema({
         type:Number,
         default:0,
     },
-    quantity:{
+    totalStocks:{
         type:Number,
-        default:true
+        required:true,
+        default:0,
+        min:0
     },
-    color: {
-        type:String,
-        required:true
-    },
-    productImage:{
-        type:[String],
-        required:true
-    },
+    variant: {
+        type: [
+          {
+            color: {
+              type: String,
+              required: true, // e.g., "Red", "Blue"
+            },
+            images: {
+              type: [String], // Array of image URLs
+            },
+            sizes: {
+              type: [
+                {
+                  size: {
+                    type: String,
+                    required: true, // e.g., "Small", "Medium", "Large"
+                  },
+                  price: {
+                    type: Number,
+                    required: true, // Price for the size
+                  },
+                  stock: {
+                    type: Number,
+                    required: true, // Available stock for the size
+                    min: 0, // Ensure stock is not negative
+                  },
+                  status: {
+                    type: String,
+                    required: true,
+                    enum: ['available', 'out of stock', 'discontinued'], // Valid statuses
+                    default: 'available',
+                  },
+                },
+              ],
+              required: true, // Ensure sizes are provided for a variation
+            },
+          },
+        ],
+        required: true, // Ensure variations are provided
+      },
     isBlocked:{
         type:Boolean,
         default:false
     },
     status:{
         type:String,
-        enum:["Available","out of stock","Discountinued"],
+        enum:["Available","Out of stock","Discountinued"],
         required:true,
         default:"Available"
     },
