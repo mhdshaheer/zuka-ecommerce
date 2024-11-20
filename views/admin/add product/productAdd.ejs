@@ -1,4 +1,4 @@
-<%-include('.. /../views/partials/admin/adminHeader')%>
+<%-include('../../views/partials/admin/adminHeader')%>
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -45,11 +45,13 @@
                                                 <select id="category" name="subcategoryf" class="form-control"
                                                     aria-label="Product name">
                                                     <option value="" disabled selected>Select a Category</option>
-                                                    <option value="product1">Category 1</option>
-                                                    <option value="product2">Category 2</option>
-                                                    <option value="product3">Category 3</option>
-                                                    <option value="product4">Category 4</option>
+                                                    <%for(let i=0;i<categories.length;i++){%>
+                                                        <option>
+                                                            <%=locals.categories[i].name%>
+                                                        </option>
+                                                        <%}%>
                                                 </select>
+                                                <div id="categoryError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -59,11 +61,12 @@
                                                 <select id="subcategory" name="subcategory" class="form-control"
                                                     aria-label="Product name">
                                                     <option value="" disabled selected>Select a Sub Category</option>
-                                                    <option value="product1">Category 1</option>
+                                                    <option value="product1">kkkkkkkkk</option>
                                                     <option value="product2">Category 2</option>
                                                     <option value="product3">Category 3</option>
                                                     <option value="product4">Category 4</option>
                                                 </select>
+                                                <div id="subCategoryError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -72,6 +75,7 @@
                                             <div class="col-lg-4">
                                                 <input type="number" id="stock" name="stock" class="form-control"
                                                     placeholder="Eg:123" />
+                                                <div id="stocksError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -80,6 +84,7 @@
                                             <div class="col-lg-4">
                                                 <input type="number" id="price" name="price" class="form-control"
                                                     placeholder="Eg:123" />
+                                                <div id="priceError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -87,7 +92,8 @@
                                             <label class="col-lg-3 col-form-label">Offer Price</label>
                                             <div class="col-lg-4">
                                                 <input type="number" id="offerPrice" name="offerPrice"
-                                                    class="form-control" placeholder="Eg:123" />
+                                                    class="form-control" placeholder="Eg:123" value="0" />
+                                                <div id="offerPriceError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -99,40 +105,70 @@
                                             <div class="col-lg-9">
                                                 <input type="text" id="colour" name="colour" class="form-control"
                                                     placeholder="Type here" />
+                                                <div id="colourError" class="text-danger"></div>
                                             </div>
                                             <!-- col.// -->
                                         </div>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Product Images*</label>
                                             <div class="col-lg-9">
-                                                <div id="image-container">
-                                                    <!-- Default image input field -->
-                                                    <div class="image-item mb-2">
-                                                        <input id="images" type="file" class="form-control"
-                                                            name="images[]" accept="image/*">
+                                                <div id="image-list">
+                                                    <!-- Image Upload 1 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-1">
+                                                        <input id="images-1" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-1"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button id="cropButton-1"
+                                                            class="btn btn-primary ms-3">Crop</button>
+                                                    </div>
+
+                                                    <!-- Image Upload 2 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-2">
+                                                        <input id="images-2" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-2"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button id="cropButton-2"
+                                                            class="btn btn-primary ms-3">Crop</button>
+                                                    </div>
+
+                                                    <!-- Image Upload 3 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-3">
+                                                        <input id="images-3" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-3"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button id="cropButton-3"
+                                                            class="btn btn-primary ms-3">Crop</button>
+                                                    </div>
+
+                                                    <!-- Image Upload 4 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-4">
+                                                        <input id="images-4" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-4"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button id="cropButton-4"
+                                                            class="btn btn-primary ms-3">Crop</button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
+
+
                                         <!-- row.// -->
 
-                                        <!-- <div class="container mt-5">
 
-                                            <div class="image-container">
-                                                <div class="image-item">
-                                                    <img src="image1.jpg" class="img-fluid" alt="Image 1">
-                                                </div>
-                                                <div class="image-item">
-                                                    <img src="image2.jpg" class="img-fluid" alt="Image 2">
-                                                </div>
-                                                <div class="image-item">
-                                                    <img src="image3.jpg" class="img-fluid" alt="Image 3">
-                                                </div>
-                                                <div class="image-item">
-                                                    <img src="image4.jpg" class="img-fluid" alt="Image 4">
-                                                </div>
-                                            </div>
-                                        </div> -->
                                         <br>
                                         <hr>
                                         <br>
@@ -156,50 +192,25 @@
                                                     <th>Size</th>
                                                     <th>Stocks</th>
                                                     <th>Price</th>
-                                                    <th>Edit</th>
+                                                    <th>Status</th>
                                                     <th>Delete</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
+                                            <tbody id="tbody">
+
                                                 <tr>
-                                                    <td>Small</td>
-                                                    <td>100</td>
-                                                    <td>$20.00</td>
+                                                    <td>N/A</td>
+                                                    <td>N/A</td>
+                                                    <td>N/A</td>
                                                     <td>
-                                                        <button class="btn btn-warning btn-sm"
-                                                            onclick="editItem()">Edit</button>
+                                                        <span class="badge rounded-pill alert-success">Added</span>
                                                     </td>
                                                     <td>
                                                         <button class="btn btn-danger btn-sm"
                                                             onclick="deleteItem()">Delete</button>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td>Medium</td>
-                                                    <td>150</td>
-                                                    <td>$25.00</td>
-                                                    <td>
-                                                        <button class="btn btn-warning btn-sm"
-                                                            onclick="editItem()">Edit</button>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm"
-                                                            onclick="deleteItem()">Delete</button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Large</td>
-                                                    <td>80</td>
-                                                    <td>$30.00</td>
-                                                    <td>
-                                                        <button class="btn btn-warning btn-sm"
-                                                            onclick="editItem()">Edit</button>
-                                                    </td>
-                                                    <td>
-                                                        <button class="btn btn-danger btn-sm"
-                                                            onclick="deleteItem()">Delete</button>
-                                                    </td>
-                                                </tr>
+
                                             </tbody>
                                         </table>
 
@@ -212,7 +223,7 @@
                                             <label class="col-lg-3 col-form-label">Tax ID</label>
                                             <div class="col-lg-4">
                                                 <input type="number" id="taxId" name="taxId" class="form-control"
-                                                    placeholder="012345678" />
+                                                    placeholder="012345678" value="0" />
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -221,7 +232,7 @@
                                             <label class="col-lg-3 col-form-label">Tax Rate*</label>
                                             <div class="col-lg-9">
                                                 <input type="text" id="taxRate" name="taxRate" class="form-control"
-                                                    placeholder="Type here" />
+                                                    placeholder="Type here" value="0" />
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -229,7 +240,7 @@
                                             <label class="col-lg-3 col-form-label">Related tags</label>
                                             <div class="col-lg-4">
                                                 <input type="text" id="tags" name="tags" class="form-control"
-                                                    placeholder="Type" />
+                                                    placeholder="Eg: #sports" />
                                             </div>
                                             <!-- col.// -->
                                         </div>
@@ -282,22 +293,23 @@
                     <form id="editProductForm">
                         <div class="mb-3">
                             <label for="productSize" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="productSize" placeholder="Enter size">
+                            <input type="text" class="form-control" id="varientSize" placeholder="Enter size">
                         </div>
                         <div class="mb-3">
                             <label for="productStocks" class="form-label">Stocks</label>
-                            <input type="number" class="form-control" id="productStocks"
+                            <input type="number" class="form-control" id="varientStock"
                                 placeholder="Enter stock quantity">
                         </div>
                         <div class="mb-3">
                             <label for="productPrice" class="form-label">Price</label>
-                            <input type="number" class="form-control" id="productPrice" placeholder="Enter price">
+                            <input type="number" class="form-control" id="varientPrice" placeholder="Enter price">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="saveProductChanges">Save changes</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="saveProductChanges">Save
+                        changes</button>
                 </div>
             </div>
         </div>
@@ -318,6 +330,7 @@
         </div>
     </footer>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="assets/js/vendors/select2.min.js"></script>
@@ -335,7 +348,6 @@
         const description = document.getElementById('description');
         const category = document.getElementById('category');
         const subcategory = document.getElementById('subcategory');
-        const stock = document.getElementById('stock');
         const price = document.getElementById('price');
         const offerPrice = document.getElementById('offerPrice');
         const colour = document.getElementById('colour');
@@ -401,37 +413,258 @@
             }
         }
 
+        //Category Validation
+        function validateCategory(categoryVal) {
+            const errorField = document.getElementById('categoryError');
+            const category = document.getElementById('category');
+            if (!categoryVal) {
+                errorField.style.display = 'block';
+                errorField.innerHTML = 'Please select a category';
+                category.focus();
+                return false
+            }
+
+            errorField.style.display = 'none'; // Hide the error if valid
+            return true; // Allow form submission
+        }
+
+
+        //Subcategory Validation
+        function validateSubCategory(subCategoryVal) {
+            const errorField = document.getElementById('subCategoryError');
+            const subcategory = document.getElementById('subcategory');
+            if (!subCategoryVal) {
+                errorField.style.display = 'block';
+                errorField.innerHTML = 'Please select a sub category';
+                subcategory.focus();
+                return false
+            }
+
+            errorField.style.display = 'none'; // Hide the error if valid
+            return true; // Allow form submission
+        }
+
+
+
+        //Price validation
+        function validatePrice(priceVal) {
+            const errorField = document.getElementById('priceError');
+            const price = document.getElementById('price');
+            if (!priceVal) {
+                errorField.style.display = 'block';
+                errorField.innerHTML = 'Enter the price';
+                price.focus();
+                return false
+            } else if (priceVal == 0) {
+                errorField.style.display = 'block';
+                errorField.innerHTML = 'Price not zero';
+                price.focus();
+                return false
+            }
+
+            errorField.style.display = 'none'; // Hide the error if valid
+            return true; // Allow form submission
+        }
+
+        //OfferPrice validation
+        function validateOfferPrice(offerPriceVal) {
+            const errorField = document.getElementById('offerPriceError');
+            const offerPrice = document.getElementById('offerPrice');
+            if (!offerPriceVal) {
+                errorField.style.display = 'block';
+                errorField.innerHTML = 'Enter the offer price';
+                offerPrice.focus();
+                return false
+            }
+
+            errorField.style.display = 'none'; // Hide the error if valid
+            return true; // Allow form submission
+        }
+
+        //Colour Validation
+        function validateColour(colourVal) {
+            console.log('inside validate')
+            const minLength = 3;
+            const maxLength = 30;
+            const colourError = document.getElementById('colourError')
+
+            console.log("name value is :", colourVal)
+
+            if (colourVal.trim() === '') {
+                colourError.style.display = 'block';
+                colourError.innerHTML = 'This Field is required';
+            } else if (colourVal.length < minLength || colourVal.length > maxLength) {
+                colourError.style.display = 'block';
+                colourError.innerHTML = `Field value must be between ${minLength} and ${maxLength} characters`;
+            } else if (!/^[A-Za-z]/.test(colourVal)) {
+                colourError.style.display = 'block';
+                colourError.innerHTML = 'Field value must start with a letter.';
+            } else if (!/^[A-Za-z\s]+$/.test(colourVal)) {
+                colourError.style.display = 'block';
+                colourError.innerHTML = 'Field value can only contain letters and spaces.';
+            } else {
+                colourError.style.display = 'none';
+                colourError.innerHTML = '';
+            }
+        }
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
-            console.log('name is:', name.value)
-            validateProductName(name.value)
-            validateProductDescription(description.value)
-            const options = {
-                name: name.value,
-                description: description.value,
-                category: category.value,
-                subcategory: subcategory.value,
-                stock: stock.value,
-                price: price.value,
-                offerPrice: offerPrice.value,
-                colour: colour.value,
-                images: images.value,
-                taxId: taxId.value,
-                status: status.value
+            console.log("array is ", array)
+            // validateProductName(name.value)
+            // validateProductDescription(description.value)
+            // validateCategory(category.value)
+            // validateSubCategory(subcategory.value);
+            // validateStock(stock.value)
+            // validatePrice(price.value)
+            // validateOfferPrice(offerPrice.value)
+            // validateColour(colour.value)
+            console.log('befor form')
+            let image1 = document.getElementById("images-1").files[0]
+            console.log(image1)
+            //form data
+            const formData = new FormData();
+            console.log('after form1')
+            formData.append('name', name.value);
+            formData.append('description', description.value)
+            formData.append('category', category.value)
+            formData.append('subcategory', subcategory.value)
+            formData.append('price', price.value)
+            formData.append('offerPrice', offerPrice.value)
+            formData.append('colour', colour.value)
+            formData.append('taxId', taxId.value)
+            formData.append('status', status.value)
+            formData.append('varient', array)
+            console.log("varient array is:", array);
+
+            array.forEach((obj, index) => {
+                formData.append(`variant[${index}][size]`, obj.size);
+                formData.append(`variant[${index}][price]`, obj.price);
+                formData.append(`variant[${index}][stock]`, obj.stock);
+            });
+
+
+            console.log("varient array ... is:", formData.get('varient'))
+            // formData.append("image", image1);
+            const imageInputs = [
+                document.getElementById('images-1'),
+                document.getElementById('images-2'),
+                document.getElementById('images-3'),
+                document.getElementById('images-4'),
+            ];
+            imageInputs.forEach((input, index) => {
+                const files = input.files;
+                for (let i = 0; i < files.length; i++) {
+                    formData.append(`images`, files[i]);
+                }
+            });
+
+            //Console form data
+            for (let [key, value] of formData.entries()) {
+                console.log(key + ': ', value);
             }
+            //form data end
+
+            console.log('to post')
             fetch('/admin/addProduct', {
                 method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(options)
-            })
+                body: formData
+            }).then(res=>res.json())
+        .then(data => {
+          console.log("inside swal")
+            Swal.fire({
+              title: 'Success!',
+              text: 'Category Edited successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then(() => {
+              console.log('reloading page....')
+                window.location.reload(); // Reload the page after success
+              });
+          })
+          .catch(err => {
+            console.error('Error:', err);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to Edit category.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          });
+            
+
+
+            console.log('then post')
 
         })
 
 
 
 
+    </script>
+    <script>
+        let array = [];
+
+        document.getElementById("saveProductChanges").addEventListener("click", () => {
+
+
+            let obj = {
+                size: document.getElementById("varientSize").value,
+                stock: document.getElementById("varientStock").value,
+                price: document.getElementById("varientPrice").value
+            }
+            console.log(obj);
+
+            array.push(obj)
+            saveChanges()
+
+        })
+
+
+
+        function saveChanges() {
+
+            let tbody = document.getElementById("tbody")
+            tbody.innerHTML = ''
+            array.map((item) => {
+
+                let element = `
+                    <tr>
+                        <td>${item.size}</td>
+                        <td>${item.stock}</td>
+                        <td>$${item.price}.00</td>
+                        <td>
+                            <span class="badge rounded-pill alert-success">Added</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm"
+                                onclick="deleteItem()">Delete</button>
+                        </td>
+                    </tr>
+                `
+                tbody.innerHTML += element
+            })
+        }
+
+    </script>
+    <script>
+        for (let i = 1; i <= 4; i++) {
+            const imageInput = document.getElementById(`images-${i}`);
+            const previewDiv = document.getElementById(`preview-${i}`);
+
+            // Display uploaded image
+            imageInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; max-height: 150px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDiv.innerHTML = "No image uploaded";
+                }
+            });
+        }
     </script>
     </body>
 
