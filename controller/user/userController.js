@@ -10,7 +10,7 @@ const env = require("dotenv").config()
 
 const loadSignup = async (req, res) => {
     try {
-        res.render('signup')
+        res.render('signup',{message:""})
     } catch (error) {
         console.log('sign up page not found');
         res.status(500).send('Server error')
@@ -241,14 +241,14 @@ const loadHomePage = async (req, res) => {
             const userData = await User.findOne({ _id: user });
             console.log("userData is :",userData.name)
             console.log("hai home")
-            res.render('home', { user: userData});
+            res.render('home', { user: userData,activePage:'home'});
         } else if(googleUser){
             console.log("google user:",googleUser)
-            res.render('home', { user: googleUser});
+            res.render('home', { user: googleUser,activePage:'home'});
         }else {
             console.log("hai home iiii")
             console.log("userData is :",user)
-            return res.render('home',{user})
+            return res.render('home',{user,activePage:'home'})
         }
 
     } catch (error) {

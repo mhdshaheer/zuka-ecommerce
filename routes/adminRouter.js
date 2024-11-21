@@ -21,6 +21,7 @@ router.post("/login",adminController.login);
 
 //Customer management
 router.get('/users',adminAuth,customerController.customerInfo)
+// router.get('/users',adminAuth,customerController.customerInfo)
 router.get('/blockUser',adminAuth,customerController.blockUser)
 router.get('/unBlockUser',adminAuth,customerController.unBlockUser);
 
@@ -36,6 +37,11 @@ router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
 //Product management
 router.get('/products',adminAuth,productController.loadProduct);
 router.post('/addProduct',adminAuth,upload.array('images', 4),productController.addProduct)
+router.get('/productList',adminAuth,productController.productList)
+router.delete('/deleteProduct/:id',adminAuth,productController.deleteProduct)
+router.put('/editProduct/:id',adminAuth,productController.editProduct);
+router.get('/blockProduct',adminAuth,productController.blockProduct)
+router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
 
 
 module.exports = router;

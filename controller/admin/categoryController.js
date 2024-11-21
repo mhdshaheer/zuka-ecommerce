@@ -3,6 +3,7 @@ const { updateOne } = require("../../models/userSchema");
 
 
 const categoryInfo = async (req, res) => {
+    if(req.session.admin){
     try {
 
         const page = parseInt(req.query.page) || 1;
@@ -27,6 +28,9 @@ const categoryInfo = async (req, res) => {
         console.log('error in admin category page...', error);
         res.redirect('/admin/admin-error');
     }
+}else{
+    res.redirect('/admin/login')
+}
 }
 
 const addCategory = async (req, res) => {
@@ -96,25 +100,29 @@ const removeOffer = async (req, res) => {
 }
 
 const editCategory = async (req, res) => {
-    try {
-        console.log('category details:', req.body)
-        const { name, description,isListed } = req.body
-        const {id}=req.params;
-        let updatedFields = {isListed}
-        if (name !== undefined && name.trim() !== '') updatedFields.name = name;
-        if (description !== undefined && description.trim() !== '') updatedFields.description = description;
-        // if (isListed !== undefined && isListed.trim() !== '') updatedFields.isListed = isListed;
+    if (req.session.admin) {
+        try {
 
-        const updateCategory = await Category.findOneAndUpdate({_id:id},updatedFields,{new:true})
+            console.log('category details:', req.body)
+            const { name, description, isListed } = req.body
+            const { id } = req.params;
+            let updatedFields = { isListed }
+            if (name !== undefined && name.trim() !== '') updatedFields.name = name;
+            if (description !== undefined && description.trim() !== '') updatedFields.description = description;
 
-        if (!updateCategory ) {
-            return res.status(404).json({ message: 'Category not found' });
+            const updateCategory = await Category.findOneAndUpdate({ _id: id }, updatedFields, { new: true })
+
+            if (!updateCategory) {
+                return res.status(404).json({ message: 'Category not found' });
+            }
+            res.status(201).json({ message: 'Edit successfull' })
+            console.log('category updated successfully', updateCategory)
+        } catch (error) {
+            console.error('Error updating category:', error);
+            res.status(500).json({ message: 'Failed to update category', error });
         }
-        res.status(201).json({ message: 'Edit successfull' })
-        console.log('category updated successfully',updateCategory)
-    } catch (error) {
-        console.error('Error updating category:', error);
-        res.status(500).json({ message: 'Failed to update category', error });
+    } else {
+        res.redirect('/admin/login')
     }
 }
 

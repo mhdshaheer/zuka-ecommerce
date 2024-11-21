@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controller/user/userController');
+const shopController = require('../controller/user/shopController')
 const passport = require('passport');
 
 
@@ -20,6 +21,12 @@ router.get("/auth/google",passport.authenticate('google',{scope:['profile','emai
 router.get('/auth/google/callback',passport.authenticate('google',{failureRedirect:'/signup'}),(req,res)=>{
     res.redirect('/');
 })
+
+//shop
+
+router.get('/shop',shopController.loadShop)
+router.get('/productInfo',shopController.loadProductInfo)
+// router.post('/productInfo/:id',shopController.productInfo)
 
 
 module.exports = router;

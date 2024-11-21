@@ -17,7 +17,7 @@
                 <header class="card-header">
                     <div class="row gx-3">
                         <div class="col-lg-4 col-md-6 me-auto">
-                            <input type="text" placeholder="Search..." class="form-control" />
+                            <input type="text" id="searchId" placeholder="Search..." class="form-control" />
                         </div>
                         <div class="col-lg-2 col-md-3 col-6">
                             <select class="form-select">
@@ -141,6 +141,12 @@
             var result = confirm("Are you sure you want to unblock this user?");
             return result;
         }
+
+        // const search = document.getElementById('searchId');
+        // search.addEventListener('input',(e)=>{
+        //     let searchQuery= search.value
+        //     fetch(`/admin/users?search=${encodeURIComponent(searchQuery)}`)
+        // })
 
     </script>
 

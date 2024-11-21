@@ -67,6 +67,9 @@
     position: relative;
     z-index: 500;
 }
+a{
+    text-decoration: none;
+}
 
 </style>
 
@@ -157,9 +160,9 @@
                 <div class="col-lg-6 col-md-6">
                     <nav class="header__menu mobile-menu">
                         <ul>
-                            <li class="active"><a href="./index.html">Home</a></li>
-                            <li><a href="./shop.html">Shop</a></li>
-                            <li><a href="#">Pages</a>
+                            <li class="<%= activePage === 'home' ? 'active' : '' %>"><a href="/">Home</a></li>
+                            <li class="<%= activePage === 'shop' ? 'active' : '' %>"><a href="/shop">Shop</a></li>
+                            <li ><a href="#">Pages</a>
                                 <ul class="dropdown">
                                     <li><a href="./about.html">About Us</a></li>
                                     <li><a href="./shop-details.html">Shop Details</a></li>
