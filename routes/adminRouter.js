@@ -42,6 +42,7 @@ router.delete('/deleteProduct/:id',adminAuth,productController.deleteProduct)
 router.put('/editProduct/:id',adminAuth,productController.editProduct);
 router.get('/blockProduct',adminAuth,productController.blockProduct)
 router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
+router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productController.updateImages)
 
 
 module.exports = router;

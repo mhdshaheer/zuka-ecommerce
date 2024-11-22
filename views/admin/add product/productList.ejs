@@ -63,7 +63,7 @@
                                 <th scope="col">Date</th>
                                 <th scope="col">Actions</th>
                                 <th scope="col">Change Image</th>
-                                <th scope="col">Block/Unblock</th>
+                                <th scope="col">Hide/Unhide</th>
                                 <th scope="col">Delete</th>
                             </tr>
                         </thead>
@@ -101,21 +101,26 @@
                                                         onclick="productEdit('<%=products[i]._id%>')">Edit</a>
                                                 </td>
                                                 <td>
-                                                    <a href="#" type="button" class="btn btn-primary" onclick="imageEdit('<%=products[i]._id%>')">Change</a>
+                                                    <a href="#" type="button" class="btn btn-primary"
+                                                        onclick="imageEdit('<%=products[i]._id%>')">Change</a>
                                                 </td>
                                                 <%if(products[i].isBlocked){%>
-                                                <td>
-                                                    <a href="/admin/unBlockProduct?id=<%=products[i]._id%>" type="button" class="btn btn-warning" onclick="return confirmUnBlock()">Unblock</a>
-                                                </td>
-                                                <%}else{%>
                                                     <td>
-                                                        <a href="/admin/blockProduct?id=<%=products[i]._id%>" type="button" class="btn btn-danger" onclick="return confirmBlock()">Block</a>
+                                                        <a href="/admin/unBlockProduct?id=<%=products[i]._id%>"
+                                                            type="button" class="btn btn-warning"
+                                                            onclick="return confirmUnBlock()">Unhide</a>
                                                     </td>
-                                                <%}%>
-                                                <td>
-                                                    <a href="#" class="btn btn-sm btn-danger" id="deleteBtn"
-                                                        onclick="deleteProduct('<%=products[i]._id%>')">Delete</a>
-                                                </td>
+                                                    <%}else{%>
+                                                        <td>
+                                                            <a href="/admin/blockProduct?id=<%=products[i]._id%>"
+                                                                type="button" class="btn btn-danger"
+                                                                onclick="return confirmBlock()">Hide</a>
+                                                        </td>
+                                                        <%}%>
+                                                            <td>
+                                                                <a href="#" class="btn btn-sm btn-danger" id="deleteBtn"
+                                                                    onclick="deleteProduct('<%=products[i]._id%>')">Delete</a>
+                                                            </td>
                                 </tr>
                                 <%}%>
                         </tbody>
@@ -129,14 +134,25 @@
         <div class="pagination-area mt-30 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
-                    <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                    <li class="page-item"><a class="page-link" href="#">02</a></li>
-                    <li class="page-item"><a class="page-link" href="#">03</a></li>
-                    <li class="page-item"><a class="page-link dot" href="#">...</a></li>
-                    <li class="page-item"><a class="page-link" href="#">16</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                    </li>
+                    <% if (currentPage> 1) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                        </li>
+                        <% } %>
+
+                            <% for (let i=1; i <=totalPages; i++) { %>
+                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                    <a class="page-link" href="?page=<%= i %>">
+                                        <%= i %>
+                                    </a>
+                                </li>
+                                <% } %>
+
+                                    <% if (currentPage < totalPages) { %>
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                                        </li>
+                                        <% } %>
                 </ul>
             </nav>
         </div>
@@ -278,23 +294,23 @@
                     </div>
 
                     <!-- Status Change Dropdown -->
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
                         <select class="form-select" id="status">
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
                             <option value="archived">Archived</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <!-- Variant Change Button -->
-                    <div class="mb-3 text-end">
+                    <!-- <div class="mb-3 text-end">
                         <button type="button" class="btn btn-warning" id="variantChangeButton">Change Variant</button>
                     </div>
-                </div>
+                </div> -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-primary" id="updateImageId">Update Images</button>
                 </div>
             </div>
         </div>
@@ -303,6 +319,7 @@
 
 
     <script>
+        // delete product
         function deleteProduct(id) {
             console.log("delete function")
             if (confirm('Are you sure you want to delete this category?')) {
@@ -321,6 +338,7 @@
             }
         }
 
+        //edit product
         function productEdit(id) {
             var modal = new bootstrap.Modal(document.getElementById('productModal'));
             modal.show();
@@ -336,59 +354,117 @@
                 const color = document.getElementById('color');
                 console.log(productName.value)
                 const options = {
-                    productName:productName.value,
-                    description:description.value,
-                    category:category.value,
-                    regularPrice:regularPrice.value,
-                    offerPrice:offerPrice.value,
-                    totalStocks:totalStocks.value,
-                    color:color.value
+                    productName: productName.value,
+                    description: description.value,
+                    category: category.value,
+                    regularPrice: regularPrice.value,
+                    offerPrice: offerPrice.value,
+                    totalStocks: totalStocks.value,
+                    color: color.value
                 }
-                fetch(`/admin/editProduct/${id}`,{
-                    method:"PUT",
-                    headers:{
-                        'Content-Type':'application/json'
+                fetch(`/admin/editProduct/${id}`, {
+                    method: "PUT",
+                    headers: {
+                        'Content-Type': 'application/json'
                     },
-                    body:JSON.stringify(options)
+                    body: JSON.stringify(options)
                 })
-                .then(res=>res.json())
-        .then(data => {
-          console.log("inside swal")
-            Swal.fire({
-              title: 'Success!',
-              text: 'Product Edited successfully!',
-              icon: 'success',
-              confirmButtonText: 'Okay'
-            }).then(() => {
-              console.log('reloading page....')
-                window.location.reload(); // Reload the page after success
-              });
-          })
-          .catch(err => {
-            console.error('Error:', err);
-            Swal.fire({
-              title: 'Error!',
-              text: 'Failed to Edit Product.',
-              icon: 'error',
-              confirmButtonText: 'Okay'
-            });
-          });
+                    .then(res => res.json())
+                    .then(data => {
+                        console.log("inside swal")
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product Edited successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(() => {
+                            console.log('reloading page....')
+                            window.location.reload(); // Reload the page after success
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to Edit Product.',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    });
             })
         }
-    
+
+        //block product confirmation
         function confirmBlock() {
             var result = confirm("Are you sure you want to block this Product?");
             return result;
         }
+        
+        //unblock product confirmation
         function confirmUnBlock() {
             var result = confirm("Are you sure you want to unblock this Product?");
             return result;
         }
 
+        //Update product images
         function imageEdit(id){
             var modal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
             modal.show();
+            const updateBtn = document.getElementById('updateImageId')
+            updateBtn.addEventListener('click',(e)=>{
+                e.preventDefault()
+                const formData = new FormData();
+                const imageInputs = [
+                            document.getElementById('image1'),
+                            document.getElementById('image2'),
+                            document.getElementById('image3'),
+                            document.getElementById('image4'),
+                        ];
+                        imageInputs.forEach((input, index) => {
+                            const files = input.files;
+                            for (let i = 0; i < files.length; i++) {
+                                formData.append(`images`, files[i]);
+                            }
+                        });
+        
+                        //Console form data
+                        for (let [key, value] of formData.entries()) {
+                            console.log(key + ': ', value);
+                        }
+                        console.log("id is..",id)
+                        fetch(`/admin/updateImages/${id}`,{
+                            method:'POST',
+                            body:formData
+                        })
+                        .then(res => res.json())
+                    .then(data => {
+                        console.log("inside swal")
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Product Image Updated successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(() => {
+                            console.log('reloading page....')
+                            window.location.reload(); // Reload the page after success
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to Update Images.',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    });
+            })
+          
+    
+            
         }
+
+
     </script>
 
     <script>

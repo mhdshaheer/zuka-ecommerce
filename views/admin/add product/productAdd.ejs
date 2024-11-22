@@ -1,4 +1,10 @@
 <%-include('../../views/partials/admin/adminHeader')%>
+
+<!-- CSS -->
+<link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet">
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -55,7 +61,7 @@
                                             </div>
                                             <!-- col.// -->
                                         </div>
-                                        <div class="row mb-4">
+                                        <!-- <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Sub Categories</label>
                                             <div class="col-lg-9">
                                                 <select id="subcategory" name="subcategory" class="form-control"
@@ -68,17 +74,15 @@
                                                 </select>
                                                 <div id="subCategoryError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
-                                        </div>
-                                        <div class="row mb-4">
+                                        </div> -->
+                                        <!-- <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Total Stocks</label>
                                             <div class="col-lg-4">
                                                 <input type="number" id="stock" name="stock" class="form-control"
                                                     placeholder="Eg:123" />
                                                 <div id="stocksError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
-                                        </div>
+                                        </div> -->
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Price</label>
                                             <div class="col-lg-4">
@@ -128,7 +132,7 @@
                                                     <!-- Image Upload 2 -->
                                                     <div class="d-flex align-items-center mb-4" id="image-container-2">
                                                         <input id="images-2" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                            name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-2"
                                                             style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
                                                             No image uploaded
@@ -140,7 +144,7 @@
                                                     <!-- Image Upload 3 -->
                                                     <div class="d-flex align-items-center mb-4" id="image-container-3">
                                                         <input id="images-3" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                            name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-3"
                                                             style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
                                                             No image uploaded
@@ -152,7 +156,7 @@
                                                     <!-- Image Upload 4 -->
                                                     <div class="d-flex align-items-center mb-4" id="image-container-4">
                                                         <input id="images-4" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                            name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-4"
                                                             style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
                                                             No image uploaded
@@ -219,13 +223,12 @@
                                         <hr>
                                         <br>
 
-                                        <div class="row mb-4">
+                                        <!-- <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Tax ID</label>
                                             <div class="col-lg-4">
                                                 <input type="number" id="taxId" name="taxId" class="form-control"
                                                     placeholder="012345678" value="0" />
                                             </div>
-                                            <!-- col.// -->
                                         </div>
 
                                         <div class="row mb-4">
@@ -234,7 +237,6 @@
                                                 <input type="text" id="taxRate" name="taxRate" class="form-control"
                                                     placeholder="Type here" value="0" />
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Related tags</label>
@@ -242,10 +244,9 @@
                                                 <input type="text" id="tags" name="tags" class="form-control"
                                                     placeholder="Eg: #sports" />
                                             </div>
-                                            <!-- col.// -->
-                                        </div>
+                                        </div> -->
 
-                                        <div class="row mb-4">
+                                        <!-- <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Status</label>
                                             <div class="col-lg-9">
                                                 <label class="form-check my-2">
@@ -253,9 +254,8 @@
                                                         class="form-check-input" checked="" />
                                                     <span class="form-check-label">Enable this product </span>
                                                 </label>
-                                            </div>
-                                            <!-- col.// -->
-                                        </div>
+                                            </div>>
+                                        </div> -->
                                         <!-- row.// -->
                                         <br />
                                         <button class="btn btn-primary" type="submit">Continue to next</button>
@@ -375,21 +375,27 @@
             if (nameVal.trim() == '') {
                 productError.style.display = 'block';
                 productError.innerHTML = 'Product name is required';
+                return false
             } else if (nameVal.length < minLength || nameVal.length > maxLength) {
                 productError.style.display = 'block';
                 productError.innerHTML = `Product name must be between ${minLength} and ${maxLength} characters`;
+                return false
             } else if (!validLetter.test(nameVal)) {
                 productError.style.display = 'block';
                 productError.innerHTML = 'Product name must start with a letter.';
+                return false
             } else if (!validCharsPattern.test(nameVal)) {
                 productError.style.display = 'block';
                 productError.innerHTML = 'Product name can only contain letters, numbers, and spaces.';
+                return false
             } else if (!validPattern.test(nameVal)) {
                 productError.style.display = 'block';
                 productError.innerHTML = 'Product name can only contain letters, numbers, and spaces';
+                return false
             } else {
                 productError.style.display = 'none';
                 productError.innerHTML = '';
+                return true
             }
         }
 
@@ -401,15 +407,19 @@
             if (descVal.trim() == '') {
                 errorElement.style.display = 'block'
                 errorElement.innerHTML = 'Description cannot be empty.';
+                return false
             } else if (descVal.trim().length < 10) {
                 errorElement.style.display = 'block'
                 errorElement.innerHTML = 'Description must be at least 10 characters long.';
+                return false
             } else if (descVal.trim().length > 300) {
                 errorElement.style.display = 'block'
                 errorElement.innerHTML = 'Description cannot exceed 300 characters.';
+                return false
             } else {
                 errorElement.style.display = 'none'
                 errorElement.innerHTML = '';
+                return true
             }
         }
 
@@ -493,108 +503,116 @@
             if (colourVal.trim() === '') {
                 colourError.style.display = 'block';
                 colourError.innerHTML = 'This Field is required';
+                return false
             } else if (colourVal.length < minLength || colourVal.length > maxLength) {
                 colourError.style.display = 'block';
                 colourError.innerHTML = `Field value must be between ${minLength} and ${maxLength} characters`;
+                return false
             } else if (!/^[A-Za-z]/.test(colourVal)) {
                 colourError.style.display = 'block';
                 colourError.innerHTML = 'Field value must start with a letter.';
+                return false
             } else if (!/^[A-Za-z\s]+$/.test(colourVal)) {
                 colourError.style.display = 'block';
                 colourError.innerHTML = 'Field value can only contain letters and spaces.';
+                return false
             } else {
                 colourError.style.display = 'none';
                 colourError.innerHTML = '';
+                return true
             }
         }
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
             console.log("array is ", array)
-            // validateProductName(name.value)
-            // validateProductDescription(description.value)
-            // validateCategory(category.value)
-            // validateSubCategory(subcategory.value);
-            // validateStock(stock.value)
-            // validatePrice(price.value)
-            // validateOfferPrice(offerPrice.value)
-            // validateColour(colour.value)
-            console.log('befor form')
-            let image1 = document.getElementById("images-1").files[0]
-            console.log(image1)
-            //form data
-            const formData = new FormData();
-            console.log('after form1')
-            formData.append('name', name.value);
-            formData.append('description', description.value)
-            formData.append('category', category.value)
-            formData.append('subcategory', subcategory.value)
-            formData.append('price', price.value)
-            formData.append('offerPrice', offerPrice.value)
-            formData.append('colour', colour.value)
-            formData.append('taxId', taxId.value)
-            formData.append('status', status.value)
-            formData.append('varient', array)
-            console.log("varient array is:", array);
-
-            array.forEach((obj, index) => {
-                formData.append(`variant[${index}][size]`, obj.size);
-                formData.append(`variant[${index}][price]`, obj.price);
-                formData.append(`variant[${index}][stock]`, obj.stock);
-            });
-
-
-            console.log("varient array ... is:", formData.get('varient'))
-            // formData.append("image", image1);
-            const imageInputs = [
-                document.getElementById('images-1'),
-                document.getElementById('images-2'),
-                document.getElementById('images-3'),
-                document.getElementById('images-4'),
-            ];
-            imageInputs.forEach((input, index) => {
-                const files = input.files;
-                for (let i = 0; i < files.length; i++) {
-                    formData.append(`images`, files[i]);
+            function validateAll() {
+                if (
+                    !validateProductName(name.value) ||
+                    !validateProductDescription(description.value) ||
+                    !validateCategory(category.value) ||
+                    // !validateSubCategory(subcategory.value) ||
+                    !validatePrice(price.value) ||
+                    !validateOfferPrice(offerPrice.value) ||
+                    !validateColour(colour.value)
+                ) {
+                    return false
                 }
-            });
-
-            //Console form data
-            for (let [key, value] of formData.entries()) {
-                console.log(key + ': ', value);
+                return true
             }
-            //form data end
+            console.log('before form')
+            if (validateAll()) {
+                let image1 = document.getElementById("images-1").files[0]
+                console.log(image1)
+                //form data
+                const formData = new FormData();
+                console.log('after form1')
+                formData.append('name', name.value);
+                formData.append('description', description.value)
+                formData.append('category', category.value)
+                // formData.append('subcategory', subcategory.value)
+                formData.append('price', price.value)
+                formData.append('offerPrice', offerPrice.value)
+                formData.append('colour', colour.value)
+                // formData.append('taxId', taxId.value)
+                // formData.append('status', status.value)
+                formData.append('varient', array)
+                console.log("varient array is:", array);
 
-            console.log('to post')
-            fetch('/admin/addProduct', {
-                method: "POST",
-                body: formData
-            }).then(res=>res.json())
-        .then(data => {
-          console.log("inside swal")
-            Swal.fire({
-              title: 'Success!',
-              text: 'Category Edited successfully!',
-              icon: 'success',
-              confirmButtonText: 'Okay'
-            }).then(() => {
-              console.log('reloading page....')
-                window.location.reload(); // Reload the page after success
-              });
-          })
-          .catch(err => {
-            console.error('Error:', err);
-            Swal.fire({
-              title: 'Error!',
-              text: 'Failed to Edit category.',
-              icon: 'error',
-              confirmButtonText: 'Okay'
-            });
-          });
-            
+                array.forEach((obj, index) => {
+                    formData.append(`variant[${index}][size]`, obj.size);
+                    formData.append(`variant[${index}][price]`, obj.price);
+                    formData.append(`variant[${index}][stock]`, obj.stock);
+                });
 
 
-            console.log('then post')
+                console.log("varient array ... is:", formData.get('varient'))
+                // formData.append("image", image1);
+                const imageInputs = [
+                    document.getElementById('images-1'),
+                    document.getElementById('images-2'),
+                    document.getElementById('images-3'),
+                    document.getElementById('images-4'),
+                ];
+                imageInputs.forEach((input, index) => {
+                    const files = input.files;
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append(`images`, files[i]);
+                    }
+                });
 
+                //Console form data
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ': ', value);
+                }
+                //form data end
+
+                console.log('to post')
+                fetch('/admin/addProduct', {
+                    method: "POST",
+                    body: formData
+                }).then(res => res.json())
+                    .then(data => {
+                        console.log("inside swal")
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Category Edited successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(() => {
+                            console.log('reloading page....')
+                            window.location.reload(); // Reload the page after success
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Failed to Edit category.',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    });
+            }
         })
 
 

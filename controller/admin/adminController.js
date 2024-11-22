@@ -11,7 +11,8 @@ const loadLogin = async (req, res) => {
             return res.redirect('/admin/dashboard');
         }
         console.log("before render of admin login")
-        res.render('admin-login')
+
+        res.render('admin-login',{message:"Incorrect username or password"})
         console.log("after render of admin login")
     } catch (error) {
         console.log("admin render error")
@@ -26,7 +27,8 @@ const login = async (req, res) => {
         console.log("admin login 1 : ", admin)
         if (admin) {
             console.log("admin passcheck...")
-            const passwordMatch = bcrypt.compare(password, admin.password);
+            const passwordMatch = await bcrypt.compare(password, admin.password);
+            console.log(passwordMatch)
             if (passwordMatch) {
                 req.session.admin = true;
                 return res.redirect('/admin/dashboard')

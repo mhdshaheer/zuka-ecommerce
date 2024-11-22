@@ -2,7 +2,7 @@ const User = require('../../models/userSchema');
 
 const customerInfo = async (req, res) => {
 
-    // if (req.session.admin) {
+    if (req.session.admin) {
         try {
             let search = '';
             if (req.query.search) {
@@ -44,9 +44,9 @@ const customerInfo = async (req, res) => {
         } catch (error) {
             console.log("error in customer page", error);
         }
-    // } else {
-    //     res.redirect('/admin/login')
-    // }
+    } else {
+        res.redirect('/admin/login')
+    }
 }
 
 const blockUser = async (req, res) => {

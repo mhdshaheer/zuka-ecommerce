@@ -37,9 +37,10 @@ const addCategory = async (req, res) => {
     try {
         console.log('data from frontend : ', req.body)
         const { name, description } = req.body;
+        
         const existingCategory = await Category.findOne({ name });
         if (existingCategory) {
-            return res.status(400).json({ erorr: "Category already exists" });
+            return res.status(409).json({ error: "409" });
         }
         const newCategory = new Category({
             name,
@@ -106,6 +107,7 @@ const editCategory = async (req, res) => {
             console.log('category details:', req.body)
             const { name, description, isListed } = req.body
             const { id } = req.params;
+            
             let updatedFields = { isListed }
             if (name !== undefined && name.trim() !== '') updatedFields.name = name;
             if (description !== undefined && description.trim() !== '') updatedFields.description = description;

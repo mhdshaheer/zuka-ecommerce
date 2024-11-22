@@ -1,0 +1,174 @@
+<%-include('../partials/user/header')%>
+
+<style>
+    .categories-text {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  /* padding-top: 5px; */
+  /* padding-bottom: 1px; */
+  color: rgb(122, 121, 121);
+  
+  font-family: Arial, sans-serif;
+}
+.categories-text:hover{
+    color: black;
+}
+.form-container {
+      background-color: #ffffff; /* White background for the form */
+      padding: 30px;
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for a floating effect */
+      max-width: 600px;
+      margin: 50px auto; /* Center the form on the page */
+    }
+    .form-label {
+      font-weight: 500; /* Slightly bolder text for labels */
+      color: #495057; /* Subtle dark gray color for labels */
+    }
+    .form-control {
+      border-radius: 8px; /* Rounded input fields */
+      border: 1px solid #ced4da; /* Light border */
+    }
+    .form-control:focus {
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Blue glow on focus */
+      border-color: #80bdff; /* Blue border on focus */
+    }
+    .edit-btn {
+      border-radius: 8px; /* Rounded button */
+      background-color: #c08a27; /* Vibrant blue button */
+      border: none;
+    }
+    .edit-btn:hover {
+      background-color: #6b4705; /* Darker blue on hover */
+    }
+</style>
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="breadcrumb__text">
+                <div class="breadcrumb__links">
+                    <a href="/">Home</a>
+                    <span>Profile</span>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="shop__sidebar">
+                        <div class="shop__sidebar__search">
+                            <form action="#">
+                                <input type="text" placeholder="Search...">
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                        </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text active">
+                                        <a>Personal Info</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                        <a>Address</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                        <a>Orders</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                        <a>Wallet</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                        <a>My Reviews</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="container">
+                        <div class="form-container">
+                          <!-- Heading -->
+                          <h3 class="mb-4 text-center">Account Details</h3>
+                          <p class="text-center text-muted">Update your profile</p>
+                    
+                          <!-- Form -->
+                          <form>
+                            <!-- Name Field -->
+                            <div class="row mb-4 align-items-center">
+                              <div class="col-sm-3">
+                                <label for="name" class="form-label">Name:</label>
+                              </div>
+                              <div class="col-sm-9">
+                                <input type="text" class="form-control" id="name" placeholder="Enter your name" value="Shaheer">
+                              </div>
+                            </div>
+                    
+                            <!-- Email Field -->
+                            <div class="row mb-4 align-items-center">
+                              <div class="col-sm-3">
+                                <label for="email" class="form-label">Email:</label>
+                              </div>
+                              <div class="col-sm-9">
+                                <input type="email" class="form-control" id="email" placeholder="Enter your email" value="shaheer@gmail,com">
+                              </div>
+                            </div>
+                    
+                            <!-- Password Field -->
+                            <div class="row mb-4 align-items-center">
+                              <div class="col-sm-3">
+                                <label for="password" class="form-label">Password:</label>
+                              </div>
+                              <div class="col-sm-9">
+                                <input type="password" class="form-control" id="password" placeholder="Enter your password" value="shaheer@123">
+                              </div>
+                            </div>
+                    
+                            <!-- Button -->
+                            <div class="text-center">
+                              <button type="button" class="btn btn-warning edit-btn px-4 py-2 mx-3"> Edit</button>
+                              <button type="button" class="btn btn-danger px-4 py-2 mx-3">Delete</button>
+                            </div>
+                            
+                          </form>
+                        </div>
+                      </div>
+            </div>
+
+    <!-- Footer Section End -->
+
+    <!-- Search Begin -->
+    <div class="search-model">
+        <div class="h-100 d-flex align-items-center justify-content-center">
+            <div class="search-close-switch">+</div>
+            <form class="search-model-form">
+                <input type="text" id="search-input" placeholder="Search here.....">
+            </form>
+        </div>
+    </div>
+    <!-- Search End -->
+
+    <!-- Js Plugins -->
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.nice-select.min.js"></script>
+    <script src="js/jquery.nicescroll.min.js"></script>
+    <script src="js/jquery.magnific-popup.min.js"></script>
+    <script src="js/jquery.countdown.min.js"></script>
+    <script src="js/jquery.slicknav.js"></script>
+    <script src="js/mixitup.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

@@ -6,6 +6,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="/css/signup.css"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
   </head>
+  <style>
+    .inputPass{
+      width: 333px;
+      
+    }
+    .password-toggle {
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+  </style>
   <body>
     <div class="main">
       <div class="container a-container" id="a-container">
@@ -15,7 +25,12 @@
            <div style="color: red;">
            <p><%=message%></p> 
           </div>
-          <input class="form__input" type="password" placeholder="Password" name="password">
+          <div>
+            <input class="form__input inputPass" type="password" placeholder="Password" name="password" id="password">
+            <span>
+              <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+            </span>
+          </div>
           <div style="color: red;">
             <p><%=message%></p> 
            </div>
@@ -43,9 +58,22 @@
 
       </div>
     </div>
-    <script src="main.js"></script>
+    <!-- <script src="main.js"></script> -->
 
+    <script>
+      const passwordToggle = document.getElementById('passwordToggle');
+      const passwordField = document.getElementById('password');
 
+      passwordToggle.addEventListener('click', () => {
+          // Toggle the type attribute of the password field
+          const type = passwordField.type === 'password' ? 'text' : 'password';
+          passwordField.type = type;
+
+          // Toggle the icon between eye and eye-slash
+          passwordToggle.classList.toggle('fa-eye');
+          passwordToggle.classList.toggle('fa-eye-slash');
+      });
+  </script>
 
   </body>
 </html>

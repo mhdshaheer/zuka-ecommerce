@@ -217,9 +217,10 @@ const verifyOtp = async (req, res) => {
 
             console.log("Added to database...")
 
-            req.session.user = saveUserData._id;
+            req.session.user = saveUserData;
 
             res.json({ success: true, redirectUrl: "/" });
+           
             console.log("redirected to home ")
         } else {
             res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
@@ -236,10 +237,14 @@ const loadHomePage = async (req, res) => {
     try {
         const googleUser = req.user;
         const user = req.session.user;
-        console.log('loaduser : ', user)
+        console.log("home user:",user)
+        if(user?.isBlocked ==true){
+            return res.redirect('/login')
+        }
         if (user) {
-            const userData = await User.findOne({ _id: user });
-            console.log("userData is :",userData.name)
+            const userData = await User.findOne({ _id: user._id });
+            console.log(userData)
+            console.log("userData is :",userData?.name)
             console.log("hai home")
             res.render('home', { user: userData,activePage:'home'});
         } else if(googleUser){
@@ -271,6 +276,14 @@ const pageNotFound = async (req, res) => {
 //================= end =============================
 
 
+const loadProfile = async (req,res)=>{
+    try {
+        res.render('profile',{activePage:''})
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     loadSignup,
     loadLogin,
@@ -280,6 +293,7 @@ module.exports = {
     resentOtp,
     login,
     logout,
-    signup
+    signup,
+    loadProfile
 
 }

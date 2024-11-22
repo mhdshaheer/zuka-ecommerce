@@ -10,7 +10,16 @@
   <link rel="stylesheet" type="text/css" href="/css/signup.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
-
+<style>
+  .inputPass{
+      width: 333px;
+      
+    }
+  .password-toggle {
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+</style>
 <body>
   <div class="main">
     <div class="container a-container" id="a-container">
@@ -21,10 +30,19 @@
         <div id="error_1" class="error-message"></div>
         <input class="form__input" type="text" placeholder="Email" name="email" id="email">
         <div id="error_2" class="error-message"></div>
-        <input class="form__input" type="password" placeholder="Password" name="password" id="password">
+        <div>
+          <input class="form__input inputPass" type="password" placeholder="Password" name="password" id="password">
+          <span>
+            <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+          </span>
+        </div>
         <div id="error_3" class="error-message"></div>
-        <input class="form__input" type="password" placeholder="confirmPassword" name="confirmPassword"
-          id="confirmPassword">
+        <div>
+          <input class="form__input inputPass" type="password" placeholder="confirmPassword" name="confirmPassword" id="confirmPassword">
+          <span>
+            <i class="fas fa-eye password-toggle" id="confirmPasswordToggle"></i>
+          </span>
+        </div>
         <div id="error_4" class="error-message"></div>
         <button class="form__button button submit" id="signUp-button">SIGN UP</button>
         <br>
@@ -197,4 +215,33 @@
 
 
 
+</script>
+
+<script>
+  const passwordToggle = document.getElementById('passwordToggle');
+  const passwordField = document.getElementById('password');
+
+  passwordToggle.addEventListener('click', () => {
+      // Toggle the type attribute of the password field
+      const type = passwordField.type === 'password' ? 'text' : 'password';
+      passwordField.type = type;
+
+      // Toggle the icon between eye and eye-slash
+      passwordToggle.classList.toggle('fa-eye');
+      passwordToggle.classList.toggle('fa-eye-slash');
+  });
+</script>
+<script>
+  
+  const confirmPasswordField = document.getElementById('confirmPassword');
+
+  confirmPasswordToggle.addEventListener('click', () => {
+      // Toggle the type attribute of the password field
+      const type = confirmPassword.type === 'password' ? 'text' : 'password';
+      confirmPasswordField.type = type;
+
+      // Toggle the icon between eye and eye-slash
+      confirmPasswordToggle.classList.toggle('fa-eye');
+      confirmPasswordToggle.classList.toggle('fa-eye-slash');
+  });
 </script>

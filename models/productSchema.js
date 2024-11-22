@@ -71,6 +71,16 @@ const productSchema = new Schema({
     type: Boolean,
     default: false
   },
+  rating: {
+    average: { 
+      type: Number, 
+      default: 0 
+    },
+    count: { 
+      type: Number, 
+      default: 0 
+    } 
+},
   status: {
     type: String,
     enum: ["Available", "Out of stock", "Discountinued"],

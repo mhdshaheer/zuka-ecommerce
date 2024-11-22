@@ -9,8 +9,9 @@ const env = require("dotenv").config();
 const userRouter = require('./routes/userRouter')
 const adminRouter = require("./routes/adminRouter")
 const db = require('./config/db');
+const nocache = require('nocache')
 db();
-
+app.use(nocache())
 app.use(morgan('common'))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));

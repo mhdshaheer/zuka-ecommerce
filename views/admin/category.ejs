@@ -108,14 +108,15 @@
 
                       <td>
                         <%if(category.isListed){%>
-                        <span class="badge rounded-pill alert-success">Listed</span>
-                        <%}else{%>
-                          <span class="badge rounded-pill alert-danger">Unlisted</span>
-                        <%}%>
+                          <span class="badge rounded-pill alert-success">Listed</span>
+                          <%}else{%>
+                            <span class="badge rounded-pill alert-danger">Unlisted</span>
+                            <%}%>
                       </td>
                       <!-- <td><a class="btn btn-warning btn-sm" href="">List</a></td> -->
                       <td>
-                        <a class="btn btn-primary" href="javascript:void(0)" onclick="editCategoryModal('<%=category._id%>')">Edit</a>
+                        <a class="btn btn-primary" href="javascript:void(0)"
+                          onclick="editCategoryModal('<%=category._id%>')">Edit</a>
                       </td>
                       <td><a class="btn btn-danger btn-sm" href=""
                           onclick="deleteCategory('<%= category._id %>')">Delete</a></td>
@@ -133,30 +134,32 @@
       </div>
       <!-- card body .// -->
     </div>
-    
+
     <div class="pagination-area">
       <nav aria-label="Page navigation example">
-          <ul class="pagination justify-content-center">
-              <% if (currentPage > 1) { %>
-                  <li class="page-item">
-                      <a class="page-link" href="/admin/category?page=<%= currentPage - 1 %>">&laquo; Prev</a>
-                  </li>
-              <% } %>
-  
-              <% for (let i = 1; i <= totalPages; i++) { %>
-                  <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                      <a class="page-link" href="/admin/category?page=<%= i %>"><%= i %></a>
-                  </li>
-              <% } %>
-  
-              <% if (currentPage < totalPages) { %>
-                  <li class="page-item">
+        <ul class="pagination justify-content-center">
+          <% if (currentPage> 1) { %>
+            <li class="page-item">
+              <a class="page-link" href="/admin/category?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+            </li>
+            <% } %>
+
+              <% for (let i=1; i <=totalPages; i++) { %>
+                <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                  <a class="page-link" href="/admin/category?page=<%= i %>">
+                    <%= i %>
+                  </a>
+                </li>
+                <% } %>
+
+                  <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
                       <a class="page-link" href="/admin/category?page=<%= currentPage + 1 %>">&raquo; Next </a>
-                  </li>
-              <% } %>
-          </ul>
+                    </li>
+                    <% } %>
+        </ul>
       </nav>
-  </div>
+    </div>
     <!-- card .// -->
 
     <!-- ============modal for add offer ==================== -->
@@ -176,7 +179,7 @@
 
               <div class="mb-3">
                 <label for="price" class="form-label">Offer Price</label>
-                <input type="number" class="form-control" id="offerPrice" name="price" required>
+                <input type="number" class="form-control" id="offerPrice" name="price" required value="">
               </div>
             </form>
           </div>
@@ -191,47 +194,47 @@
     <!-- ============modal end==================== -->
 
     <!-- =============modal for edit category============ -->
-     <!-- Edit Category Modal -->
-<div class="modal" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="editCategoryModalLabel">Edit Category</h3>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="editCategoryForm">
-          <!-- Hidden field to store category ID -->
-          <input type="hidden" id="categoryIdInput">
-
-          <div class="mb-3">
-            <label for="categoryName" class="form-label">Category Name</label>
-            <input type="text" class="form-control" id="categoryName" name="name" required>
+    <!-- Edit Category Modal -->
+    <div class="modal" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 class="modal-title" id="editCategoryModalLabel">Edit Category</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
+          <div class="modal-body">
+            <form id="editCategoryForm">
+              <!-- Hidden field to store category ID -->
+              <input type="hidden" id="categoryIdInput">
 
-          <div class="mb-3">
-            <label for="categoryDescription" class="form-label">Description</label>
-            <textarea class="form-control" id="categoryDescription" name="description" required></textarea>
-          </div>
+              <div class="mb-3">
+                <label for="categoryName" class="form-label">Category Name</label>
+                <input type="text" class="form-control" id="categoryName" name="name" required>
+              </div>
 
-          <div class="mb-3">
-            <label for="categoryStatus" class="form-label">Status</label>
-            <select class="form-control" id="categoryStatus" name="status" required>
-              <option value="listed">Listed</option>
-              <option value="unlisted">Unlisted</option>
-            </select>
+              <div class="mb-3">
+                <label for="categoryDescription" class="form-label">Description</label>
+                <textarea class="form-control" id="categoryDescription" name="description" required></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="categoryStatus" class="form-label">Status</label>
+                <select class="form-control" id="categoryStatus" name="status" required>
+                  <option value="listed">Listed</option>
+                  <option value="unlisted">Unlisted</option>
+                </select>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="saveCategoryButton">Save Changes</button>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" id="saveCategoryButton">Save Changes</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ==============Modal to Edit category end-->
+    <!-- ==============Modal to Edit category end-->
 
 
   </section>
@@ -297,25 +300,36 @@
         .then(res => res.json())
         .then(data => {
           console.log("Success:", data);
+          if (a == 0 && data.error!="409") {
+
+            Swal.fire({
+              title: 'Success!',
+              text: 'Category added successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            })
+              .then((result) => {
+                console.log('Result:', result.isConfirmed)
+                if (result.isConfirmed) {
+                  window.location.reload(); // Reload the page after clicking "Okay"
+                }
+              });
+          }
+          else{
+
+            Swal.fire({
+              title: 'error!',
+              text: 'Category added successfully!',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            })
+              
+          }
         })
         .catch(err => {
           console.log("Error :", err);
         })
-      if (a == 0) {
 
-        Swal.fire({
-          title: 'Success!',
-          text: 'Category added successfully!',
-          icon: 'success',
-          confirmButtonText: 'Okay'
-        })
-          .then((result) => {
-            console.log('Result:', result.isConfirmed)
-            if (result.isConfirmed) {
-              window.location.reload(); // Reload the page after clicking "Okay"
-            }
-          });
-      }
       console.log("catName is :", catName.value, description.value)
     })
 
@@ -411,31 +425,31 @@
 
     //edit category
 
-    function editCategoryModal(id){
+    function editCategoryModal(id) {
       var modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-       modal.show();
+      modal.show();
 
-       const categoryName = document.getElementById('categoryName');
-       const categoryDescription = document.getElementById('categoryDescription');
-       const categoryStatus = document.getElementById('categoryStatus');
-       const saveCategoryButton = document.getElementById('saveCategoryButton');
-       saveCategoryButton.addEventListener('click',(e)=>{
+      const categoryName = document.getElementById('categoryName');
+      const categoryDescription = document.getElementById('categoryDescription');
+      const categoryStatus = document.getElementById('categoryStatus');
+      const saveCategoryButton = document.getElementById('saveCategoryButton');
+      saveCategoryButton.addEventListener('click', (e) => {
         e.preventDefault();
         console.log("clicked....ok")
-        fetch(`/admin/editCategory/${id}`,{
-          method:'PUT',
-          headers:{
-            'Content-Type':'application/json'
+        fetch(`/admin/editCategory/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
           },
-          body:JSON.stringify({
-            name:categoryName.value,
-            description:categoryDescription.value,
-            isListed:categoryStatus.value=='listed'?true:false
+          body: JSON.stringify({
+            name: categoryName.value,
+            description: categoryDescription.value,
+            isListed: categoryStatus.value == 'listed' ? true : false
           })
         })
-        .then(res=>res.json())
-        .then(data => {
-          console.log("inside swal")
+          .then(res => res.json())
+          .then(data => {
+            console.log("inside swal")
             Swal.fire({
               title: 'Success!',
               text: 'Category Edited successfully!',
@@ -443,8 +457,8 @@
               confirmButtonText: 'Okay'
             }).then(() => {
               console.log('reloading page....')
-                window.location.reload(); // Reload the page after success
-              });
+              window.location.reload(); // Reload the page after success
+            });
           })
           .catch(err => {
             console.error('Error:', err);
@@ -455,7 +469,7 @@
               confirmButtonText: 'Okay'
             });
           });
-       })
+      })
 
 
     }
