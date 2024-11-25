@@ -9,6 +9,7 @@ const env = require("dotenv").config();
 const userRouter = require('./routes/userRouter')
 const adminRouter = require("./routes/adminRouter")
 const db = require('./config/db');
+const axios = require('axios');
 const nocache = require('nocache')
 db();
 app.use(nocache())

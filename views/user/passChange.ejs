@@ -1,0 +1,257 @@
+<%-include('../partials/user/header')%>
+
+    <style>
+        .categories-text {
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: rgb(122, 121, 121);
+
+            font-family: Arial, sans-serif;
+        }
+
+        /* .categories-text:hover {
+      color: black;
+    } */
+
+        .form-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+
+        .form-control:focus {
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            border-color: #80bdff;
+        }
+
+        .error {
+            margin-left: 130px;
+            color: red;
+        }
+
+        .success {
+            margin-left: 130px;
+            color: green;
+        }
+    </style>
+    <!-- Shop Section Begin -->
+    <section class="shop spad">
+        <div class="container">
+            <div class="breadcrumb__text">
+                <div class="breadcrumb__links">
+                    <a href="/">Home</a>
+                    <a href="/profile">profile</a>
+                    <span>change password</span>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="shop__sidebar">
+                        <!-- <div class="shop__sidebar__search">
+              <form action="#">
+                <input type="text" placeholder="Search...">
+                <button type="submit"><span class="icon_search"></span></button>
+              </form>
+            </div> -->
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text active">
+                                    <a href="/profile" class="text-dark ">Personal Info</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                    <a href="/address"
+                                        class="text-secondary text-decoration-none hover:text-danger">Address</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                    <a href="" class="text-secondary text-decoration-none hover:text-danger">Orders</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                    <a href="" class="text-secondary text-decoration-none hover:text-danger">Wallet</a>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="accordion" id="accordionExample">
+                                <div class="card categories-text">
+                                    <a href="" class="text-secondary text-decoration-none hover:text-danger">My
+                                        Reviews</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-9">
+                    <div class="container container">
+                        <div class="form-container">
+                            <!-- Heading -->
+                            <h3 class="text-center">Change Password</h3>
+                            <!-- <p class="text-center text-muted">Update your profile</p> -->
+                            <hr>
+                            <br>
+                            <!-- Form -->
+                            <form>
+                                <!-- Name Field -->
+
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-sm-3">
+                                        <label for="password" class="form-label">Old Password:</label>
+                                    </div>
+                                    <div class="col-sm-9 d-flex">
+                                        <input type="password" class="form-control" id="oldPassword"
+                                            placeholder="Enter old password" value="">
+                                    </div>
+                                </div>
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-sm-3">
+                                        <label for="password" class="form-label">New Password:</label>
+                                    </div>
+                                    <div class="col-sm-9 d-flex">
+                                        <input type="password" class="form-control" id="newPassword"
+                                            placeholder="Enter new password" value="">
+                                    </div>
+                                    <div id="message"></div>
+                                </div>
+
+                                <hr>
+                                <!-- Button -->
+                                <div class="text-right">
+                                    <!-- <button class="btn btn-warning ml-3">Edit</button> -->
+                                    <button type="button" class="btn btn-warning px-1 py-2 " id="passButton">Apply
+                                        Changes</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Section End -->
+
+                <!-- Search Begin -->
+                <div class="search-model">
+                    <div class="h-100 d-flex align-items-center justify-content-center">
+                        <div class="search-close-switch">+</div>
+                        <form class="search-model-form">
+                            <input type="text" id="search-input" placeholder="Search here.....">
+                        </form>
+                    </div>
+                </div>
+                <!-- Search End -->
+                <!-- Js Plugins -->
+                <script src="js/jquery-3.3.1.min.js"></script>
+                <script src="js/bootstrap.min.js"></script>
+                <script src="js/jquery.nice-select.min.js"></script>
+                <script src="js/jquery.nicescroll.min.js"></script>
+                <script src="js/jquery.magnific-popup.min.js"></script>
+                <script src="js/jquery.countdown.min.js"></script>
+                <script src="js/jquery.slicknav.js"></script>
+                <script src="js/mixitup.min.js"></script>
+                <script src="js/owl.carousel.min.js"></script>
+                <script src="js/main.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+                <script>
+                    const passButton = document.getElementById('passButton')
+                    passButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const oldPassword = document.getElementById('oldPassword')
+                        const newPassword = document.getElementById('newPassword')
+                        function validate() {
+
+
+                            const messageDiv = document.getElementById("message")
+
+                            const minLength = 8;
+                            const hasUppercase = /[A-Z]/.test(newPassword.value);
+                            const hasLowercase = /[a-z]/.test(newPassword.value);
+                            const hasNumber = /\d/.test(newPassword.value);
+                            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword.value);
+
+                            if (newPassword.value.length < minLength) {
+                                messageDiv.innerHTML = "Password must be at least 8 characters long.";
+                                messageDiv.className = "error";
+                                return false
+                            } else if (!hasUppercase) {
+                                messageDiv.innerHTML = "Password must contain at least one uppercase letter.";
+                                messageDiv.className = "error";
+                                return false
+                            } else if (!hasLowercase) {
+                                messageDiv.innerHTML = "Password must contain at least one lowercase letter.";
+                                messageDiv.className = "error";
+                                return false
+                            } else if (!hasNumber) {
+                                messageDiv.innerHTML = "Password must contain at least one number.";
+                                messageDiv.className = "error";
+                                return false
+                            } else if (!hasSpecialChar) {
+                                messageDiv.innerHTML = "Password must contain at least one special character.";
+                                messageDiv.className = "error";
+                                return false
+                            } else {
+                                messageDiv.innerHTML = "Password is valid!";
+                                messageDiv.className = "success";
+                                return true
+                            }
+
+                        }
+                        if (validate()) {
+
+
+                            axios.post('/changePass', {
+                                oldPassword: oldPassword.value,
+                                newPassword: newPassword.value
+                            }).then(res => {
+                                if (res.data) {
+
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: 'Password changed successfully!',
+                                        icon: 'success',
+                                        confirmButtonText: 'Okay'
+                                    })
+                                        .then(() => {
+                                            window.location.reload();
+                                        });
+                                }
+                            }).catch(err => {
+                                if (err.response.status == 401) {
+                                    Swal.fire({
+                                        title: 'Error!',
+                                        text: 'Incorrect Password',
+                                        icon: 'error',
+                                        confirmButtonText: 'Okay'
+                                    });
+                                }
+                            })
+                        }
+                    })
+
+                </script>
+
+                </body>
+
+                </html>

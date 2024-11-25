@@ -98,11 +98,11 @@
 
                                                 <td>
                                                     <a href="#" class="btn btn-sm btn-primary" id="productEdit"
-                                                        onclick="productEdit('<%=products[i]._id%>')">Edit</a>
+                                                        onclick="productEdit('<%=products[i]._id%>','<%=products[i].productName%>','<%=products[i].regularPrice%>','<%=products[i].offerPrice%>','<%=products[i].color%>',`'<%=products[i].description%>'`)">Edit</a>
                                                 </td>
                                                 <td>
                                                     <a href="#" type="button" class="btn btn-primary"
-                                                        onclick="imageEdit('<%=products[i]._id%>')">Change</a>
+                                                        onclick="imageEdit('<%=products[i]._id%>', '<%= JSON.stringify(products[i].images) %>')">Change</a>
                                                 </td>
                                                 <%if(products[i].isBlocked){%>
                                                     <td>
@@ -256,7 +256,7 @@
                                 onchange="previewImage(this, 'preview1')">
                             <div id="preview1" class="image-preview mt-2"
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
-                                No image uploaded
+                                <img id="imgDiv1" src="" alt="No image uploaded">
                             </div>
                         </div>
                         <!-- Image 2 -->
@@ -266,7 +266,7 @@
                                 onchange="previewImage(this, 'preview2')">
                             <div id="preview2" class="image-preview mt-2"
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
-                                No image uploaded
+                                <img id="imgDiv2" src="" alt="No image uploaded">
                             </div>
                         </div>
                     </div>
@@ -278,7 +278,7 @@
                                 onchange="previewImage(this, 'preview3')">
                             <div id="preview3" class="image-preview mt-2"
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
-                                No image uploaded
+                                <img id="imgDiv3" src="" alt="">
                             </div>
                         </div>
                         <!-- Image 4 -->
@@ -288,7 +288,7 @@
                                 onchange="previewImage(this, 'preview4')">
                             <div id="preview4" class="image-preview mt-2"
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
-                                No image uploaded
+                                <img id="imgDiv4" src="" alt="">
                             </div>
                         </div>
                     </div>
@@ -339,19 +339,25 @@
         }
 
         //edit product
-        function productEdit(id) {
+        function productEdit(id,name,regPrice,offPrice,col,desc) {
+        // regPrice,description,offerPrice,color
+            const productName = document.getElementById('productName')
+            const description = document.getElementById('description');
+            const category = document.getElementById('category');
+            const regularPrice = document.getElementById('regularPrice');
+            const offerPrice = document.getElementById('offerPrice');
+            const totalStocks = document.getElementById('totalStocks');
+            const color = document.getElementById('color');
+            productName.value = name;
+            regularPrice.value = regPrice;
+            offerPrice.value = offPrice;
+            description.value = desc;
+            color.value=col
             var modal = new bootstrap.Modal(document.getElementById('productModal'));
             modal.show();
 
             document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
                 e.preventDefault();
-                const productName = document.getElementById('productName')
-                const description = document.getElementById('description');
-                const category = document.getElementById('category');
-                const regularPrice = document.getElementById('regularPrice');
-                const offerPrice = document.getElementById('offerPrice');
-                const totalStocks = document.getElementById('totalStocks');
-                const color = document.getElementById('color');
                 console.log(productName.value)
                 const options = {
                     productName: productName.value,
@@ -407,7 +413,11 @@
         }
 
         //Update product images
-        function imageEdit(id){
+        function imageEdit(id,images){
+            const imgArr = JSON.parse(images)
+            for(let i=0;i<imgArr.length;i++){
+                document.getElementById(`imgDiv${i+1}`).src = imgArr[i]
+            }
             var modal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
             modal.show();
             const updateBtn = document.getElementById('updateImageId')

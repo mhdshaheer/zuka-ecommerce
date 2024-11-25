@@ -72,7 +72,7 @@ a{
 }
 
 </style>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <body>
     <!-- Page Preloder -->
     <div id="preloder">
@@ -80,7 +80,7 @@ a{
     </div>
 
     <!-- Offcanvas Menu Begin -->
-    <div class="offcanvas-menu-overlay"></div>
+    <!-- <div class="offcanvas-menu-overlay"></div>
     <div class="offcanvas-menu-wrapper">
         <div class="offcanvas__option">
             <div class="offcanvas__links">
@@ -99,15 +99,15 @@ a{
         <div class="offcanvas__nav__option">
             <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
             <a href="#"><img src="img/icon/heart.png" alt=""></a>
-            <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
+            <a href="/cart"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
             <div class="price">$0.00</div>
         </div>
         <div id="mobile-menu-wrap"></div>
         <div class="offcanvas__text">
             <p>Free shipping, 30-day return or refund guarantee.</p>
         </div>
-    </div>
-    <!-- Offcanvas Menu End -->
+    </div> -->
+
 
     <!-- Header Section Begin -->
     <header class="header">
@@ -137,14 +137,7 @@ a{
                                         <a href="/signup">Sign Up</a>
                                         <%}%>
                             </div>
-                            <div class="header__top__hover">
-                                <span>Usd <i class="arrow_carrot-down"></i></span>
-                                <ul>
-                                    <li>USD</li>
-                                    <li>EUR</li>
-                                    <li>USD</li>
-                                </ul>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -173,17 +166,18 @@ a{
                                     <li><a href="./blog-details.html">Blog Details</a></li>
                                 </ul>
                             </li>
-                            <li><a href="./blog.html">Blog</a></li>
+                            <li class="<%= activePage === 'cart' ? 'active' : '' %>"><a href="/cart">Cart</a></li>
                             <li><a href="./contact.html">Contacts</a></li>
                         </ul>
                     </nav>
                 </div>
                 <div class="col-lg-3 col-md-3">
                     <div class="header__nav__option">
-                        <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
-                        <a href="#"><img src="img/icon/heart.png" alt=""></a>
-                        <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-                        <div class="price">$0.00</div>
+                        <a href="/profile" ><i class="fa-solid fa-user" style="color: #000000;"></i></a>
+                        <a href="#" class="search-switch"><i class="fa-solid fa-magnifying-glass" style="color: #000000;"></i></a>
+                        <a href="#"><i class="fa-regular fa-heart" style="color: #000000;"></i></a>
+                        <a href="#"><i class="fa-solid fa-wallet" style="color: #000000;"></i></a>
+                        <!-- <div class="price">$0.00</div> -->
                     </div>
                 </div>
             </div>
@@ -202,7 +196,7 @@ a{
 
     // Close dropdown if clicked outside
     document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) {
+        if (dropdownContent && !dropdown.contains(e.target)) {
             dropdownContent.style.display = 'none';
         }
     });

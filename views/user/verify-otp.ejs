@@ -211,13 +211,6 @@
             document.getElementById("otp").disabled = false; // Re-enable OTP input
 
             try {
-                // let options = {
-                //     method: "POST",
-                //     headers: {
-                //         'Content-Type': 'application/json',
-                //     },
-                //     body: JSON.stringify({ email: email })
-                // }
                 console.log("before fetch")
                 let res = await fetch('/resentOtp', {
                     method:'post'

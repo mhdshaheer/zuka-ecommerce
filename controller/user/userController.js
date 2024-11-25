@@ -276,9 +276,71 @@ const pageNotFound = async (req, res) => {
 //================= end =============================
 
 
+
+// profile page
 const loadProfile = async (req,res)=>{
     try {
-        res.render('profile',{activePage:''})
+        const user = req.session.user
+        res.render('profile',{
+            user,
+            activePage:''
+        })
+    } catch (error) {
+        
+    }
+}
+const loadAddress = async (req,res)=>{
+    try {
+        res.render('addAddress',{activePage:""})
+    } catch (error) {
+        
+    }
+}
+const editName = async (req,res)=>{
+    try {
+        const user = req.session.user;
+        const {userName} = req.body
+        const result = await User.updateOne({_id:user._id},{$set:{name:userName}})
+        req.session.user.name = userName
+        res.status(200).json({success:"profile name successfully edited"})
+        res.redirect('/profile')
+    } catch (error) {
+        
+    }
+}
+const loadPassChange = async (req,res)=>{
+    try {
+        const user = req.session.user
+        res.render('passChange',{activePage:'',user});
+    } catch (error) {
+        
+    }
+}
+const changePass = async(req,res)=>{
+    try {
+        const {oldPassword,newPassword} = req.body;
+        const user = req.session.user
+        const userPass = req.session.user.password;
+        console.log(oldPassword,newPassword)
+        console.log(userPass)
+        console.log(oldPassword,newPassword);
+        const compPass = await bcrypt.compare(oldPassword,userPass)
+        if(!compPass){
+            return res.status(401).json({message:"Password not match"})
+        }
+        const changePass = await securePassword(newPassword);
+        await User.updateOne({_id:user._id},{$set:{password:changePass}})
+        console.log("Password change succesfully")
+        console.log(compPass) 
+        return res.status(200).json({message:"success"})
+    } catch (error) {
+        console.log("server error",error);
+        res.redirect('/pageNotFound')
+    }
+}
+const cropImage = async(req,res)=>{
+    try {
+        res.render('justForCrop');
     } catch (error) {
         
     }
@@ -294,6 +356,10 @@ module.exports = {
     login,
     logout,
     signup,
-    loadProfile
-
+    loadProfile,
+    loadAddress,
+    editName,
+    loadPassChange,
+    changePass,
+    cropImage
 }

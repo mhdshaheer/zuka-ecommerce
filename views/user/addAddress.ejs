@@ -60,13 +60,13 @@
             <div class="shop__sidebar__accordion">
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text active">
-                  <a href="/profile" class="text-dark ">Personal Info</a>
+                  <a href="/profile" class="text-secondary text-decoration-none hover:text-danger">Personal Info</a>
                 </div>
               </div>
               <hr>
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text">
-                  <a href="/address" class="text-secondary text-decoration-none hover:text-danger">Address</a>
+                  <a href="/address" class="text-dark">Address</a>
                 </div>
               </div>
               <hr>
@@ -94,7 +94,7 @@
           <div class="container container">
             <div class="form-container">
               <!-- Heading -->
-              <h3 class="text-center">Account Details</h3>
+              <h3 class="mb-4 text-center">Account Details</h3>
               <p class="text-center text-muted">Update your profile</p>
               <hr>
               <br>
@@ -104,11 +104,10 @@
                 <div class="row mb-4 align-items-center">
                   <div class="col-sm-3">
                     <label for="name" class="form-label">Name:</label>
-                    
                   </div>
                   <div class="col-sm-9 d-flex">
-                    <input type="text" class="form-control" id="name" placeholder="User Name" value="<%=user?.name%>">
-                    <button class="btn btn-warning ml-3 px-4" id="nameEditBtn">Edit</button>
+                    <input type="text" class="form-control" id="name" placeholder="Enter your name" value="Shaheer">
+                    <button class="btn btn-warning ml-3 px-4">Edit</button>
                   </div>
                 </div>
 
@@ -118,11 +117,12 @@
                     <label for="email" class="form-label">Email:</label>
                   </div>
                   <div class="col-sm-9 d-flex">
-                    <input type="email" class="form-control" id="email" placeholder="E mail"
-                      value="<%=user?.email%>" disabled>
-                    <!-- <button class="btn btn-warning ml-3">Change</button> -->
+                    <input type="email" class="form-control" id="email" placeholder="Enter your email"
+                      value="shaheer@gmail.com">
+                    <button class="btn btn-warning ml-3">Change</button>
                   </div>
                 </div>
+
                 <!-- Password Field -->
                 <div class="row mb-4 align-items-center">
                   <div class="col-sm-3">
@@ -130,18 +130,14 @@
                   </div>
                   <div class="col-sm-9 d-flex">
                     <input type="password" class="form-control" id="password" placeholder="Enter your password"
-                      value="shaheer@123" disabled>
-                     <a href="/changePassword" class="btn btn-warning ml-3" >Change</a>
+                      value="shaheer@123">
+                    <button class="btn btn-warning ml-3">Change</button>
                   </div>
-                </div>
-                <div class="row mb-4 align-items-center">
-                  <a class="text-primary" href="">Forgot password?</a>
                 </div>
                 <hr>
                 <!-- Button -->
                 <div class="text-right">
-                  <!-- <button class="btn btn-warning ml-3">Edit</button> -->
-                  <button type="button" class="btn btn-danger px-1 py-2 " >Delete Account</button>
+                  <button type="button" class="btn btn-danger px-1 py-2 ">Delete Account</button>
                 </div>
 
               </form>
@@ -162,8 +158,6 @@
         </div>
         <!-- Search End -->
 
-
-       
         <!-- Js Plugins -->
         <script src="js/jquery-3.3.1.min.js"></script>
         <script src="js/bootstrap.min.js"></script>
@@ -175,68 +169,7 @@
         <script src="js/mixitup.min.js"></script>
         <script src="js/owl.carousel.min.js"></script>
         <script src="js/main.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
         </body>
-    </html>
-    <script>
-      const changeName = document.getElementById('nameEditBtn')
-      const userName = document.getElementById('name')
-      changeName.addEventListener('click',(e)=>{
-        e.preventDefault();
-        console.log(userName.value)
-        
-        Swal.fire({
-        title: 'Name Field',
-        text: "Do you want to edit this field?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, do it!',
-        cancelButtonText: 'No, cancel!',
-        reverseButtons: true
-      }).then((result) => {
-        if (result.isConfirmed) {
-          console.log('Success');
-          axios.patch('/nameEdit',{userName:userName.value})
-          .then(res => {
-            console.log("inside swal")
-            if(res.data){
-              Swal.fire({
-              title: 'Success!',
-              text: 'Category Edited successfully!',
-              icon: 'success',
-              confirmButtonText: 'Okay'
-            }).then(() => {
-              console.log('reloading page....')
-              window.location.reload(); // Reload the page after success
-            });
-            }
-           
-          })
-          .catch(err => {
-            console.error('Error:', err);
-            Swal.fire({
-              title: 'Error!',
-              text: 'Failed to Edit Name.',
-              icon: 'error',
-              confirmButtonText: 'Okay'
-            });
-          });
-        } else if (result.isDismissed) {
-          console.log('Failed');
-        }
-      });
-      })
-      
 
-      // const changePass = document.getElementById('changePassBtn');
-      // const password = document.getElementById('password');
-      // changePass.addEventListener('click',(e)=>{
-      //   e.preventDefault();
-        
-      // })
-   
+        </html>
 
-    </script>

@@ -44,7 +44,25 @@ const loadProductInfo = async (req,res)=>{
     }
 }
 
+const loadCart = async (req,res)=>{
+    try {
+        res.render('shopingCart',{activePage:'cart'})
+    } catch (error) {
+        
+    }
+}
+
+const loadCheckout = async (req,res)=>{
+    try {
+        res.render('checkout',{activePage:""})
+    } catch (error) {
+        
+    }
+}
+
 module.exports = {
     loadShop,
     loadProductInfo,
+    loadCart,
+    loadCheckout
 }
