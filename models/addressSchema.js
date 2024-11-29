@@ -20,7 +20,7 @@ const addressSchema = new Schema({
             type:String,
             required:true
         },
-        landmark:{
+        address:{
             type:String,
             required:true
         },
@@ -38,10 +38,14 @@ const addressSchema = new Schema({
         },
         altPhone:{
             type:String,
+            required:false
+        },
+        country:{
+            type:String,
             required:true
         }
     }]
-})
+},{timestamps:true})
 
 const Address = mongoose.model("Address",addressSchema);
 module.exports = Address;

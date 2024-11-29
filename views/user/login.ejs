@@ -1,79 +1,92 @@
 <!DOCTYPE html>
 <html lang="es" dir="ltr">
-  <head>
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" type="text/css" href="/css/signup.css"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
-  </head>
-  <style>
-    .inputPass{
-      width: 333px;
-      
-    }
-    .password-toggle {
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-  </style>
-  <body>
-    <div class="main">
-      <div class="container a-container" id="a-container">
-        <form class="form" id="a-form" method="post" action="/login">
-          <h2 class="form_title title">Login</h2>
-          <input class="form__input" type="text" placeholder="Email" name="email">
-           <div style="color: red;">
-           <p><%=message%></p> 
+
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" type="text/css" href="/css/signup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<style>
+  .inputPass {
+    width: 333px;
+
+  }
+
+  .password-toggle {
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+</style>
+
+<body>
+  <div class="main">
+    <div class="container a-container" id="a-container">
+      <form class="form" id="a-form" method="post" action="/login">
+        <h2 class="form_title title">Login</h2>
+        <input class="form__input" type="text" placeholder="Email" name="email">
+        <div style="color: red;">
+          <p>
+            <%=message%>
+          </p>
+        </div>
+        <div>
+          <input class="form__input inputPass" type="password" placeholder="Password" name="password" id="password">
+          <span>
+            <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+          </span>
+        </div>
+        <div style="color: red;">
+          <p>
+            <%=message%>
+          </p>
+        </div>
+        <button class="form__button button submit" type="submit">SIGN IN</button>
+        <br>
+
+
+        <div class="form__icons">
+          <div class="google_icon"><a href="/auth/google">
+              <i class="fa-brands fa-google fa-lg"></i></a>
           </div>
-          <div>
-            <input class="form__input inputPass" type="password" placeholder="Password" name="password" id="password">
-            <span>
-              <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
-            </span>
-          </div>
-          <div style="color: red;">
-            <p><%=message%></p> 
-           </div>
-          <button class="form__button button submit" type="submit">SIGN IN</button>
-          <br>
-          
-          
-          <div class="form__icons">
-            <div class="google_icon"><i class="fa-brands fa-google fa-lg"></i></div>
-            <div class="google_icon"><i class="fa-brands fa-facebook fa-lg"></i></div>
-            </div>
+          <div class="google_icon"><i class="fa-brands fa-facebook fa-lg"></i></div>
+        </div>
         <span class="form__span">or use email for registration</span>
 
-        </form>
-      </div>
-
-      <div class="switch" id="switch-cnt">
-        <div class="switch__circle"></div>
-        <div class="switch__circle switch__circle--t"></div>
-        <div class="switch__container" id="switch-c1">
-          <h2 class="switch__title title">Welcome Back !</h2>
-          <p class="switch__description description">To keep connected with us please login with your personal info</p>
-          <a href="/signup"><button class="switch__button button switch-btn">SIGN UP</button></a>
-        </div>
-
-      </div>
+      </form>
     </div>
-    <!-- <script src="main.js"></script> -->
 
-    <script>
-      const passwordToggle = document.getElementById('passwordToggle');
-      const passwordField = document.getElementById('password');
+    <div class="switch" id="switch-cnt">
+      <div class="switch__circle"></div>
+      <div class="switch__circle switch__circle--t"></div>
+      <div class="switch__container" id="switch-c1">
+        <h2 class="switch__title title">Welcome Back !</h2>
+        <p class="switch__description description">To keep connected with us please login with your personal info</p>
+        <a href="/signup"><button class="switch__button button switch-btn">SIGN UP</button></a>
+      </div>
 
-      passwordToggle.addEventListener('click', () => {
-          // Toggle the type attribute of the password field
-          const type = passwordField.type === 'password' ? 'text' : 'password';
-          passwordField.type = type;
+    </div>
+  </div>
+  <!-- <script src="main.js"></script> -->
 
-          // Toggle the icon between eye and eye-slash
-          passwordToggle.classList.toggle('fa-eye');
-          passwordToggle.classList.toggle('fa-eye-slash');
-      });
+  <script>
+    const passwordToggle = document.getElementById('passwordToggle');
+    const passwordField = document.getElementById('password');
+
+    passwordToggle.addEventListener('click', () => {
+      // Toggle the type attribute of the password field
+      const type = passwordField.type === 'password' ? 'text' : 'password';
+      passwordField.type = type;
+
+      // Toggle the icon between eye and eye-slash
+      passwordToggle.classList.toggle('fa-eye');
+      passwordToggle.classList.toggle('fa-eye-slash');
+    });
   </script>
 
-  </body>
+</body>
+
 </html>

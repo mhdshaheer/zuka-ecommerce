@@ -11,7 +11,8 @@ const cartSchema = new Schema({
         productId: {
             type: Schema.Types.ObjectId,
             ref: 'Product',
-            required: true
+            required: true,
+            unique:true
         },
         quantity: {
             type: Number,
@@ -21,21 +22,26 @@ const cartSchema = new Schema({
             type: Number,
             required: true
         },
+        size: {
+            type:String,
+            required:true
+        },
         totalPrice: {
             type: Number,
             required: true
         },
-        status: {
-            type: String,
-            default: 'placed'
-        },
-        cancellationReason: {
-            type: String,
-            default: "none"
-        }
+        // status: {
+        //     type: String,
+        //     default: 'placed'
+        // },
+        // cancellationReason: {
+        //     type: String,
+        //     default: "none"
+        // }
 
     }]
-})
+    
+},{timestamps:true})
 
 const Cart = mongoose.model("Cart",cartSchema);
 module.exports = Cart;

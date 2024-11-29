@@ -1,5 +1,7 @@
 const express = require('express')
 const User = require('../../models/userSchema');
+const Address = require('../../models/addressSchema')
+const mongoose = require('mongoose')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const env = require("dotenv").config()
@@ -236,6 +238,7 @@ const verifyOtp = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const googleUser = req.user;
+        req.session.googleUser=googleUser;
         const user = req.session.user;
         console.log("home user:",user)
         if(user?.isBlocked ==true){
@@ -291,9 +294,23 @@ const loadProfile = async (req,res)=>{
 }
 const loadAddress = async (req,res)=>{
     try {
-        res.render('addAddress',{activePage:""})
+        const user = req.session.user
+        const addressDb = await Address.findOne({userId:user?._id})
+        if(addressDb){
+
+             return res.render('addAddress',{
+                user,
+                addressDb,
+                activePage:""
+            })
+        }
+        return res.render('addAddress',{
+           user,
+           activePage:""
+       })
+
     } catch (error) {
-        
+        console.log("error in load address",error)
     }
 }
 const editName = async (req,res)=>{
@@ -338,8 +355,155 @@ const changePass = async(req,res)=>{
         res.redirect('/pageNotFound')
     }
 }
+const loadForgotPass = async (req,res)=>{
+    try {
+        const user = req.session.user
+        res.render('forgotPassword',{
+            user,
+            activePage:""
+        })
+    } catch (error) {
+        
+    }
+}
+
+const sentOtp = async (req,res)=>{
+    try {
+        const {email}= req.body;
+        const sessionEmail = req.session?.user?.email;
+        if(email==sessionEmail){
+            console.log("match");
+            const otp = generateOtp();
+            req.session.forgotOtp = otp;
+            const sentOtp = await sendEmailVerify(sessionEmail,otp);
+            if(sentOtp){
+                console.log("otp sent:",otp)
+                res.status(200).json({message:"success"});
+
+            }
+
+        }else{
+            res.status(401).json({message:"Email not match"});
+        }
+        console.log(sessionEmail)
+        console.log(email)
+    } catch (error) {
+        
+    }
+}
+const loadForgotOtpVerify = async (req,res)=>{
+    try {
+        res.render('forgotOtpVerify')
+    } catch (error) {
+        
+    }
+}
+
+const verifyForgot = async (req, res) => {
+    try {
+        const { otp } = req.body;
+        console.log("otp is:", otp);
+        if (otp == req.session.forgotOtp) {
+            console.log("OTP verified successfully")
+            return res.status(200).json({success:true})
+        } else {
+            res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
+        }
+    } catch (error) {
+        console.error("Error verifying OTP ", error);
+        res.status(500).json({ success: false, message: "An error occured" })
+    }
+}
+
+const resentForgotOtp = async (req, res) => {
+    try {
+
+        let otp = generateOtp();
+        req.session.forgotOtp = otp;
+        const email = req.session.user.email
+        const emailSent = await sendEmailVerify(email, otp);
+        console.log(emailSent);
+
+        if (emailSent) {
+            console.log("Resent otp", otp);
+            res.status(200).json({ success: true, message: "otp resent successfully" })
+        } else {
+            res.status(500).json({ success: false, message: "Failed to resent otp,Please try again" })
+        }
+
+    } catch (error) {
+        console.error("error resenting otp",error);
+        res.status(500).json({ success: false, message: "Internal server error,please try again" })
+    }
+}
+
+const newPassSet = async (req,res)=>{
+    try {
+        const user = req.session.user
+        res.render('newPassword',{activePage :"",user})
+    } catch (error) {
+        
+    }
+}
+const updatePass = async (req,res)=>{
+    try {
+        const {password} = req.body;
+        const user = req.session.user;
+        const bcryptPass = await securePassword(password);
+        const result = await User.updateOne({_id:user._id},{$set:{password:bcryptPass}})
+        if(result){
+            req.session.user.password=bcryptPass;
+            res.status(200).json({message:"Password changed successfully"});
+            console.log("password changed successfully")
+        }else{
+            res.status(400).json({message:"Password change error"})
+            console.log("password change not done..! Error")
+        }
+
+    } catch (error) {
+        console.log("server error in password changing",error)
+        res.status(500).json({message:"Server while changing password"})
+    }
+}
+
+const addAddress = async (req,res)=>{
+    try {
+        const address=req.body;
+        console.log(address)
+        const addressData = {
+            addressType:address.addressType,
+            name:address.name,
+            country:address.country,
+            city:address.city,
+            address:address.address,
+            state:address.state,
+            pincode:address.pincode,
+            phone:address.phone,
+            altPhone:address.altPhone
+        }
+        const user  = req.session.user;
+        console.log("session data:",user);
+        // const userId = await User.findOne({_id:user._id},{_id:1})
+        // console.log("user id from the session:",userId)
+        const updateAddress = await Address.findOneAndUpdate(
+            {userId:user._id},
+            {$push:{address:addressData}},
+            {upsert:true,new:true}
+        );
+        if(updateAddress){
+            console.log("address added")
+        }else{
+            console.log("error in address adding")
+        }
+        // await address.save()
+    } catch (error) {
+        console.log("error in adding address",error)
+    }
+}
+
 const cropImage = async(req,res)=>{
     try {
+
         res.render('justForCrop');
     } catch (error) {
         
@@ -359,7 +523,22 @@ module.exports = {
     loadProfile,
     loadAddress,
     editName,
+    
+    //password change
     loadPassChange,
     changePass,
+
+    //forgot password
+    loadForgotPass,
+    sentOtp,
+    loadForgotOtpVerify,
+    verifyForgot,
+    resentForgotOtp,
+    newPassSet,
+    updatePass,
+
+    //address
+    addAddress,
+
     cropImage
 }

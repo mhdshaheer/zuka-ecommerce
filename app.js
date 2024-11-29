@@ -13,7 +13,7 @@ const axios = require('axios');
 const nocache = require('nocache')
 db();
 app.use(nocache())
-app.use(morgan('common'))
+app.use(morgan('tiny'))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 

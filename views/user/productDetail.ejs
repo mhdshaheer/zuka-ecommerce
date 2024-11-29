@@ -141,18 +141,33 @@
                                 <div class="product__details__option__size">
                                     <span>Size:</span>
                                     <%for(let i=0;i<product[0].variant.length;i++){%>
-                                    <label for="xl"><%=product[0].variant[i].size%>
-                                        <input type="radio" id="xxl">
-                                        <span> </span>
-                                        <span class="badge rounded-pill bg-dark text-light"><%=product[0].variant[i].stock%></span>
+                                    <label id="sizeLabel" for="xl" onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)"><%=product[0].variant[i].size%> 
+                                        <input type="radio" id="itemSize" name="variant">
+                                        <span > </span>
+                                        <span class="badge rounded-pill bg-dark text-light" id="itemStock"><%=product[0].variant[i].stock%></span>
                                     </label>
                                     <%}%> 
                                 </div>
+                                <!-- <div class="product__details__option__size">
+                                    <span>Color:</span>
+                                    
+                                    <label for="xl"><%=product[0].color%>
+                                        <input type="radio" id="xxl">
+                                    </label>
+                                </div> -->
 
-                                <div class="product__details__option__color">
+                                <div class="mt-2">
+                                    <p><b>COLOR: </b><span id="itemColor"><%=product[0].color%></span></p>
+                                </div>
+                                
+
+                                <!-- <div class="product__details__option__color">
                                     <span>Color:</span>
                                     <label class="c-1" for="sp-1">
                                         <input type="radio" id="sp-1">
+                                    </label>
+                                    <label for="">
+                                        <p>red</p>
                                     </label>
                                     <label class="c-2" for="sp-2">
                                         <input type="radio" id="sp-2">
@@ -166,15 +181,15 @@
                                     <label class="c-9" for="sp-9">
                                         <input type="radio" id="sp-9">
                                     </label>
-                                </div>
+                                </div> -->
                             </div>
                             <div class="product__details__cart__option">
                                 <div class="quantity">
                                     <div class="pro-qty">
-                                        <input type="text" value="1">
+                                        <input id="itemQuantity" type="text" value="1">
                                     </div>
                                 </div>
-                                <a href="#" class="primary-btn">add to cart</a>
+                                <a href="#" class="primary-btn" id="addToCart">add to cart</a>
                             </div>
                             
                             
@@ -492,6 +507,31 @@ images.forEach((img) => {
   });
 });
 
+    </script>
+
+    <script>
+        const addToCart = document.getElementById('addToCart');
+        const itemSize = document.getElementById('itemSize');
+        const sizeLabel = document.getElementById('sizeLabel')
+        const itemColor = document.getElementById('itemColor')
+        const itemQuantity = document.getElementById('itemQuantity')
+        function itemSizeFun(size,stock,product){
+            addToCart.addEventListener('click',(e)=>{
+            
+            e.preventDefault();
+            console.log(size,stock,itemQuantity.value)
+            const productObj = JSON.parse(product)
+            console.log("Products: ",productObj.color)
+            axios.post('addToCart',{
+                size,
+                stock,
+                productObj,
+                quantity:itemQuantity.value
+            })
+   
+        })
+        }
+        
     </script>
 
 <%- include('../partials/user/footer') %>
