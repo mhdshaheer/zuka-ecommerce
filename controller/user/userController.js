@@ -4,6 +4,7 @@ const Address = require('../../models/addressSchema')
 const mongoose = require('mongoose')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const { truncateSync } = require('fs-extra');
 const env = require("dotenv").config()
 
 //===================================================
@@ -296,16 +297,10 @@ const loadAddress = async (req,res)=>{
     try {
         const user = req.session.user
         const addressDb = await Address.findOne({userId:user?._id})
-        if(addressDb){
-
-             return res.render('addAddress',{
-                user,
-                addressDb,
-                activePage:""
-            })
-        }
+        
         return res.render('addAddress',{
            user,
+           addressDb,
            activePage:""
        })
 
@@ -370,12 +365,14 @@ const loadForgotPass = async (req,res)=>{
 const sentOtp = async (req,res)=>{
     try {
         const {email}= req.body;
-        const sessionEmail = req.session?.user?.email;
-        if(email==sessionEmail){
+        req.session.email= email;
+        const emailFound = await User.find({email:email})
+        req.session.user = emailFound
+        if(emailFound){
             console.log("match");
             const otp = generateOtp();
             req.session.forgotOtp = otp;
-            const sentOtp = await sendEmailVerify(sessionEmail,otp);
+            const sentOtp = await sendEmailVerify(email,otp);
             if(sentOtp){
                 console.log("otp sent:",otp)
                 res.status(200).json({message:"success"});
@@ -385,7 +382,6 @@ const sentOtp = async (req,res)=>{
         }else{
             res.status(401).json({message:"Email not match"});
         }
-        console.log(sessionEmail)
         console.log(email)
     } catch (error) {
         
@@ -448,11 +444,12 @@ const newPassSet = async (req,res)=>{
 const updatePass = async (req,res)=>{
     try {
         const {password} = req.body;
-        const user = req.session.user;
+        const email = req.session.email;
         const bcryptPass = await securePassword(password);
-        const result = await User.updateOne({_id:user._id},{$set:{password:bcryptPass}})
+        const result = await User.updateOne({email:email},{$set:{password:bcryptPass}})
         if(result){
-            req.session.user.password=bcryptPass;
+            // req.session.user.password=bcryptPass;
+            req.session.destroy()
             res.status(200).json({message:"Password changed successfully"});
             console.log("password changed successfully")
         }else{
@@ -492,12 +489,36 @@ const addAddress = async (req,res)=>{
         );
         if(updateAddress){
             console.log("address added")
+            res.status(200).json({success:true})
         }else{
             console.log("error in address adding")
+            res.status(400).json({success:false})
         }
         // await address.save()
     } catch (error) {
         console.log("error in adding address",error)
+        res.status(500).json({success:false})
+    }
+}
+
+//delete address
+const deleteAddress = async(req,res)=>{
+    try {
+        const {index} = req.query;
+        const user = req.session.user
+        console.log("index is : ",index)
+        const addressData = await Address.findOne({userId:user._id});
+        const addressArr = addressData.address
+        addressArr.splice(index,1);
+        console.log(addressArr);
+        await Address.updateOne({userId:user._id},{$set:{address:addressArr}})
+        res.status(200).json({success:true})
+        console.log("Address deleted successfully")
+        
+
+        
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -539,6 +560,7 @@ module.exports = {
 
     //address
     addAddress,
+    deleteAddress,
 
     cropImage
 }

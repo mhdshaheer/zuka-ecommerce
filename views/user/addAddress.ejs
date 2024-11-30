@@ -175,110 +175,138 @@
           </div>
           <div class="row">
             <h2><b>Saved Addresses</b></h2>
-            <%addressDb?.address.map((item,index)=>{%>
-            <div class="card shadow-sm col-4 m-2">
-              <div class="card-body">
-                <h5 class="card-title"><strong><%=item.addressType%> Address</strong> </h5>
-                <p class="card-text">
-                  <strong>Name:</strong> <%=item.name%><br>
-                  <strong>Address:</strong> <%=item.address%>,<%=item.city%>,<%=item.state%>,<%=item.country%><br>
-                  <strong>ZIP Code:</strong> <%=item.pincode%><br>
-                  <strong>Phone:</strong> <%=item.phone%>,<br>
-                  <%=item.altPhone%><br>
-                </p>
-                <div class="col">
-                  <button class="btn btn-secondary">Edit</button>
-                  <button class="btn btn-danger">Delete</button>
+            <%if(addressDb){%>
+
+              <%addressDb.address.map((item,index)=>{%>
+                <div class="card shadow-sm col-4 m-2">
+                  <div class="card-body">
+                    <h5 class="card-title"><strong>
+                        <%=item.addressType%> Address
+                      </strong> </h5>
+                    <p class="card-text">
+                      <strong>Name:</strong>
+                      <%=item.name%><br>
+                        <strong>Address:</strong>
+                        <%=item.address%>,<%=item.city%>,<%=item.state%>,<%=item.country%><br>
+                                <strong>ZIP Code:</strong>
+                                <%=item.pincode%><br>
+                                  <strong>Phone:</strong>
+                                  <%=item.phone%>,<br>
+                                    <%=item.altPhone%><br>
+                    </p>
+                    <div class="col">
+                      <button class="btn btn-secondary">Edit</button>
+                      <button class="btn btn-danger" id="deleteBtn"
+                        onclick="deleteAddress('<%=index%>')">Delete</button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <%})%>
-            <!-- <div class="card shadow-sm col-4 m-2">
-              <div class="card-body">
-                <h5 class="card-title">Shipping Address</h5>
-                <p class="card-text">
-                  <strong>Name:</strong> John Doe<br>
-                  <strong>Address:</strong> 123 Cherry Lane, Apt 12<br>
-                  <strong>City:</strong> Harrisburg<br>
-                  <strong>State:</strong> Pennsylvania<br>
-                  <strong>ZIP Code:</strong> 17101<br>
-                  <strong>Phone:</strong> +1 555-123-4567
-                </p>
-                <div class="col">
-                  <button class="btn btn-secondary">Edit</button>
-                  <button class="btn btn-danger">Delete</button>
-                </div>
-              </div>
-            </div>
-            <div class="card shadow-sm col-4 m-2">
-              <div class="card-body">
-                <h5 class="card-title">Shipping Address</h5>
-                <p class="card-text">
-                  <strong>Name:</strong> John Doe<br>
-                  <strong>Address:</strong> 123 Cherry Lane, Apt 12<br>
-                  <strong>City:</strong> Harrisburg<br>
-                  <strong>State:</strong> Pennsylvania<br>
-                  <strong>ZIP Code:</strong> 17101<br>
-                  <strong>Phone:</strong> +1 555-123-4567
-                </p>
-                <div class="col">
-                  <button class="btn btn-secondary">Edit</button>
-                  <button class="btn btn-danger">Delete</button>
-                </div>
-              </div>
-            </div>
-          </div> -->
+                <%})%>
+                  <%}else{%>
+                    <div class="card shadow-sm col-4 m-2">
+                      <div class="card-body">
+                        <h5 class="card-title">No address Found</h5>
+                      </div>
+                    </div>
+                    <%}%>
 
-        </div>
 
-        <!-- Footer Section End -->
+          </div>
 
-        <script>
-          const addBtn = document.getElementById('addBtn');
-          const name = document.getElementById('name');
-          // const email = document.getElementById('email');
-          const phone = document.getElementById('phone');
-          const altPhone = document.getElementById('altPhone');
-          const addressType = document.getElementById('addressType');
-          const address = document.getElementById('address');
-          const country = document.getElementById('country');
-          const state = document.getElementById('state');
-          const city = document.getElementById('city');
-          const pincode = document.getElementById('pincode');
+          <!-- Footer Section End -->
 
-          addBtn.addEventListener('click',(e)=>{
-            e.preventDefault();
-            console.log(addressType.value);
-            axios.post('/addAddress',{
-              name:name.value,
-              // email:email.value,
-              phone:phone.value,
-              altPhone:altPhone.value,
-              addressType:addressType.value,
-              address:address.value,
-              country:country.value,
-              state:state.value,
-              city:city.value,
-              pincode:pincode.value
+          <script>
+            const addBtn = document.getElementById('addBtn');
+            const name = document.getElementById('name');
+            // const email = document.getElementById('email');
+            const phone = document.getElementById('phone');
+            const altPhone = document.getElementById('altPhone');
+            const addressType = document.getElementById('addressType');
+            const address = document.getElementById('address');
+            const country = document.getElementById('country');
+            const state = document.getElementById('state');
+            const city = document.getElementById('city');
+            const pincode = document.getElementById('pincode');
+
+            addBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              console.log(addressType.value);
+              axios.post('/addAddress', {
+                name: name.value,
+                // email:email.value,
+                phone: phone.value,
+                altPhone: altPhone.value,
+                addressType: addressType.value,
+                address: address.value,
+                country: country.value,
+                state: state.value,
+                city: city.value,
+                pincode: pincode.value
+              }).then(res => {
+                if (res.status == 200) {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: 'Address added successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                  }).then(() => {
+                    window.location.reload()
+                  })
+                }
+              })
             })
-          })
-          
-        </script>
+
+          </script>
+          <script>
+            function deleteAddress(index) {
+              console.log(index)
+              Swal.fire({
+                title: 'Are you sure!',
+                text: 'Do you want to delete address!',
+                icon: 'warning',
+                confirmButtonText: 'Okay',
+                showCancelButton: true,
+                cancelButtonText: 'Cancel'
+              }).then((result) => {
+                if(result.isConfirmed){
+                  
+                  axios.delete('/deleteAddress', {
+                    params: {
+                      index: index
+                    }
+                  }).then(res => {
+                    if (res.status == 200) {
+                      Swal.fire({
+                        title: 'Success!',
+                        text: 'Address removed successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'Okay'
+                      }).then(() => {
+                        window.location.reload()
+                      })
+                    }
+                  })
+                }
+              })
+                
+            }
+          </script>
 
 
-        <!-- Js Plugins -->
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+          <!-- Js Plugins -->
+          <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-        <script src="js/jquery-3.3.1.min.js"></script>
-        <script src="js/bootstrap.min.js"></script>
-        <script src="js/jquery.nice-select.min.js"></script>
-        <script src="js/jquery.nicescroll.min.js"></script>
-        <script src="js/jquery.magnific-popup.min.js"></script>
-        <script src="js/jquery.countdown.min.js"></script>
-        <script src="js/jquery.slicknav.js"></script>
-        <script src="js/mixitup.min.js"></script>
-        <script src="js/owl.carousel.min.js"></script>
-        <script src="js/main.js"></script>
-        </body>
+          <script src="js/jquery-3.3.1.min.js"></script>
+          <script src="js/bootstrap.min.js"></script>
+          <script src="js/jquery.nice-select.min.js"></script>
+          <script src="js/jquery.nicescroll.min.js"></script>
+          <script src="js/jquery.magnific-popup.min.js"></script>
+          <script src="js/jquery.countdown.min.js"></script>
+          <script src="js/jquery.slicknav.js"></script>
+          <script src="js/mixitup.min.js"></script>
+          <script src="js/owl.carousel.min.js"></script>
+          <script src="js/main.js"></script>
+          </body>
 
-        </html>
+          </html>

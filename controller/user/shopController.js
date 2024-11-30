@@ -2,6 +2,7 @@ const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
+const mongoose = require('mongoose')
 const loadShop = async (req, res) => {
 
     try {
@@ -53,37 +54,21 @@ const loadCart = async (req, res) => {
         const user = req.session.user;
         const cartItem = await Cart.findOne({ userId: user._id });
         //===========================================================
-        const cart = await Cart.aggregate([ {$lookup:{from:'products',localField:'items.productId',foreignField:'_id',as:'result'}},{$project:{result:1}} ])
-        // Cart.aggregate([
-            // { $match: { userId: user._id } },
-            // { $unwind: "$cartItem.items" }, 
-            // {
-            //     $lookup: {
-            //         from: "products",                
-            //         localField: "cartItem.items.productId",
-            //         foreignField: "_id",              
-            //         as: "productDetails"             
-            //     }
-            // },
-            // {
-            //     $group: { 
-            //         _id: "$_id",
-            //         userId: { $first: "$userId" },
-            //         cartItem: { $first: "$cartItem" },
-            //         productDetails: { $push: { $arrayElemAt: ["$productDetails", 0] } }
-            //     }
-            // }
-        // ])
-//=====================================================================        
-        console.log('cart after lookup : ',cart[0].result)
+       
+       
+        const newCart = await Cart.findOne({userId:user._id}).populate('items.productId')
+        console.log("new Cart: ",cartItem)
+        //=====================================================================        
+        const total = cartItem.items.reduce((acc,curr)=>{
+            return acc+curr.totalPrice;
+        },0)
+        console.log("total : ",total)
 
-
-        console.log('cart items are :', cartItem)
         res.render('shopingCart', {
             activePage: 'cart',
             user,
-            cartItem,
-            cart:cart[0].result
+            cartItem: newCart.items,
+            total
         })
     } catch (error) {
         console.log(error)
@@ -121,10 +106,32 @@ const addToCart = async (req, res) => {
         );
         if (toCart) {
             console.log('added to db')
+            res.status(200).json({message:true})
         }
+
     } catch (error) {
         console.log(error);
 
+    }
+}
+const deleteFromCart = async (req,res)=>{
+    try {
+        const {index} = req.query;
+        console.log('index is :',index)
+        const user = req.session.user;
+        const cart = await Cart.findOne({userId:user._id},{items:1})
+        cart.items.splice(Number(index),1)
+        console.log("cart is :",cart.items)
+
+        const result = await Cart.updateOne({userId:user._id},{$set:{items:cart.items}})
+        
+        if(result){
+            res.status(200).json({message:true})
+            console.log("successfully deleted")
+        }   
+
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -133,5 +140,6 @@ module.exports = {
     loadProductInfo,
     loadCart,
     loadCheckout,
-    addToCart
+    addToCart,
+    deleteFromCart
 }

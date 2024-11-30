@@ -30,7 +30,7 @@ router.get('/cart',shopController.loadCart)
 router.get('/checkout',shopController.loadCheckout)
 
 router.get('/profile',userController.loadProfile)
-router.get('/address',userController.loadAddress)
+router.get('/address',userAuth,userController.loadAddress)
 router.patch('/nameEdit',userController.editName)
 router.get('/changePassword',userController.loadPassChange)
 router.post('/changePass',userController.changePass)
@@ -47,10 +47,12 @@ router.patch('/updatePass',userController.updatePass)
 
 //address
 router.post('/addAddress',userController.addAddress);
+router.delete('/deleteAddress',userController.deleteAddress)
 
 
 //addtoCart
-router.post('/addToCart',shopController.addToCart)
+router.post('/addToCart',shopController.addToCart);
+router.delete('/deleteItem',shopController.deleteFromCart)
 
 //justcrop
 router.get('/crop',userController.cropImage)
