@@ -37,6 +37,7 @@
                                     <th>Size</th>
                                     <th>Quantity</th>
                                     <th>Total</th>
+                                    <!-- <th>Edit</th> -->
                                     <th></th>
                                 </tr>
                             </thead>
@@ -60,75 +61,16 @@
                                         <td class="quantity__item">
                                             <div class="quantity">
                                                 <div class="pro-qty-2">
-                                                    <input onchange="quantityCount(this.value)" type="text" value="<%=item.quantity%>">
+                                                    <input id="itemQty" type="text" value="<%=item.quantity%>" class="quantity-input">
                                                 </div>
                                             </div>
                                         </td>
                                         <td class="cart__price">Rs :<%=item.totalPrice%>.00</td>
+                                        <!-- <td><button class="btn btn-dark" onclick="saveItem('<%=index%>')">save</button></td> -->
                                         <td class="cart__close" onclick="deleteItem('<%=index%>')"><i
                                                 class="fa fa-close"></i></td>
                                     </tr>
                                     <%})%>
-                                        <!-- <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-2.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Diagonal Textured Cap</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 32.50</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-3.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 47.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr>
-                                <tr>
-                                    <td class="product__cart__item">
-                                        <div class="product__cart__item__pic">
-                                            <img src="img/shopping-cart/cart-4.jpg" alt="">
-                                        </div>
-                                        <div class="product__cart__item__text">
-                                            <h6>Basic Flowing Scarf</h6>
-                                            <h5>$98.49</h5>
-                                        </div>
-                                    </td>
-                                    <td class="quantity__item">
-                                        <div class="quantity">
-                                            <div class="pro-qty-2">
-                                                <input type="text" value="1">
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="cart__price">$ 30.00</td>
-                                    <td class="cart__close"><i class="fa fa-close"></i></td>
-                                </tr> -->
                             </tbody>
                         </table>
                     </div>
@@ -138,9 +80,9 @@
                                 <a href="/shop">Continue Shopping</a>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                        <div class="col-lg-6 col-md-6 col-sm-6" >
+                            <div class="continue__btn update__btn"  >
+                                <a href="#" id="updateCartBtn" ><i class="fa fa-spinner"></i> Update cart</a>
                             </div>
                         </div>
                     </div>
@@ -159,7 +101,7 @@
                             <!-- <li>Subtotal <span>Rs : 169.50</span></li> -->
                             <li>Total <span>Rs : <%=total%></span></li>
                         </ul>
-                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout"  class="primary-btn">Proceed to checkout</a>
                     </div>
                 </div>
             </div>
@@ -281,10 +223,15 @@
             
         }
 
-        function quantityCount(event){
-            console.log("value is :",event.target.value)
+    </script>
+    <script>
+        function saveItem(index){
+            console.log(index);
+            const itemQty = document.getElementById('itemQty');
+            console.log('hai',itemQty.value)
         }
     </script>
+    
     <!-- Js Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

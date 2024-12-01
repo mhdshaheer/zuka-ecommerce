@@ -9,7 +9,7 @@ const env = require("dotenv").config()
 
 //===================================================
 
-//================sign up ===========================
+//================ sign up ===========================
 
 const loadSignup = async (req, res) => {
     try {
@@ -50,7 +50,6 @@ const signup = async (req, res) => {
         res.redirect('/pageNotFound');
     }
 }
-
 
 
 //=================== login ============================
@@ -121,13 +120,13 @@ const logout = async (req, res) => {
     }
 }
 
-//===================== otp ============================
+//===================== otp generation ============================
 
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 90000).toString();
 }
 
-//================= sent & resent otp ================================
+//================= sent & resent otp for signUp ================================
 
 const resentOtp = async (req, res) => {
     try {
@@ -156,6 +155,7 @@ const resentOtp = async (req, res) => {
     }
 }
 
+// sent mail to user mail
 async function sendEmailVerify(email, otp) {
     try {
         const transporter = nodemailer.createTransport({
@@ -280,6 +280,7 @@ const pageNotFound = async (req, res) => {
 //================= end =============================
 
 
+// ================ Profile -> profile Page ====================================
 
 // profile page
 const loadProfile = async (req,res)=>{
@@ -293,21 +294,7 @@ const loadProfile = async (req,res)=>{
         
     }
 }
-const loadAddress = async (req,res)=>{
-    try {
-        const user = req.session.user
-        const addressDb = await Address.findOne({userId:user?._id})
-        
-        return res.render('addAddress',{
-           user,
-           addressDb,
-           activePage:""
-       })
-
-    } catch (error) {
-        console.log("error in load address",error)
-    }
-}
+//edit user name
 const editName = async (req,res)=>{
     try {
         const user = req.session.user;
@@ -320,6 +307,7 @@ const editName = async (req,res)=>{
         
     }
 }
+//Load passChange page
 const loadPassChange = async (req,res)=>{
     try {
         const user = req.session.user
@@ -328,6 +316,7 @@ const loadPassChange = async (req,res)=>{
         
     }
 }
+
 const changePass = async(req,res)=>{
     try {
         const {oldPassword,newPassword} = req.body;
@@ -350,6 +339,8 @@ const changePass = async(req,res)=>{
         res.redirect('/pageNotFound')
     }
 }
+//// ================ Forgot password ====================================
+
 const loadForgotPass = async (req,res)=>{
     try {
         const user = req.session.user
@@ -462,7 +453,27 @@ const updatePass = async (req,res)=>{
         res.status(500).json({message:"Server while changing password"})
     }
 }
+// ================ Profile -> address ====================================
 
+
+// Load Address
+const loadAddress = async (req,res)=>{
+    try {
+        const user = req.session.user
+        const addressDb = await Address.findOne({userId:user?._id})
+        
+        return res.render('addAddress',{
+           user,
+           addressDb,
+           activePage:""
+       })
+
+    } catch (error) {
+        console.log("error in load address",error)
+    }
+}
+
+//Add address
 const addAddress = async (req,res)=>{
     try {
         const address=req.body;
@@ -522,6 +533,71 @@ const deleteAddress = async(req,res)=>{
     }
 }
 
+const LoadEditAddress = async (req,res)=>{
+    try {
+        const {addressId,index}=req.query;
+        const user = req.session.user
+        console.log(addressId,index);
+        const userAddress = await Address.findOne({userId:user._id})
+        const oneAddress = userAddress.address.splice(index,1)
+        console.log(oneAddress)
+        
+        res.render('editAddress',{
+            activePage:'',
+            user,
+            address:oneAddress[0]
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//edit Address
+const editAddressData = async (req,res)=>{
+    try {
+        const index= Number(req.body.index)
+        const user = req.session.user;
+        const editedData = req.body.editedData;
+        console.log(editedData,index);
+        const result = await Address.updateOne({userId:user._id},
+            {$set:{
+                [`address.${index}.name`]:editedData.name,
+                [`address.${index}.phone`]:editedData.phone,
+                [`address.${index}.altPhone`]:editedData.altPhone,
+                [`address.${index}.addressType`]:editedData.addressType,
+                [`address.${index}.address`]:editedData.address,
+                [`address.${index}.country`]:editedData.country,
+                [`address.${index}.state`]:editedData.state,
+                [`address.${index}.pincode`]:editedData.pincode,
+                [`address.${index}.city`]:editedData.city,
+            }}
+        )
+        if(result){
+            console.log("Address edited successfully");
+            res.status(200).json({success:true})
+        }
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+
+//Orders
+const loadOrders = async (req,res)=>{
+    try {
+        const user = req.session.user
+        res.render('orders',{
+            activePage:'',
+            user
+        })
+    } catch (error) {
+        
+    }
+}
+
+// ================ Testing ====================================
+
 const cropImage = async(req,res)=>{
     try {
 
@@ -532,35 +608,40 @@ const cropImage = async(req,res)=>{
 }
 
 module.exports = {
-    loadSignup,
-    loadLogin,
-    loadHomePage,
+    loadSignup,//load
+    loadLogin,//load
+    loadHomePage,//load
     pageNotFound,
     verifyOtp,
     resentOtp,
     login,
     logout,
     signup,
-    loadProfile,
-    loadAddress,
+    loadProfile,//load
+    loadAddress,//load
     editName,
     
     //password change
-    loadPassChange,
+    loadPassChange,//load
     changePass,
 
     //forgot password
-    loadForgotPass,
+    loadForgotPass,//load
     sentOtp,
-    loadForgotOtpVerify,
+    loadForgotOtpVerify, //load
     verifyForgot,
     resentForgotOtp,
-    newPassSet,
+    newPassSet,//load
     updatePass,
 
     //address
     addAddress,
     deleteAddress,
+    LoadEditAddress, //load
+    editAddressData,
+
+    //Orders
+    loadOrders,
 
     cropImage
 }

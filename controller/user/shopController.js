@@ -3,6 +3,7 @@ const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
 const mongoose = require('mongoose')
+const Address = require('../../models/addressSchema')
 const loadShop = async (req, res) => {
 
     try {
@@ -78,8 +79,17 @@ const loadCart = async (req, res) => {
 const loadCheckout = async (req, res) => {
     try {
         const user = req.session.user;
+        const userAddress = await Address.findOne({userId:user._id});
+        const userCart = await Cart.findOne({userId:user._id}).populate('items.productId');
+        console.log(userCart)
+        // console.log(userAddress)
 
-        res.render('checkout', { activePage: "", user })
+        res.render('checkout', { 
+            activePage: "", 
+            user,
+            userAddress,
+            userCart
+         })
     } catch (error) {
         console.log(error);
 
@@ -89,8 +99,30 @@ const loadCheckout = async (req, res) => {
 const addToCart = async (req, res) => {
     try {
         const user = req.session.user;
-        const { size, stock, productObj, quantity } = req.body
+        let { size, stock, productObj, quantity } = req.body
         console.log(size, stock, typeof quantity, productObj._id)
+        const sizeFound = await Cart.findOne({userId:user._id,'items.size':size,'items.productId':productObj._id});
+        console.log('Product obj: ',productObj)
+        console.log('size found : ',sizeFound)
+        if(sizeFound){
+            const itemIndex = sizeFound.items.findIndex(item => 
+                item.size === size && item.productId.toString() === productObj._id.toString()
+              );
+              console.log('item index is:',itemIndex)
+              console.log('stocks : ',sizeFound.items[itemIndex].quantity)
+              quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
+              console.log(quantity)
+              let totalPrice= Number(quantity) * Number(productObj.regularPrice)
+              const result = await Cart.updateOne({userId:user._id},{$set:{[`items.${itemIndex}.quantity`]:quantity}})
+              const resultPrice = await Cart.updateOne({userId:user._id},{$set:{[`items.${itemIndex}.totalPrice`]:totalPrice}})
+              if (result&&resultPrice) {
+                console.log('updated to db')
+                res.status(200).json({message:true})
+            }
+
+        }else{
+
+        
         const itemData = {
             productId: productObj._id,
             quantity: Number(quantity),
@@ -108,7 +140,7 @@ const addToCart = async (req, res) => {
             console.log('added to db')
             res.status(200).json({message:true})
         }
-
+    }
     } catch (error) {
         console.log(error);
 
@@ -132,6 +164,17 @@ const deleteFromCart = async (req,res)=>{
 
     } catch (error) {
         console.log(error)
+    }
+}
+
+//Orders
+
+const addOrder = async (req,res)=>{
+    try {
+        const user = req.session.user;
+        // const cart = 
+    } catch (error) {
+        
     }
 }
 

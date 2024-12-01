@@ -10,10 +10,6 @@
       font-family: Arial, sans-serif;
     }
 
-    /* .categories-text:hover {
-      color: black;
-    } */
-
     .form-container {
       background-color: #ffffff;
       padding: 30px;
@@ -44,19 +40,14 @@
       <div class="breadcrumb__text">
         <div class="breadcrumb__links">
           <a href="/">Home</a>
-          <span>Address</span>
+          <a href="/address">Address</a>
+          <span>Edit-Address</span>
         </div>
       </div>
       <br>
       <div class="row">
         <div class="col-lg-3">
           <div class="shop__sidebar">
-            <!-- <div class="shop__sidebar__search">
-              <form action="#">
-                <input type="text" placeholder="Search...">
-                <button type="submit"><span class="icon_search"></span></button>
-              </form>
-            </div> -->
             <div class="shop__sidebar__accordion">
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text active">
@@ -100,27 +91,28 @@
             <div class="col-lg-6">
               <div class="checkout__input">
                 <p>Name<span>*</span></p>
-                <input type="text" class="text-dark" id="name">
+                <input type="text" class="text-dark" id="name" value="<%=address.name%>" required>
               </div>
             </div>
-            
             <div class="col-lg-6">
               <div class="checkout__input">
                 <p>Phone<span>*</span></p>
-                <input type="number" value="" class="text-dark" id="phone">
+                <input type="number" value="<%=address.phone%>" class="text-dark" id="phone" required>
               </div>
             </div>
             <div class="col-lg-6">
               <div class="checkout__input">
                 <p>Alternative Phone</p>
-                <input type="number" value="" class="text-dark" id="altPhone">
+                <input type="number" value="<%=address.altPhone%>" class="text-dark" id="altPhone">
               </div>
             </div>
             <div class="col-lg-6 mb-2">
               <div class="checkout__input">
                 <p>Address Type<span>*</span></p>
                 <select class="form-control text-dark" required id="addressType">
-                  <option value="" disabled selected>Select Address Type</option>
+                  <option value="<%=address.addressType%>" disabled selected>
+                    <%=address.addressType%>
+                  </option>
                   <option value="Home">Home</option>
                   <option value="Work">Work</option>
                   <option value="Other">Other</option>
@@ -130,83 +122,45 @@
           </div>
           <div class="checkout__input">
             <p>Address<span>*</span></p>
-            <input type="text" placeholder="Street Address" class="checkout__input__add text-dark" id="address">
+            <input type="text" value="<%=address.address%>" placeholder="Street Address" required
+              class="checkout__input__add text-dark" id="address">
           </div>
           <div class="row">
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>Country<span>*</span></p>
-                <input type="text" class="text-dark" id="country">
+                <input type="text" value="<%=address.country%>" class="text-dark" id="country" required>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>State<span>*</span></p>
-                <input type="text" class="text-dark" id="state">
+                <input type="text" value="<%=address.state%>" class="text-dark" id="state" required>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>City/Town<span>*</span></p>
-                <input type="text" class="text-dark" id="city">
+                <input type="text" value="<%=address.city%>" class="text-dark" id="city" required>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>Pincode/ZIP<span>*</span></p>
-                <input type="number" class="text-dark" id="pincode">
+                <input type="number" value="<%=address.pincode%>" class="text-dark" id="pincode" required>
               </div>
             </div>
           </div>
           <div>
-            <button class="btn btn-dark py-3 px-5 mb-5 " id="addBtn">Add</button>
+            <button class="btn btn-dark py-3 px-5 mb-5 " id="addBtn">Edit address</button>
           </div>
-          <div class="row">
-            <h2><b>Saved Addresses</b></h2>
-            <%if(addressDb){%>
 
-              <%addressDb.address.map((item,index)=>{%>
-                <div class="card shadow-sm col-4 m-2">
-                  <div class="card-body">
-                    <h5 class="card-title"><strong>
-                        <%=item.addressType%> Address
-                      </strong> </h5>
-                    <p class="card-text">
-                      <strong>Name:</strong>
-                      <%=item.name%><br>
-                        <strong>Address:</strong>
-                        <%=item.address%>,<%=item.city%>,<%=item.state%>,<%=item.country%><br>
-                                <strong>ZIP Code:</strong>
-                                <%=item.pincode%><br>
-                                  <strong>Phone:</strong>
-                                  <%=item.phone%>,<br>
-                                    <%=item.altPhone%><br>
-                    </p>
-                    <div class="col">
-                      <a href="/editAddress?addressId=<%=item._id%>&index=<%=index%>"><button class="btn btn-secondary" >Edit</button></a>
-                      <button class="btn btn-danger" id="deleteBtn"
-                        onclick="deleteAddress('<%=index%>')">Delete</button>
-                    </div>
-                  </div>
-                </div>
-                <%})%>
-                  <%}else{%>
-                    <div class="card shadow-sm col-4 m-2">
-                      <div class="card-body">
-                        <h5 class="card-title">No address Found</h5>
-                      </div>
-                    </div>
-                    <%}%>
-
-
-          </div>
 
           <!-- Footer Section End -->
 
           <script>
             const addBtn = document.getElementById('addBtn');
             const name = document.getElementById('name');
-            // const email = document.getElementById('email');
             const phone = document.getElementById('phone');
             const altPhone = document.getElementById('altPhone');
             const addressType = document.getElementById('addressType');
@@ -216,12 +170,18 @@
             const city = document.getElementById('city');
             const pincode = document.getElementById('pincode');
 
+            //access value from the query ===================
+            const queryString = window.location.search;
+            const params = new URLSearchParams(queryString);
+            const index = params.get("index");
+            console.log(index)
+            //===============================================
+
             addBtn.addEventListener('click', (e) => {
               e.preventDefault();
-              console.log(addressType.value);
-              axios.post('/addAddress', {
+              // console.log(index.value)
+              const editedData = {
                 name: name.value,
-                // email:email.value,
                 phone: phone.value,
                 altPhone: altPhone.value,
                 addressType: addressType.value,
@@ -230,11 +190,16 @@
                 state: state.value,
                 city: city.value,
                 pincode: pincode.value
+              }
+              axios.post('/editAddress', {
+                index,
+                editedData
+               
               }).then(res => {
                 if (res.status == 200) {
                   Swal.fire({
                     title: 'Success!',
-                    text: 'Address added successfully!',
+                    text: 'Address Edited successfully!',
                     icon: 'success',
                     confirmButtonText: 'Okay'
                   }).then(() => {
@@ -245,40 +210,7 @@
             })
 
           </script>
-          <script>
-            function deleteAddress(index) {
-              console.log(index)
-              Swal.fire({
-                title: 'Are you sure!',
-                text: 'Do you want to delete address!',
-                icon: 'warning',
-                confirmButtonText: 'Okay',
-                showCancelButton: true,
-                cancelButtonText: 'Cancel'
-              }).then((result) => {
-                if(result.isConfirmed){
-                  
-                  axios.delete('/deleteAddress', {
-                    params: {
-                      index: index
-                    }
-                  }).then(res => {
-                    if (res.status == 200) {
-                      Swal.fire({
-                        title: 'Success!',
-                        text: 'Address removed successfully!',
-                        icon: 'success',
-                        confirmButtonText: 'Okay'
-                      }).then(() => {
-                        window.location.reload()
-                      })
-                    }
-                  })
-                }
-              })
-                
-            }
-          </script>
+
 
 
           <!-- Js Plugins -->

@@ -104,7 +104,7 @@
     <section class="checkout spad">
         <div class="container">
             <div class="checkout__form">
-                <form action="#">
+                <form >
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
                             <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
@@ -117,83 +117,90 @@
                             <div class="collapsible-content" id="billing-details">
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <div class="checkout__input">
-                                            <p>First Name<span>*</span></p>
-                                            <input type="text" class="text-dark">
-                                        </div>
+                                      <div class="checkout__input">
+                                        <p>Name<span>*</span></p>
+                                        <input type="text" class="text-dark" id="name">
+                                      </div>
+                                    </div>
+                                    
+                                    <div class="col-lg-6">
+                                      <div class="checkout__input">
+                                        <p>Phone<span>*</span></p>
+                                        <input type="number" value="" class="text-dark" id="phone">
+                                      </div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div class="checkout__input">
-                                            <p>Last Name<span>*</span></p>
-                                            <input type="text" class="text-dark">
-                                        </div>
+                                      <div class="checkout__input">
+                                        <p>Alternative Phone</p>
+                                        <input type="number" value="" class="text-dark" id="altPhone">
+                                      </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="checkout__input">
-                                            <p>Email<span>*</span></p>
-                                            <input type="email" value="shaheer@gmail.com" class="text-dark">
-                                        </div>
+                                    <div class="col-lg-6 mb-2">
+                                      <div class="checkout__input">
+                                        <p>Address Type<span>*</span></p>
+                                        <select class="form-control text-dark" required id="addressType">
+                                          <option value="" disabled selected>Select Address Type</option>
+                                          <option value="Home">Home</option>
+                                          <option value="Work">Work</option>
+                                          <option value="Other">Other</option>
+                                        </select>
+                                      </div>
                                     </div>
-                                    <div class="col-lg-6">
-                                        <div class="checkout__input">
-                                            <p>Phone<span>*</span></p>
-                                            <input type="number" value="7034786543" class="text-dark">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="checkout__input">
+                                  </div>
+                                  <div class="checkout__input">
                                     <p>Address<span>*</span></p>
-                                    <input type="text" placeholder="Street Address"
-                                        class="checkout__input__add text-dark">
-                                    <input type="text" placeholder="Apartment, suite, unit, etc. (optional)"
-                                        class="text-dark">
-                                </div>
+                                    <input type="text" placeholder="Street Address" class="checkout__input__add text-dark" id="address">
+                                  </div>
+                                  <div class="row">
+                                    <div class="col-lg-3">
+                                      <div class="checkout__input">
+                                        <p>Country<span>*</span></p>
+                                        <input type="text" class="text-dark" id="country">
+                                      </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                      <div class="checkout__input">
+                                        <p>State<span>*</span></p>
+                                        <input type="text" class="text-dark" id="state">
+                                      </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                      <div class="checkout__input">
+                                        <p>City/Town<span>*</span></p>
+                                        <input type="text" class="text-dark" id="city">
+                                      </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                      <div class="checkout__input">
+                                        <p>Pincode/ZIP<span>*</span></p>
+                                        <input type="number" class="text-dark" id="pincode">
+                                      </div>
+                                    </div>
+                                  </div>
                                 <div class="row">
-                                    <div class="col-lg-4">
-                                        <div class="checkout__input">
-                                            <p>Country<span>*</span></p>
-                                            <input type="text" class="text-dark">
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="checkout__input">
-                                            <p>State<span>*</span></p>
-                                            <input type="text" class="text-dark">
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="checkout__input">
-                                            <p>City/Town<span>*</span></p>
-                                            <input type="text" class="text-dark">
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-4">
-                                        <div class="checkout__input">
-                                            <p>Pincode/ZIP<span>*</span></p>
-                                            <input type="number" class="text-dark">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card shadow-sm col-4 mb-3">
+                                <%userAddress.address.map((item,index)=>{%>
+                                <div class="card shadow-sm col-4 m-2">
                                     <div class="card-body">
-                                        <h5 class="card-title">Shipping Address</h5>
+                                        <h5 class="card-title"><%=item.addressType%> Address</h5>
                                         <p class="card-text">
-                                            <strong>Name:</strong> John Doe<br>
-                                            <strong>Address:</strong> 123 Cherry Lane, Apt 12<br>
-                                            <strong>City:</strong> Harrisburg<br>
-                                            <strong>State:</strong> Pennsylvania<br>
-                                            <strong>ZIP Code:</strong> 17101<br>
-                                            <strong>Phone:</strong> +1 555-123-4567
+                                            <strong>Name:</strong> <%=item.name%><br>
+                                            <strong>Address:</strong> <%=item.address%><br>
+                                            <strong>City:</strong> <%=item.city%><br>
+                                            <strong>State:</strong> <%=item.state%><br>
+                                            <strong>ZIP Code:</strong> <%=item.pincode%><br>
+                                            <strong>Phone:</strong> <%=item.phone%> 
                                         </p>
+                                        <button class="btn btn-dark" id="chooseBtn" data-item="<%=item%>" data-index="<%=index%>">Choose</button>
+                                        
                                     </div>
                                 </div>
-                                <div>
-                                    <button class="btn btn-dark py-3 px-5 mb-5 ">Next</button>
-                                </div>
+                                <%})%>
                             </div>
-                            <h6 class="checkout__title toggle-btn text-dark" id="toggle-payment">
+                                <!-- <div>
+                                    <button class="btn btn-dark py-3 px-5 mb-5 ">Next</button>
+                                </div> -->
+                            </div>
+                            <h6 class="checkout__title toggle-btn text-dark mt-3" id="toggle-payment">
                                 Payment Details
                             </h6>
 
@@ -262,14 +269,16 @@
                                 <h4 class="order__title">Your order</h4>
                                 <div class="checkout__order__products">Product <span>Total</span></div>
                                 <ul class="checkout__total__products">
-                                    <li>01. Vanilla salted caramel <span>300.00</span></li>
-                                    <li>02. German chocolate <span>170.00</span></li>
+                                    <%userCart.items.map((item,index)=>{%>
+                                    <li><%=index+1%>. <%=item.productId.productName%> <span><%=item.totalPrice%>.00</span></li>
+                                    <%})%>
+                                    <!-- <li>02. German chocolate <span>170.00</span></li>
                                     <li>03. Sweet autumn <span>170.00</span></li>
-                                    <li>04. Cluten free mini dozen <span>110.00</span></li>
+                                    <li>04. Cluten free mini dozen <span>110.00</span></li> -->
                                 </ul>
                                 <ul class="checkout__total__all">
-                                    <li>Subtotal <span>Rs: 750.99</span></li>
-                                    <li>Total <span>Rs: 750.99</span></li>
+                                    <!-- <li>Subtotal <span>Rs: 750.99</span></li> -->
+                                    <li>Total <span>Rs: <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%></span></li>
                                 </ul>
 
                                 <button type="submit" class="site-btn">PLACE ORDER</button>
@@ -404,4 +413,18 @@
                 paymentDetails.style.display = 'none'; // Hide details
             }
         });
+    </script>
+
+    <script>
+        const chooseBtns = document.querySelectorAll('[id="chooseBtn"]'); 
+        chooseBtns.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default form behavior (like page reload)
+
+            const item = btn.getAttribute('data-item');
+            const index = btn.getAttribute('data-index');
+            console.log(item, index); // Log the item and index values
+            console.log('Address chosen');
+        });
+    });
     </script>
