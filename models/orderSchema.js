@@ -8,27 +8,37 @@ const orderSchema = new Schema({
         default: () => uuidv4(),
         unique: true
     },
-    orderedItems: [{
+    userId:{
+        type: Schema.Types.ObjectId,
+        ref:'User',
+        required:true
+    },
+    cartId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Cart', // Links to the cart from which the order was created
+        required: true,
+      },
+    // orderedItems: [{
 
-        product: {
-            type: Schema.Types.ObjectId,
-            ref: 'Product',
-            required: true
-        },
-        quantity: {
-            type: Number,
-            required: true
-        },
-        price: {
-            type: Number,
-            default: 0
-        },
-        size: {
-            type: String,
-            required: false,
-        },
+    //     product: {
+    //         type: Schema.Types.ObjectId,
+    //         ref: 'Product',
+    //         required: true
+    //     },
+    //     quantity: {
+    //         type: Number,
+    //         required: true
+    //     },
+    //     price: {
+    //         type: Number,
+    //         default: 0
+    //     },
+    //     size: {
+    //         type: String,
+    //         required: false,
+    //     },
 
-    }],
+    // }],
     totalPrice: {
         type: Number,
         required: true
@@ -48,7 +58,7 @@ const orderSchema = new Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['COD', 'Credit Card', 'Debit Card', 'PayPal', 'UPI', 'Wallet'],
+        enum: ['Cash on Delivery', 'Credit Card', 'Debit Card', 'PayPal', 'UPI', 'Wallet'],
         required: true,
     },
     paymentStatus: {
@@ -56,13 +66,17 @@ const orderSchema = new Schema({
         enum: ['Pending', 'Paid', 'Failed', 'Refunded'],
         default: 'Pending',
     },
+    index:{
+        type:Number,
+    },
     invoiceDate: {
         type: Date
     },
     status: {
         type: String,
         required: true,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned']
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+        default:'Pending',
     },
     couponApplied: {
         type: Boolean,

@@ -121,33 +121,37 @@
                                     <tr>
                                         <th class="small">Order ID</th>
                                         <th class="small">Address</th>
-                                        <th class="small">Phone</th>
+                                        <th class="small">Payment</th>
                                         <th class="small">Status</th>
                                         <th class="small">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <!-- Example order entry -->
+                                     <%userOrder.map((order,index)=>{%>
                                     <tr>
-                                        <td class="small">12345</td>
+                                        <td class="small">#<%=order.orderId%></td>
                                         <td class="small">
-                                            <strong>Home Address</strong><br>
+                                            Need to add
+                                            <!-- <strong><%=order.address%></strong><br>
                                             123 Main St, Cityville, State, Country<br>
-                                            123456
+                                            123456 -->
                                         </td>
                                         <td class="small">
-                                            <strong>Primary:</strong> 9876543210<br>
-                                            <strong>Alt:</strong> 1112233445
+                                            <%=order.paymentMethod%>
+                                            <!-- <strong>Primary:</strong> 9876543210<br>
+                                            <strong>Alt:</strong> 1112233445 -->
                                         </td>
-                                        <td class="small"><span class="badge badge-success">Shipped</span></td>
+                                        <td class="small"><span class="badge badge-success"><%=order.status%></span></td>
                                         <td class="small">
-                                            <a href="/editOrder/12345">
+                                            <!-- <a href="/editOrder/12345">
                                                 <button class="btn btn-warning btn-sm mr-2">Edit</button>
-                                            </a>
+                                            </a> -->
                                             <button class="btn btn-danger btn-sm"
-                                                onclick="deleteOrder(12345)">Delete</button>
+                                                onclick="deleteOrder(12345)">Cancel</button>
                                         </td>
                                     </tr>
+                                    <%})%>
                                     <!-- More orders will be dynamically added here -->
                                 </tbody>
                             </table>

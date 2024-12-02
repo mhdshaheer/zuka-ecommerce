@@ -1,0 +1,250 @@
+<%- include('../partials/user/header') %>
+
+    <style>
+        .checkout__input p {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .text-dark {
+            color: #333;
+        }
+
+        .collapsible-content {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .toggle-btn .toggle-payment {
+            cursor: pointer;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .custom-label {
+            font-size: 18px;
+            /* Adjust font size for label */
+            display: flex;
+            align-items: center;
+        }
+
+        .custom-label input {
+            transform: scale(1.5);
+            /* Resize the radio button */
+            margin-right: 10px;
+            /* Add spacing */
+        }
+
+
+        /* css for cards */
+        .address-card {
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .address-card-header {
+            background-color: #f8f9fa;
+            /* Light gray */
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 1.25rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .address-card-body {
+            padding: 20px;
+            background-color: #ffffff;
+            /* White */
+        }
+
+        .address-card-body p {
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .address-card-body strong {
+            color: #007bff;
+            /* Bootstrap primary color */
+        }
+
+        .address-card-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #ddd;
+            padding: 10px 20px;
+            text-align: right;
+        }
+
+        .btn-custom {
+            margin-left: 10px;
+            border-radius: 20px;
+        }
+    </style>
+    <style>
+        .order-success {
+            padding: 40px 0;
+            background-color: #f4f4f9;
+        }
+        
+        .order-success__wrapper {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .order-success__header .swal-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+    
+        .order-success__title {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+    
+        .order-success__message {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-bottom: 25px;
+        }
+    
+        .order-success__subtitle {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+    
+        .order-summary-list {
+            list-style: none;
+            padding-left: 0;
+            text-align: left;
+            font-size: 16px;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+    
+        .order-summary-list li {
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+    
+        .order-summary-list li strong {
+            color: #2c3e50;
+        }
+    
+        .next-steps-list {
+            list-style: none;
+            padding-left: 0;
+            font-size: 14px;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+    
+        .next-steps-list li {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+    
+        .order-success__actions a {
+            display: inline-block;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin: 8px;
+            text-decoration: none;
+        }
+    
+        .order-success__actions .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+    
+        .order-success__actions .btn-primary:hover {
+            background-color: #2980b9;
+        }
+    
+        .order-success__actions .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+    
+        .order-success__actions .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+    
+        /* SweetAlert success icon styles */
+        .swal-icon--success {
+            position: relative;
+            display: inline-block;
+            background: #a5d6a7;
+            border-radius: 50%;
+        }
+    
+        
+    
+       
+    
+       
+    </style>
+
+    <!-- Breadcrumb Section Begin -->
+    <!-- <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Check Out</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <a href="/shop">Shop</a>
+                            <span>Check Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section> -->
+    <!-- Breadcrumb Section End -->
+
+    <section class="order-success spad">
+        <div class="container">
+            <div class="order-success__wrapper">
+                <!-- Success Icon using SweetAlert -->
+                <div class="order-success__header">
+                    <!-- Swal success icon -->
+                    <div class="m-4">
+                        <i class="fa-solid fa-circle-check fa-4x" style="color: #1ca61e; "></i>
+                    </div>
+                    <h2 class="order-success__title">Order Placed Successfully!</h2>
+                    <p class="order-success__message">Thank you for shopping with us. Your order has been successfully placed.</p>
+                </div>
+    
+                <!-- Center-aligned Order Summary -->
+                <div class="order-success__details text-center">
+                    <h3 class="order-success__subtitle">Order Summary</h3>
+                    <!-- <ul class="order-summary-list">
+                        <li><strong>Order ID:</strong> <span id="orderId">dffds</span></li>
+                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice">dsfdsf</span></li>
+                        <li><strong>Payment Method:</strong> <span id="paymentMethod">dsfsdffds</span></li>
+                        <li><strong>Shipping Address:</strong></li>
+                        <li id="shippingAddress">dsffsdsfd</li>
+                    </ul> -->
+                </div>
+    
+                <div class="order-success__actions text-center">
+                    <a href="/" class="btn btn-dark">Continue Shopping</a>
+                    <!-- <a href="/orders" class="btn btn-secondary">View Orders</a> -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('../partials/user/footer') %>

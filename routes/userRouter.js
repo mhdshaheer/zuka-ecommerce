@@ -52,12 +52,18 @@ router.get('/editAddress',userController.LoadEditAddress);
 router.post('/editAddress',userController.editAddressData)
 
 //orders
-router.get('/orders',userController.loadOrders)
+router.get('/orders',userController.loadOrders);
+
+
 
 
 //addtoCart
 router.post('/addToCart',shopController.addToCart);
 router.delete('/deleteItem',shopController.deleteFromCart)
+
+// Checkout
+router.post('/placeOrder',shopController.addOrder)
+router.get('/orderSuccess',shopController.loadOrderSuccess)
 
 //justcrop
 router.get('/crop',userController.cropImage)

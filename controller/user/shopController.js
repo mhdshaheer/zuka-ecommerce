@@ -4,6 +4,7 @@ const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
 const mongoose = require('mongoose')
 const Address = require('../../models/addressSchema')
+const Order = require('../../models/orderSchema');
 const loadShop = async (req, res) => {
 
     try {
@@ -171,10 +172,51 @@ const deleteFromCart = async (req,res)=>{
 
 const addOrder = async (req,res)=>{
     try {
-        const user = req.session.user;
-        // const cart = 
-    } catch (error) {
         
+        const user = req.session.user;
+        const {totalPrice,address,paymentMethod,index} = req.body
+        const cart = await Cart.findOne({userId:user._id});
+        const addOrder = await Order.create({
+            cartId: cart._id,
+            userId:user._id,
+            totalPrice,
+            finalAmount:totalPrice,
+            address: address._id,
+            index:Number(index),
+            paymentMethod
+        });
+        if(addOrder){
+            console.log("added to orders")
+            const order = await Order.findOne({cartId:cart._id})
+            console.log('order is :',order)
+            req.session.order = order
+            await Cart.updateOne({ userId:user._id }, { $set: { items: [] } })
+            // res.status(200).redirect(`/orderSuccess?orderId=${order.orderId}`);
+            res.status(200).json({success:true})
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success:false})
+    }
+}
+
+const loadOrderSuccess = async (req,res)=>{
+    try {
+        const user = req.session.user;
+        let {orderId} = req.query
+        console.log('order id:',orderId);
+        const order = await Order.findOne({orderId:orderId})
+        // const findAddress = await Address.findOne({_id:user._id},{[`address.${order.index}`]:1})
+        
+        console.log('success: ',order)
+        res.render('orderSuccess',{
+            activePage:'',
+            user,
+            order,
+            // findAddress:findAddress.address[0]
+        })
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -184,5 +226,7 @@ module.exports = {
     loadCart,
     loadCheckout,
     addToCart,
-    deleteFromCart
+    deleteFromCart,
+    addOrder,
+    loadOrderSuccess
 }

@@ -2,6 +2,7 @@ const express = require('express')
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema')
 const mongoose = require('mongoose')
+const Order = require('../../models/orderSchema')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { truncateSync } = require('fs-extra');
@@ -285,13 +286,13 @@ const pageNotFound = async (req, res) => {
 // profile page
 const loadProfile = async (req,res)=>{
     try {
-        const user = req.session.user
+        const user = req.session.user || req.session.googleUser
         res.render('profile',{
             user,
             activePage:''
         })
     } catch (error) {
-        
+        console.log(error)
     }
 }
 //edit user name
@@ -586,10 +587,13 @@ const editAddressData = async (req,res)=>{
 //Orders
 const loadOrders = async (req,res)=>{
     try {
-        const user = req.session.user
+        const user = req.session.user;
+        const userOrder = await Order.find({userId:user._id}).populate('address')
+        console.log('orders',userOrder)
         res.render('orders',{
             activePage:'',
-            user
+            user,
+            userOrder
         })
     } catch (error) {
         

@@ -84,7 +84,7 @@
         <div class="col-lg-9">
 
           <div class="row">
-            <h2><b>Add Address</b></h2>
+            <h2><b>Edit Address</b></h2>
           </div>
           <hr>
           <div class="row">
@@ -92,12 +92,14 @@
               <div class="checkout__input">
                 <p>Name<span>*</span></p>
                 <input type="text" class="text-dark" id="name" value="<%=address.name%>" required>
+                <div id="nameError"></div>
               </div>
             </div>
             <div class="col-lg-6">
               <div class="checkout__input">
                 <p>Phone<span>*</span></p>
                 <input type="number" value="<%=address.phone%>" class="text-dark" id="phone" required>
+                <div id="phoneError"></div>
               </div>
             </div>
             <div class="col-lg-6">
@@ -117,37 +119,43 @@
                   <option value="Work">Work</option>
                   <option value="Other">Other</option>
                 </select>
+                <div id="addressTypeError"></div>
               </div>
             </div>
           </div>
           <div class="checkout__input">
             <p>Address<span>*</span></p>
             <input type="text" value="<%=address.address%>" placeholder="Street Address" required
-              class="checkout__input__add text-dark" id="address">
+            class="checkout__input__add text-dark" id="address">
+            <div id="addressError"></div>
           </div>
           <div class="row">
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>Country<span>*</span></p>
                 <input type="text" value="<%=address.country%>" class="text-dark" id="country" required>
+                <div id="countryError"></div>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>State<span>*</span></p>
                 <input type="text" value="<%=address.state%>" class="text-dark" id="state" required>
+                <div id="stateError"></div>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>City/Town<span>*</span></p>
                 <input type="text" value="<%=address.city%>" class="text-dark" id="city" required>
+                <div id="cityError"></div>
               </div>
             </div>
             <div class="col-lg-3">
               <div class="checkout__input">
                 <p>Pincode/ZIP<span>*</span></p>
                 <input type="number" value="<%=address.pincode%>" class="text-dark" id="pincode" required>
+                <div id="pincodeError"></div>
               </div>
             </div>
           </div>
@@ -179,6 +187,98 @@
 
             addBtn.addEventListener('click', (e) => {
               e.preventDefault();
+
+              function validateAddressForm() {
+                const nameError = document.getElementById('nameError');
+                const phoneError = document.getElementById('phoneError');
+                const addressTypeError = document.getElementById('addressTypeError');
+                const addressError = document.getElementById('addressError');
+                const cityError = document.getElementById('cityError');
+                const pincodeError = document.getElementById('pincodeError');
+                const countryError = document.getElementById('countryError');
+                const stateError = document.getElementById('stateError');
+
+                const nameRegex = /^[a-zA-Z\s]{1,50}$/;
+                const phoneRegex = /^[0-9]{10}$/;
+                const addressRegex = /^[a-zA-Z0-9\s,.-]{1,255}$/;
+                const cityRegex = /^[a-zA-Z\s]+$/;
+                const pincodeRegex = /^[0-9]{6}$/;
+
+
+                if (!nameRegex.test(name.value.trim())) {
+                  nameError.style.color = "red";
+                  nameError.innerHTML = "Invalid name. Please enter only alphabets";
+                  name.focus();
+                  return false;
+                } else {
+                  nameError.innerHTML = "";
+
+                }
+
+                if (!phoneRegex.test(phone.value.trim())) {
+                  phoneError.style.color = "red";
+                  phoneError.innerHTML = "Invalid phone number. Please enter a 10-digit number.";
+                  phone.focus();
+                  return false;
+                }else{
+                  phoneError.innerHTML = "";
+                }
+
+                if (addressType.value.trim() === "") {
+                  addressTypeError.style.color = "red";
+                  addressTypeError.innerHTML = "Please select an address type.";
+                  addressType.focus();
+                  return false;
+                }else{
+                  addressTypeError.innerHTML = "";
+                }
+
+                if (!addressRegex.test(address.value.trim())) {
+                  addressError.style.color = "red";
+                  addressError.innerHTML = "Invalid address. Please check for special characters.";
+                  address.focus();
+                  return false;
+                }else{
+                  addressError.innerHTML = "";
+                }
+
+                if (country.value.trim() === "") {
+                  countryError.style.color = "red";
+                  countryError.innerHTML = "Please select a country.";
+                  country.focus();
+                  return false;
+                }else{
+                  countryError.innerHTML = "";
+                }
+
+                if (state.value.trim() === "") {
+                  stateError.style.color = "red";
+                  stateError.innerHTML = "Please select a state.";
+                  state.focus();
+                  return false;
+                }else{
+                  stateError.innerHTML = "";
+                }
+
+                if (!cityRegex.test(city.value.trim())) {
+                  cityError.style.color = "red";
+                  cityError.innerHTML = "Invalid city. Please enter only alphabets.";
+                  city.focus();
+                  return false;
+                }else{
+                  cityError.innerHTML = "";
+                }
+
+                if (!pincodeRegex.test(pincode.value.trim())) {
+                  pincodeError.style.color = "red";
+                  pincodeError.innerHTML = "Invalid pincode. Please enter a 6-digit number.";
+                  pincode.focus();
+                  return false;
+                }else{
+                  pincodeError.innerHTML = "";
+                }
+                return true;
+              }
               // console.log(index.value)
               const editedData = {
                 name: name.value,
@@ -191,22 +291,25 @@
                 city: city.value,
                 pincode: pincode.value
               }
-              axios.post('/editAddress', {
-                index,
-                editedData
-               
-              }).then(res => {
-                if (res.status == 200) {
-                  Swal.fire({
-                    title: 'Success!',
-                    text: 'Address Edited successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                  }).then(() => {
-                    window.location.reload()
-                  })
-                }
-              })
+              if(validateAddressForm()){
+
+                axios.post('/editAddress', {
+                  index,
+                  editedData
+                 
+                }).then(res => {
+                  if (res.status == 200) {
+                    Swal.fire({
+                      title: 'Success!',
+                      text: 'Address Edited successfully!',
+                      icon: 'success',
+                      confirmButtonText: 'Okay'
+                    }).then(() => {
+                      window.location.reload()
+                    })
+                  }
+                })
+              }
             })
 
           </script>
