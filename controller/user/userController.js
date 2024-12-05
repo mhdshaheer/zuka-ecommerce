@@ -57,7 +57,8 @@ const signup = async (req, res) => {
 
 const loadLogin = async (req, res) => {
     try {
-        if (!req.session.user) {
+        const user = req.session.user|| req.session.googleUser
+        if (!user) {
             res.render('login', { message: '' })
         } else {
             res.redirect('/');
@@ -241,7 +242,7 @@ const loadHomePage = async (req, res) => {
     try {
         const googleUser = req.user;
         req.session.googleUser=googleUser;
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         console.log("home user:",user)
         if(user?.isBlocked ==true){
             return res.redirect('/login')
@@ -252,10 +253,12 @@ const loadHomePage = async (req, res) => {
             console.log("userData is :",userData?.name)
             console.log("hai home")
             res.render('home', { user: userData,activePage:'home'});
-        } else if(googleUser){
-            console.log("google user:",googleUser)
-            res.render('home', { user: googleUser,activePage:'home'});
-        }else {
+        } 
+        // else if(googleUser){
+        //     console.log("google user:",googleUser)
+        //     res.render('home', { user: googleUser,activePage:'home'});
+        // }
+        else {
             console.log("hai home iiii")
             console.log("userData is :",user)
             return res.render('home',{user,activePage:'home'})
@@ -460,7 +463,7 @@ const updatePass = async (req,res)=>{
 // Load Address
 const loadAddress = async (req,res)=>{
     try {
-        const user = req.session.user
+        const user = req.session.user || req.session.googleUser
         const addressDb = await Address.findOne({userId:user?._id})
         
         return res.render('addAddress',{
@@ -490,7 +493,7 @@ const addAddress = async (req,res)=>{
             phone:address.phone,
             altPhone:address.altPhone
         }
-        const user  = req.session.user;
+        const user  = req.session.user || req.session.googleUser;
         console.log("session data:",user);
         // const userId = await User.findOne({_id:user._id},{_id:1})
         // console.log("user id from the session:",userId)
@@ -517,7 +520,7 @@ const addAddress = async (req,res)=>{
 const deleteAddress = async(req,res)=>{
     try {
         const {index} = req.query;
-        const user = req.session.user
+        const user = req.session.user || req.session.googleUser
         console.log("index is : ",index)
         const addressData = await Address.findOne({userId:user._id});
         const addressArr = addressData.address
@@ -537,7 +540,7 @@ const deleteAddress = async(req,res)=>{
 const LoadEditAddress = async (req,res)=>{
     try {
         const {addressId,index}=req.query;
-        const user = req.session.user
+        const user = req.session.user || req.session.googleUser
         console.log(addressId,index);
         const userAddress = await Address.findOne({userId:user._id})
         const oneAddress = userAddress.address.splice(index,1)
@@ -557,7 +560,7 @@ const LoadEditAddress = async (req,res)=>{
 const editAddressData = async (req,res)=>{
     try {
         const index= Number(req.body.index)
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         const editedData = req.body.editedData;
         console.log(editedData,index);
         const result = await Address.updateOne({userId:user._id},
@@ -587,14 +590,41 @@ const editAddressData = async (req,res)=>{
 //Orders
 const loadOrders = async (req,res)=>{
     try {
-        const user = req.session.user;
-        const userOrder = await Order.find({userId:user._id}).populate('address')
-        console.log('orders',userOrder)
+        const user = req.session.user || req.session.googleUser;
+        const userOrder = await Order.find({userId:user._id})
+        const userAddress = await Address.findOne({userId:user._id})
+        // const id = order.cartId
+        // const address = await Cart.aggregate([{$match:{
+        //    _id:mongoose.Types.ObjectId(id)
+        // }},{$unwind:'$item'}])
+        // console.log("unwind result : ",address)
+        console.log('orders',userOrder);
+        console.log('address',userAddress);
+        
         res.render('orders',{
             activePage:'',
             user,
-            userOrder
+            userOrder,
+            address:userAddress.address
         })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const cancelOrder = async (req,res)=>{
+    try {
+        const {orderId} = req.body;
+        console.log('order id :',orderId)
+        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}})
+        if (cancelOrder.matchedCount === 0) {
+            console.error("No cart found with the specified ID");
+        } else if (cancelOrder.modifiedCount === 0) {
+            console.warn("Status was not modified (maybe it was already the same)");
+        } else {
+            console.log("Status updated successfully");
+            res.status(200).json({success:true})
+        }
     } catch (error) {
         
     }
@@ -646,6 +676,7 @@ module.exports = {
 
     //Orders
     loadOrders,
+    cancelOrder,
 
     cropImage
 }

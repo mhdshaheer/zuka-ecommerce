@@ -121,13 +121,15 @@
                                         <div class="checkout__input">
                                             <p>Name<span>*</span></p>
                                             <input type="text" class="text-dark" id="name">
+                                            <div id="nameError"></div>
                                         </div>
                                     </div>
-
+                                    
                                     <div class="col-lg-6">
                                         <div class="checkout__input">
                                             <p>Phone<span>*</span></p>
                                             <input type="number" value="" class="text-dark" id="phone">
+                                            <div id="phoneError"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -145,44 +147,51 @@
                                                 <option value="Work">Work</option>
                                                 <option value="Other">Other</option>
                                             </select>
+                                            <div id="addressTypeError"></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="checkout__input">
                                     <p>Address<span>*</span></p>
                                     <input type="text" placeholder="Street Address"
-                                        class="checkout__input__add text-dark" id="address">
+                                    class="checkout__input__add text-dark" id="address">
+                                    <div id="addressError"></div>
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-3">
                                         <div class="checkout__input">
                                             <p>Country<span>*</span></p>
                                             <input type="text" class="text-dark" id="country">
+                                            <div id="countryError"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="checkout__input">
                                             <p>State<span>*</span></p>
                                             <input type="text" class="text-dark" id="state">
+                                            <div id="stateError"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="checkout__input">
                                             <p>City/Town<span>*</span></p>
                                             <input type="text" class="text-dark" id="city">
+                                            <div id="cityError"></div>
                                         </div>
                                     </div>
                                     <div class="col-lg-3">
                                         <div class="checkout__input">
                                             <p>Pincode/ZIP<span>*</span></p>
                                             <input type="number" class="text-dark" id="pincode">
+                                            <div id="pincodeError"></div>
                                         </div>
                                     </div>
                                 </div>
                                 <div>
-                                    <button class="btn btn-dark py-3 px-5 mb-5 ">Add</button>
+                                    <button class="btn btn-dark py-3 px-5 mb-5 " id="addBtn">Add</button>
                                 </div>
                                 <div class="row">
+                                    <%if(userAddress){%>
                                     <% userAddress.address.map((item, index)=> { %>
                                         <div class="card shadow-sm col-4 m-2">
                                             <div class="card-body">
@@ -219,6 +228,13 @@
                                             </div>
                                         </div>
                                         <% }) %>
+                                        <%}else{%>
+                                            <div class="card shadow-sm col-4 m-2">
+                                                <div class="card-body">
+                                                    <div>No saved address found</div>
+                                                </div>
+                                            </div>
+                                            <%}%>
                                 </div>
 
                                 <!-- <div>
@@ -503,7 +519,9 @@
                 })
                 .then(res=>{
                     if(res.status==200){
-                        window.location.href = '/orderSuccess'
+                        let id = res.data.orderId
+                        console.log("order id is : ",id)
+                        window.location.href = `/orderSuccess?id=${id}`
                     }
                 })
                 
@@ -515,6 +533,146 @@
         });
 
 
+    </script>
+
+    <script>
+        //add address
+        const addBtn = document.getElementById('addBtn');
+            const name = document.getElementById('name');
+            const phone = document.getElementById('phone');
+            const altPhone = document.getElementById('altPhone');
+            const addressType = document.getElementById('addressType');
+            const address = document.getElementById('address');
+            const country = document.getElementById('country');
+            const state = document.getElementById('state');
+            const city = document.getElementById('city');
+            const pincode = document.getElementById('pincode');
+
+            addBtn.addEventListener('click', (e) => {
+              e.preventDefault();
+              console.log("inside button click")
+
+              //=============================
+              function validateAddressForm() {
+                const nameError = document.getElementById('nameError');
+                const phoneError = document.getElementById('phoneError');
+                const addressTypeError = document.getElementById('addressTypeError');
+                const addressError = document.getElementById('addressError');
+                const cityError = document.getElementById('cityError');
+                const pincodeError = document.getElementById('pincodeError');
+                const countryError = document.getElementById('countryError');
+                const stateError = document.getElementById('stateError');
+
+                const nameRegex = /^[a-zA-Z\s]{1,50}$/;
+                const phoneRegex = /^[0-9]{10}$/;
+                const addressRegex = /^[a-zA-Z0-9\s,.-]{1,255}$/;
+                const cityRegex = /^[a-zA-Z\s]+$/;
+                const pincodeRegex = /^[0-9]{6}$/;
+
+
+                if (!nameRegex.test(name.value.trim())) {
+                  nameError.style.color = "red";
+                  nameError.innerHTML = "Invalid name. Please enter only alphabets";
+                  name.focus();
+                  return false;
+                } else {
+                  nameError.innerHTML = "";
+
+                }
+
+                if (!phoneRegex.test(phone.value.trim())) {
+                  phoneError.style.color = "red";
+                  phoneError.innerHTML = "Invalid phone number. Please enter a 10-digit number.";
+                  phone.focus();
+                  return false;
+                }else{
+                  phoneError.innerHTML = "";
+                }
+
+                if (addressType.value.trim() === "") {
+                  addressTypeError.style.color = "red";
+                  addressTypeError.innerHTML = "Please select an address type.";
+                  addressType.focus();
+                  return false;
+                }else{
+                  addressTypeError.innerHTML = "";
+                }
+
+                if (!addressRegex.test(address.value.trim())) {
+                  addressError.style.color = "red";
+                  addressError.innerHTML = "Invalid address. Please check for special characters.";
+                  address.focus();
+                  return false;
+                }else{
+                  addressError.innerHTML = "";
+                }
+
+                if (country.value.trim() === "") {
+                  countryError.style.color = "red";
+                  countryError.innerHTML = "Please select a country.";
+                  country.focus();
+                  return false;
+                }else{
+                  countryError.innerHTML = "";
+                }
+
+                if (state.value.trim() === "") {
+                  stateError.style.color = "red";
+                  stateError.innerHTML = "Please select a state.";
+                  state.focus();
+                  return false;
+                }else{
+                  stateError.innerHTML = "";
+                }
+
+                if (!cityRegex.test(city.value.trim())) {
+                  cityError.style.color = "red";
+                  cityError.innerHTML = "Invalid city. Please enter only alphabets.";
+                  city.focus();
+                  return false;
+                }else{
+                  cityError.innerHTML = "";
+                }
+
+                if (!pincodeRegex.test(pincode.value.trim())) {
+                  pincodeError.style.color = "red";
+                  pincodeError.innerHTML = "Invalid pincode. Please enter a 6-digit number.";
+                  pincode.focus();
+                  return false;
+                }else{
+                  pincodeError.innerHTML = "";
+                }
+                return true;
+              }
+              //=============================
+              if (validateAddressForm()) {
+                console.log("inside validate")
+
+                axios.post('/addAddress', {
+                  name: name.value,
+                  // email:email.value,
+                  phone: phone.value,
+                  altPhone: altPhone.value,
+                  addressType: addressType.value,
+                  address: address.value,
+                  country: country.value,
+                  state: state.value,
+                  city: city.value,
+                  pincode: pincode.value
+                }).then(res => {
+                  if (res.status == 200) {
+                    Swal.fire({
+                      title: 'Success!',
+                      text: 'Address added successfully!',
+                      icon: 'success',
+                      confirmButtonText: 'Okay'
+                    }).then(() => {
+                      window.location.reload()
+                    })
+                  }
+                })
+              }
+            })
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

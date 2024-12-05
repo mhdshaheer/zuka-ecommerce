@@ -47,7 +47,9 @@ router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productContr
 
 
 //Orders
-router.get('/orders',orderController.loadOrderList)
+router.get('/orders',orderController.loadOrderList);
+router.get('/orderDetails',orderController.orderDetails);
+router.patch('/changeStatus',orderController.changeOrderStatus)
 
 
 module.exports = router;

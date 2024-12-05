@@ -53,6 +53,84 @@
             font-size: 1.25rem;
             /* Reduce header font size */
         }
+        #ordersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 20px;
+}
+
+.order-card {
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+  background: #f9f9f9;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.order-header .order-id {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.order-header .badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.order-body {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 10px;
+}
+
+.order-detail {
+  flex: 1;
+}
+
+.order-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.order-actions .btn {
+  padding: 5px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+.btn-danger {
+  background-color: #d9534f;
+  color: #fff;
+}
+
+.btn-danger:hover {
+  background-color: #c9302c;
+}
+
+.btn-secondary {
+  background-color: #5bc0de;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #31b0d5;
+}
+
     </style>
     <!-- Shop Section Begin -->
     <section class="shop spad">
@@ -115,54 +193,59 @@
                         </div>
 
                         <!-- Orders Table -->
-                        <div id="ordersTable">
-                            <table class="table table-striped table-hover">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th class="small">Order ID</th>
-                                        <th class="small">Address</th>
-                                        <th class="small">Payment</th>
-                                        <th class="small">Status</th>
-                                        <th class="small">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Example order entry -->
-                                     <%userOrder.map((order,index)=>{%>
-                                    <tr>
-                                        <td class="small">#<%=order.orderId%></td>
-                                        <td class="small">
-                                            Need to add
-                                            <!-- <strong><%=order.address%></strong><br>
-                                            123 Main St, Cityville, State, Country<br>
-                                            123456 -->
-                                        </td>
-                                        <td class="small">
-                                            <%=order.paymentMethod%>
-                                            <!-- <strong>Primary:</strong> 9876543210<br>
-                                            <strong>Alt:</strong> 1112233445 -->
-                                        </td>
-                                        <td class="small"><span class="badge badge-success"><%=order.status%></span></td>
-                                        <td class="small">
-                                            <!-- <a href="/editOrder/12345">
-                                                <button class="btn btn-warning btn-sm mr-2">Edit</button>
-                                            </a> -->
-                                            <button class="btn btn-danger btn-sm"
-                                                onclick="deleteOrder(12345)">Cancel</button>
-                                        </td>
-                                    </tr>
-                                    <%})%>
-                                    <!-- More orders will be dynamically added here -->
-                                </tbody>
-                            </table>
-                        </div>
+                        <%if(userOrder && userOrder.length > 0){%>
+                            <div id="ordersContainer">
+                                <% userOrder.map((order, index) => { %>
+                                <div class="order-card">
+                                  <div class="order-header">
+                                    <span class="order-id">Order ID: #<%= order.orderId %></span>
+                                    <%if(order.status==='Cancelled'){%>
+                                      <span class="order-status badge badge-danger">
+                                        <%= order.status %>
+                                      </span>
+                                    <%}else{%>
+                                    <span class="order-status badge <%= order.status === 'Delivered' ? 'badge-success' : 'badge-warning' %>">
+                                      <%= order.status %>
+                                    </span>
+                                    <%}%>
+                                  </div>
+                                  <div class="order-body">
+                                    <div class="order-detail">
+                                      <strong>Address:</strong>
+                                      <p>
+                                        <%= address[order.index].address || 'Address details here' %> <br>
+                                        <%= address[order.index].city %> , <%= address[order.index].state %> , <%= address[order.index].country %> <br>
+                                        <%= address[order.index].phone %>  <br> 
+                                        <%= address[order.index].altPhone %> 
 
-                        <!-- If no orders exist -->
+                                    </p>
+                                    </div>
+                                    <div class="order-detail">
+                                      <strong>Payment:</strong>
+                                      <p><%= order.paymentMethod %></p>
+                                    </div>
+                                  </div>
+                                  <div class="order-actions">
+                                    <%if(order.status==='Pending'){%>
+                                    <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order.orderId %>')">
+                                      Cancel
+                                    </button>
+                                    <%}%>
+                                    <button class="btn btn-secondary btn-sm" onclick="returnOrder('<%= order.orderId %>')">
+                                      Return
+                                    </button>
+                                  </div>
+                                </div>
+                                <% }) %>
+                              </div>
+                              
+                        <%}else{%>
                         <div id="noOrdersMessage" class="text-center mt-4">
-                            <div class="alert alert-info" role="alert">
+                            <div class="alert alert-dark" role="alert">
                                 No Orders Found
                             </div>
                         </div>
+                        <%}%>
                     </div>
 
 
@@ -171,7 +254,37 @@
 
 
 
-
+<script>
+  function cancelOrder(orderId){
+    console.log(orderId);
+    Swal.fire({
+  title: "Are you sure?",
+  text: "Do you cancel your order!",
+  icon: "warning",
+  showCancelButton: true,
+  confirmButtonColor: "#3085d6",
+  cancelButtonColor: "#d33",
+  confirmButtonText: "Yes, Cancel it!"
+}).then((result) => {
+  if (result.isConfirmed) {
+    axios.patch('/cancelOrder',{
+        orderId:orderId
+    }).then(res=>{
+      if(res.status===200){
+        Swal.fire({
+          title: "Cancelled!",
+          text: "Your order cancelled.",
+          icon: "success"
+        }).then(()=>{
+          window.location.reload()
+        })
+      }
+    })
+  }
+});
+    
+  }
+</script>
 
 
 

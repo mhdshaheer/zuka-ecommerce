@@ -9,7 +9,7 @@ const loadShop = async (req, res) => {
 
     try {
 
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         console.log("home user:", user)
         if (user?.isBlocked == true) {
             return res.redirect('/login')
@@ -30,7 +30,7 @@ const loadShop = async (req, res) => {
 }
 const loadProductInfo = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         console.log("home user:", user)
         if (user?.isBlocked == true) {
             return res.redirect('/login')
@@ -53,24 +53,26 @@ const loadProductInfo = async (req, res) => {
 
 const loadCart = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         const cartItem = await Cart.findOne({ userId: user._id });
         //===========================================================
+        console.log("user id is :",user)
        
        
         const newCart = await Cart.findOne({userId:user._id}).populate('items.productId')
         console.log("new Cart: ",cartItem)
         //=====================================================================        
-        const total = cartItem.items.reduce((acc,curr)=>{
+        const total = cartItem?.items.reduce((acc,curr)=>{
             return acc+curr.totalPrice;
-        },0)
+        },0) ?? 0
         console.log("total : ",total)
 
         res.render('shopingCart', {
             activePage: 'cart',
             user,
-            cartItem: newCart.items,
-            total
+            cartItem: newCart?.items,
+            total,
+            cart:newCart
         })
     } catch (error) {
         console.log(error)
@@ -79,7 +81,7 @@ const loadCart = async (req, res) => {
 
 const loadCheckout = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         const userAddress = await Address.findOne({userId:user._id});
         const userCart = await Cart.findOne({userId:user._id}).populate('items.productId');
         console.log(userCart)
@@ -99,12 +101,20 @@ const loadCheckout = async (req, res) => {
 
 const addToCart = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         let { size, stock, productObj, quantity } = req.body
         console.log(size, stock, typeof quantity, productObj._id)
+
         const sizeFound = await Cart.findOne({userId:user._id,'items.size':size,'items.productId':productObj._id});
         console.log('Product obj: ',productObj)
         console.log('size found : ',sizeFound)
+
+        // For getting varienty id of the perticular varient
+        const varientDetail = await Product.findOne({_id:productObj._id,"variant.size":size},{'variant.$':1})
+        console.log("varient details id:",varientDetail)
+
+
+        // manage duplicate adding to cart
         if(sizeFound){
             const itemIndex = sizeFound.items.findIndex(item => 
                 item.size === size && item.productId.toString() === productObj._id.toString()
@@ -126,6 +136,7 @@ const addToCart = async (req, res) => {
         
         const itemData = {
             productId: productObj._id,
+            varientId:varientDetail.variant[0]._id,
             quantity: Number(quantity),
             price: productObj.regularPrice,
             size,
@@ -151,7 +162,7 @@ const deleteFromCart = async (req,res)=>{
     try {
         const {index} = req.query;
         console.log('index is :',index)
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         const cart = await Cart.findOne({userId:user._id},{items:1})
         cart.items.splice(Number(index),1)
         console.log("cart is :",cart.items)
@@ -173,12 +184,14 @@ const deleteFromCart = async (req,res)=>{
 const addOrder = async (req,res)=>{
     try {
         
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
         const {totalPrice,address,paymentMethod,index} = req.body
         const cart = await Cart.findOne({userId:user._id});
+        
         const addOrder = await Order.create({
-            cartId: cart._id,
+            cartId:cart._id,
             userId:user._id,
+            orderedItems:cart.items,
             totalPrice,
             finalAmount:totalPrice,
             address: address._id,
@@ -191,8 +204,12 @@ const addOrder = async (req,res)=>{
             console.log('order is :',order)
             req.session.order = order
             await Cart.updateOne({ userId:user._id }, { $set: { items: [] } })
+            // for(let i=0;i<=n;i++){
+
+            // }
+
             // res.status(200).redirect(`/orderSuccess?orderId=${order.orderId}`);
-            res.status(200).json({success:true})
+            res.status(200).json({orderId:order._id})
         }
     } catch (error) {
         console.log(error)
@@ -202,21 +219,45 @@ const addOrder = async (req,res)=>{
 
 const loadOrderSuccess = async (req,res)=>{
     try {
-        const user = req.session.user;
-        let {orderId} = req.query
+        const user = req.session.user || req.session.googleUser;
+        let orderId = req.query.id
         console.log('order id:',orderId);
-        const order = await Order.findOne({orderId:orderId})
-        // const findAddress = await Address.findOne({_id:user._id},{[`address.${order.index}`]:1})
+        const order = await Order.findOne({_id:orderId})
+        const findAddress =await Address.findOne({userId:user._id,'address._id':order.address},{'address.$':1})
+        console.log('address :',findAddress)
+
         
         console.log('success: ',order)
         res.render('orderSuccess',{
             activePage:'',
             user,
             order,
-            // findAddress:findAddress.address[0]
+            address:findAddress.address[0]
         })
     } catch (error) {
         console.log(error)
+    }
+}
+
+const editCart = async (req,res)=>{
+    try {
+        const {itemIndex,itemId,cartId,quantity,regularPrice} = req.body;
+        console.log(itemIndex,itemId,cartId,quantity,regularPrice)
+        let total = Number(quantity)*Number(regularPrice)
+        const result = await Cart.updateOne({ _id:cartId,'items._id':itemId },{ $set: { 
+            [`items.${itemIndex}.quantity`]: Number(quantity),
+            [`items.${itemIndex}.totalPrice`] : total
+         } });
+        if (result.matchedCount === 0) {
+            console.error("No cart found with the specified ID");
+        } else if (result.modifiedCount === 0) {
+            console.warn("Quantity was not modified (maybe it was already the same)");
+        } else {
+            console.log("Quantity updated successfully");
+        }
+    } catch (error) {
+        console.log(error);
+        
     }
 }
 
@@ -228,5 +269,6 @@ module.exports = {
     addToCart,
     deleteFromCart,
     addOrder,
-    loadOrderSuccess
+    loadOrderSuccess,
+    editCart
 }

@@ -1,0 +1,259 @@
+<%-include('../../views/partials/admin/adminHeader')%>
+    <style>
+        .custom-badge {
+            display: inline-block;
+            background-color: #28a745;
+            /* Green */
+            color: white;
+            padding: 0.3em 0.6em;
+            font-size: 0.7rem;
+            border-radius: .75rem;
+        }
+
+        .badge-cancel {
+            background-color: #d62626;
+            /* Green */
+        }
+
+        .fixed-size {
+            width: 200px;
+            height: 200px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Order Details</h2>
+                <!-- <p>Lorem ipsum dolor sit amet.</p> -->
+            </div>
+            <div>
+                <input type="text" placeholder="Search order ID" class="form-control bg-white" />
+            </div>
+        </div>
+        <div class="mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <div class="col-lg-8 col-md-6 me-auto">
+                        <h5>OrderId : <p>#<%=orders.orderId%>
+                            </p>
+                        </h5>
+                        <!-- <input type="text" placeholder="Search..." class="form-control" /> -->
+                    </div>
+                    <!-- <div class="col-lg-2 col-6 col-md-3">
+                                <select class="form-select">
+                                    <option>Status</option>
+                                    <option>Cancel</option>
+                                    <option>Disabled</option>
+                                    <option>Show all</option>
+                                </select>
+                            </div> -->
+                    <div class="col-lg-2 col-6 col-md-3">
+                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
+                            onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
+                    </div>
+                </div>
+            </header>
+        </div>
+        <%orders.orderedItems.map((item)=>{%>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <!-- Product Image -->
+                        <div class="col-md-3 text-center fixed-size">
+                            <img src="<%= item.productId.images[0] %>" alt="Product Image"
+                                class="img-fluid rounded shadow"
+                                style="max-width: 100%; max-height: 100%; object-fit: cover; border: 2px solid #ddd; padding: 5px;">
+                        </div>
+                        <!-- Order Details -->
+                        <div class="col-md-5">
+                            <h4 class="text-primary">
+                                <%=item.productId.productName%>
+                            </h4>
+                            <!-- <p class="text-muted mb-2"><strong>Order ID:</strong> #12345</p> -->
+                            <p class="text-dark mb-2"><strong>Price:</strong>
+                                <%=item.productId.regularPrice%>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Color:</strong>
+                                <%=item.productId.color%>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Quantity:</strong>
+                                <%=item.quantity%>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Order Date:</strong>
+                                <%=orders.createdAt.toLocaleDateString()%>
+                            </p>
+                        </div>
+                        <!-- Shipping Information -->
+                        <div class="col-md-4">
+                            <p class="text-dark mb-2"><strong>Status:</strong>
+                                <%if(orders.status==='Cancelled' ){%>
+                                    <span class="badge custom-badge badge-cancel">
+                                        <%=orders.status%>
+                                    </span>
+                                    <%}else{%>
+                                        <span class="badge custom-badge">
+                                            <%=orders.status%>
+                                        </span>
+                                        <%}%>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Payment status:</strong>
+                                <%if(orders.paymentStatus==='Cancelled' ){%>
+                                    <span class="badge custom-badge badge-cancel">
+                                        <%=orders.paymentStatus%>
+                                    </span>
+                                    <%}else{%>
+                                        <span class="badge custom-badge">
+                                            <%=orders.paymentStatus%>
+                                        </span>
+                                        <%}%>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%})%>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <!-- Shipping Information -->
+                            <div class="col-md-4">
+                                <h6 class="text-dark fs-5">Shipping Information</h6>
+                                <p class="text-dark mb-1"><strong>Customer Name:</strong> <span class="text-secondary">
+                                        <%=address.name%>
+                                    </span> </p>
+                                <p class="text-dark mb-1"><strong>Shipping Address:</strong> <span
+                                        class="text-secondary">
+                                        <%=address.address%>,
+                                            <br>
+                                            <%=address.city%>,<%=address.state%>,<%=address.country%>
+                                                        <br>
+                                                        <%=address.pincode%>
+                                    </span>
+                                </p>
+                                <p class="text-dark"><strong>Contact:</strong><span class="text-secondary">
+                                        <%=address.phone%> <br>
+                                            <%=address.altPhone%>
+                                    </span></p>
+                                <br>
+                                <p class="text-dark"><strong>Payment Method:</strong><span class="text-secondary">
+                                        <%=orders.paymentMethod%>
+                                    </span> </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- card end// -->
+
+    </section>
+
+    <!-- content-main end// -->
+    <footer class="main-footer font-xs">
+        <div class="row pb-30 pt-15">
+            <div class="col-sm-6">
+                <script>
+                    document.write(new Date().getFullYear());
+                </script>
+                &copy; Nest - HTML Ecommerce Template .
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end">All rights reserved</div>
+            </div>
+        </div>
+    </footer>
+    </main>
+
+    <!-- modal for status change -->
+    <!-- Button to Trigger Modal -->
+    <div class="col-lg-2 col-6 col-md-3">
+        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal">
+            Status
+        </button>
+    </div>
+
+    <!-- Modal Structure -->
+    <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="statusModalLabel">Update Order Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <form id="updateStatusForm">
+                        <div class="mb-3">
+                            <label for="orderStatus" class="form-label">Order Status</label>
+                            <select class="form-select" id="orderStatus" name="status" required>
+                                <!-- <option value="">Select Status</option> -->
+                                <option value="Pending">Pending</option>
+                                <option value="Processing">Processing</option>
+                                <option value="Shipped">Shipped</option>
+                                <option value="Delivered">Delivered</option>
+                                <option value="Cancelled">Cancelled</option>
+                                <option value="Return Request">Return Request</option>
+                                <option value="Returned">Returned</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="orderId" name="order_id" value="">
+                    </form>
+                </div>
+                <!-- Modal Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="updateStatusButton">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================= -->
+
+    <script>
+        function updateStatus(order_id, orderStatus) {
+            console.log(order_id, orderStatus);
+            const statusOption = document.getElementById('orderStatus')
+            statusOption.value = orderStatus;
+            const updateStatus = document.getElementById('updateStatusButton');
+            updateStatus.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log(statusOption.value)
+                Swal.fire({
+                    title: 'Are you sure!',
+                    text: 'Do you want to change status!',
+                    icon: 'warning',
+                    confirmButtonText: 'Yes,Proceed',
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel'
+                })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            console.log("hai")
+                            axios.patch(`/admin/changeStatus?order_id=${order_id}`,{
+                                status : statusOption.value
+                            })
+                        }
+                    })
+
+
+            })
+
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/vendors/select2.min.js"></script>
+    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <!-- Main Script -->
+    <script src="assets/js/main.js?v=1.1" type="text/javascript"></script>
+    </body>
+
+    </html>

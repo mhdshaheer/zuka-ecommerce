@@ -15,30 +15,45 @@ const orderSchema = new Schema({
     },
     cartId: {
         type: Schema.Types.ObjectId,
-        ref: 'Cart', // Links to the cart from which the order was created
-        required: true,
-      },
-    // orderedItems: [{
+        ref: "Cart",
+        required: true
+    },
+  
+    orderedItems: [{
 
-    //     product: {
-    //         type: Schema.Types.ObjectId,
-    //         ref: 'Product',
-    //         required: true
-    //     },
-    //     quantity: {
-    //         type: Number,
-    //         required: true
-    //     },
-    //     price: {
-    //         type: Number,
-    //         default: 0
-    //     },
-    //     size: {
-    //         type: String,
-    //         required: false,
-    //     },
+        productId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Product',
+            required: true
+        },
+        quantity: {
+            type: Number,
+            required: true
+        },
+        varientId:{
+            type:Schema.Types.ObjectId,
+            required:true
+        },
+        price: {
+            type: Number,
+            default: 0
+        },
+        size: {
+            type: String,
+            required: false,
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+            default:'Pending',
+         },
+         totalPrice: {
+            type: Number,
+            required: true
+        },
 
-    // }],
+    }],
     totalPrice: {
         type: Number,
         required: true

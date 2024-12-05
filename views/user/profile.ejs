@@ -101,6 +101,36 @@
               <!-- Form -->
               <form>
                 <!-- Name Field -->
+                 <%if(user.googleId){%>
+                  <div class="row mb-4 align-items-center">
+                    <div class="col-sm-3">
+                      <label for="name" class="form-label">Name:</label>
+                      
+                    </div>
+                    <div class="col-sm-9 d-flex">
+                      <input type="text" class="form-control" id="name" placeholder="User Name" value="<%=user?.name%>">
+                      <button class="btn btn-secondary ml-3 px-4" id="nameEditBtn">Edit</button>
+                    </div>
+                  </div>
+  
+                  <!-- Email Field -->
+                  <div class="row mb-4 align-items-center">
+                    <div class="col-sm-3">
+                      <label for="email" class="form-label">Email:</label>
+                    </div>
+                    <div class="col-sm-9 d-flex">
+                      <input type="email" class="form-control" id="email" placeholder="E mail"
+                        value="<%=user?.email%>" disabled>
+                    </div>
+                  </div>
+                  <hr>
+                  <!-- Button -->
+                  <div class="text-right">
+                    <!-- <button class="btn btn-warning ml-3">Edit</button> -->
+                    <button type="button" class="btn btn-danger px-1 py-2 " >Delete Account</button>
+                  </div>
+
+                 <%}else{%>
                 <div class="row mb-4 align-items-center">
                   <div class="col-sm-3">
                     <label for="name" class="form-label">Name:</label>
@@ -143,7 +173,7 @@
                   <!-- <button class="btn btn-warning ml-3">Edit</button> -->
                   <button type="button" class="btn btn-danger px-1 py-2 " >Delete Account</button>
                 </div>
-
+                <%}%>
               </form>
             </div>
           </div>

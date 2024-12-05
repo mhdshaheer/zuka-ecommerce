@@ -51,70 +51,36 @@
                                     <%orders.map((item,index)=>{%>
                                     <tr>
                                         <td>#<%=item.orderId%></td>
-                                        <td><b>Need to add</b></td>
+                                        <td><b><%=item.userId.name%></b></td>
                                         <td><%=item.paymentMethod%></td>
                                         <td><%=item.totalPrice%></td>
-                                        <td><span class="badge rounded-pill alert-warning"><%=item.status%></span></td>
+                                        <%if(item.status==='Cancelled'){%>
+                                            <td><span class="badge rounded-pill alert-danger"><%=item.status%></span></td>
+                                        <%}else{%>
+                                            <td><span class="badge rounded-pill alert-warning"><%=item.status%></span></td>
+                                        <%}%>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateOrderModal" onclick="openModal('orderId123')">
+                                            <a href="/admin/orderDetails?order_id=<%= item._id %>">
+                                                <button class="btn btn-primary" >
+                                                    View order
+                                                </button>
+                                            </a>
+                                            <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateOrderModal" onclick="openModal('orderId123')">
                                                 Edit
-                                              </button>
-                                            <div class="dropdown">
+                                              </button> -->
+                                            <!-- <div class="dropdown">
                                                 <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item" href="#">View detail</a>
                                                     <a class="dropdown-item" href="#">Edit status</a>
                                                     <a class="dropdown-item text-danger" href="#" >Delete</a>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                             <!-- dropdown //end -->
                                         </td>
                                     </tr>
                                     <%})%>
-                                    <!-- <tr>
-                                        <td>1233</td>
-                                        <td><b>Esther Howard</b></td>
-                                        <td>esther@example.com</td>
-                                        <td>$12.00</td>
-                                        <td><span class="badge rounded-pill alert-danger">Canceled</span></td>
-                                        <td>03.07.2020</td>
-                                        <td class="text-end">
-                                            <a href="#" class="btn btn-md rounded font-sm">Edit</a>
-                                            <div class="dropdown">
-                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#">View detail</a>
-                                                    <a class="dropdown-item" href="#">Edit status</a>
-                                                    <a class="dropdown-item text-danger" href="#">Delete</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr> -->
-                                    
-                                    <!-- <tr>
-                                        <td>2323</td>
-                                        <td><b>Jenny Wilson</b></td>
-                                        <td>jenny@example.com</td>
-                                        <td>$589.99</td>
-                                        <td><span class="badge rounded-pill alert-success">Received</span></td>
-                                        <td>22.05.2020</td>
-                                        <td class="text-end">
-                                            <a href="#" class="btn btn-md rounded font-sm">Edit</a>
-                                            <div class="dropdown">
-                                                <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                                <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="#">View detail</a>
-                                                    <a class="dropdown-item" href="#">Edit status</a>
-                                                    <a class="dropdown-item text-danger" href="#">Delete</a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr> -->
-                                    
-                                    
-                                    
-                                    
                                 </tbody>
                             </table>
                         </div>
@@ -140,32 +106,6 @@
             </section>
 
 
-            <!-- Modal HTML -->
-<div class="modal fade" id="updateOrderModal" tabindex="-1" aria-labelledby="updateOrderModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="updateOrderModalLabel">Update Order Status</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="updateOrderForm">
-            <div class="mb-3">
-              <label for="orderStatus" class="form-label">Select Status</label>
-              <select id="orderStatus" class="form-select" required>
-                <option value="Pending">Pending</option>
-                <option value="Shipped">Shipped</option>
-                <option value="Fulfilled">Fulfilled</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </div>
-            <input type="hidden" id="orderId" name="orderId" value="">
-            <button type="submit" class="btn btn-primary">Update</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
 
 
             <!-- content-main end// -->
@@ -183,6 +123,13 @@
                 </div>
             </footer>
         </main>
+
+        
+
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
         <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
         <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
         <script src="assets/js/vendors/select2.min.js"></script>

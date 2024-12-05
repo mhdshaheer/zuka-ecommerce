@@ -216,7 +216,7 @@
 
     <section class="order-success spad">
         <div class="container">
-            <div class="order-success__wrapper">
+            <div class="order-success__wrapper my-5">
                 <!-- Success Icon using SweetAlert -->
                 <div class="order-success__header">
                     <!-- Swal success icon -->
@@ -230,13 +230,19 @@
                 <!-- Center-aligned Order Summary -->
                 <div class="order-success__details text-center">
                     <h3 class="order-success__subtitle">Order Summary</h3>
-                    <!-- <ul class="order-summary-list">
-                        <li><strong>Order ID:</strong> <span id="orderId">dffds</span></li>
-                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice">dsfdsf</span></li>
-                        <li><strong>Payment Method:</strong> <span id="paymentMethod">dsfsdffds</span></li>
+                    <ul class="order-summary-list">
+                        <li><strong>Order ID:</strong> <span id="orderId">#<%=order.orderId%></span></li>
+                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice"><%=order.finalAmount%></span></li>
+                        <li><strong>Payment Method:</strong> <span id="paymentMethod"><%=order.paymentMethod%></span></li>
                         <li><strong>Shipping Address:</strong></li>
-                        <li id="shippingAddress">dsffsdsfd</li>
-                    </ul> -->
+                        <li id="shippingAddress">
+                            <%=address.address%> <br> 
+                            <%=address.city%> <br> 
+                            <%=address.state%> <br> 
+                            <%=address.Country%> <br> 
+                            <%=address.phone%> 
+                        </li>
+                    </ul>
                 </div>
     
                 <div class="order-success__actions text-center">

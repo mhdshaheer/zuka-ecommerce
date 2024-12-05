@@ -26,33 +26,34 @@ router.get('/auth/google/callback',passport.authenticate('google',{failureRedire
 //shop
 router.get('/shop',shopController.loadShop)
 router.get('/productInfo',shopController.loadProductInfo);
-router.get('/cart',shopController.loadCart)
-router.get('/checkout',shopController.loadCheckout)
+router.get('/cart',userAuth,shopController.loadCart)
+router.get('/checkout',userAuth,shopController.loadCheckout)
 
-router.get('/profile',userController.loadProfile)
-router.get('/address',userController.loadAddress)
+router.get('/profile',userAuth,userController.loadProfile)
+router.get('/address',userAuth,userController.loadAddress)
 router.patch('/nameEdit',userController.editName)
-router.get('/changePassword',userController.loadPassChange)
+router.get('/changePassword',userAuth,userController.loadPassChange)
 router.post('/changePass',userController.changePass)
 
 
 //forgot password
-router.get('/forgotPassword',userController.loadForgotPass);
+router.get('/forgotPassword',userAuth,userController.loadForgotPass);
 router.post('/sentOtp',userController.sentOtp);
-router.get('/forgotOtpVerify',userController.loadForgotOtpVerify);
+router.get('/forgotOtpVerify',userAuth,userController.loadForgotOtpVerify);
 router.post('/verifyForgot',userController.verifyForgot)
 router.post('/resentForgotOtp',userController.resentForgotOtp);
-router.get('/newPassSet',userController.newPassSet)
+router.get('/newPassSet',userAuth,userController.newPassSet)
 router.patch('/updatePass',userController.updatePass)
 
 //address
 router.post('/addAddress',userController.addAddress);
 router.delete('/deleteAddress',userController.deleteAddress);
-router.get('/editAddress',userController.LoadEditAddress);
+router.get('/editAddress',userAuth,userController.LoadEditAddress);
 router.post('/editAddress',userController.editAddressData)
 
 //orders
-router.get('/orders',userController.loadOrders);
+router.get('/orders',userAuth,userController.loadOrders);
+router.patch('/cancelOrder',userController.cancelOrder)
 
 
 
@@ -60,10 +61,11 @@ router.get('/orders',userController.loadOrders);
 //addtoCart
 router.post('/addToCart',shopController.addToCart);
 router.delete('/deleteItem',shopController.deleteFromCart)
+router.patch('/cart',shopController.editCart)
 
 // Checkout
 router.post('/placeOrder',shopController.addOrder)
-router.get('/orderSuccess',shopController.loadOrderSuccess)
+router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess)
 
 //justcrop
 router.get('/crop',userController.cropImage)
