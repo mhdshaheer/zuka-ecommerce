@@ -75,7 +75,7 @@
                             </h4>
                             <!-- <p class="text-muted mb-2"><strong>Order ID:</strong> #12345</p> -->
                             <p class="text-dark mb-2"><strong>Price:</strong>
-                                <%=item.productId.regularPrice%>
+                                ₹<%=item.productId.regularPrice%>
                             </p>
                             <p class="text-dark mb-2"><strong>Color:</strong>
                                 <%=item.productId.color%>
@@ -235,6 +235,19 @@
                             console.log("hai")
                             axios.patch(`/admin/changeStatus?order_id=${order_id}`,{
                                 status : statusOption.value
+                            })
+                            .then(res=>{
+                                if(res.status==200){
+                                    Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Status Updated successfully!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Okay'
+                                })
+                                .then(()=>{
+                                    window.location.reload()
+                                })
+                                }
                             })
                         }
                     })

@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../../models/userSchema');
-const Address = require('../../models/addressSchema')
+const Address = require('../../models/addressSchema');
+const Product = require('../../models/productSchema')
 const mongoose = require('mongoose')
 const Order = require('../../models/orderSchema')
 const nodemailer = require('nodemailer');
@@ -616,7 +617,13 @@ const cancelOrder = async (req,res)=>{
     try {
         const {orderId} = req.body;
         console.log('order id :',orderId)
-        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}})
+        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}});
+        const orders = await Order.findOne({orderId:orderId})
+        //Return the stock to dataBase
+        orders.orderedItems.map(async (item)=>{
+            let updateStock =  await Product.updateOne({[`variant._id`]:item.varientId },{$inc:{'variant.$.stock':item.quantity}})
+        })
+        //=============================
         if (cancelOrder.matchedCount === 0) {
             console.error("No cart found with the specified ID");
         } else if (cancelOrder.modifiedCount === 0) {
@@ -626,7 +633,7 @@ const cancelOrder = async (req,res)=>{
             res.status(200).json({success:true})
         }
     } catch (error) {
-        
+        console.log(error)
     }
 }
 

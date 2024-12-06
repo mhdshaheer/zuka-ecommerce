@@ -45,6 +45,8 @@ router.get('/blockProduct',adminAuth,productController.blockProduct)
 router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
 router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productController.updateImages);
 
+router.get('/manageStock',productController.loadManageStock)
+
 
 //Orders
 router.get('/orders',orderController.loadOrderList);

@@ -15,7 +15,7 @@ const loadShop = async (req, res) => {
             return res.redirect('/login')
         }
         // const findUser = await User.findOne({ isAdmin: 0, email: email });
-        const products = await Product.find()
+        const products = await Product.find({isBlocked:false}).populate('category')
         console.log(products)
         const category = await Category.find()
         res.render('shop', {
@@ -203,11 +203,12 @@ const addOrder = async (req,res)=>{
             const order = await Order.findOne({cartId:cart._id})
             console.log('order is :',order)
             req.session.order = order
+           cart.items.map(async (item)=>{
+                let updateStock =  await Product.updateOne({[`variant._id`]:item.varientId },{$inc:{'variant.$.stock':-item.quantity}})
+            })
+            
             await Cart.updateOne({ userId:user._id }, { $set: { items: [] } })
-            // for(let i=0;i<=n;i++){
-
-            // }
-
+            console.log("")
             // res.status(200).redirect(`/orderSuccess?orderId=${order.orderId}`);
             res.status(200).json({orderId:order._id})
         }

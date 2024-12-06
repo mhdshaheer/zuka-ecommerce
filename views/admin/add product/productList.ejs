@@ -21,12 +21,8 @@
         <div class="card mb-4">
             <header class="card-header">
                 <div class="row align-items-center">
-                    <div class="col col-check flex-grow-0">
-                        <div class="form-check ms-2">
-                            <input class="form-check-input" type="checkbox" value="" />
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
+                    
+                    <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
                         <select class="form-select">
                             <option selected>All category</option>
                             <%for(let i=0;i<category.length;i++){%>
@@ -35,8 +31,10 @@
                                 </option>
                                 <%}%>
                         </select>
-                    </div>
-                    <div class="col-md-2 col-6">
+                    </div> -->
+
+                    
+                    <!-- <div class="col-md-2 col-6">
                         <input type="date" value="02.05.2021" class="form-control" />
                     </div>
                     <div class="col-md-2 col-6">
@@ -46,7 +44,7 @@
                             <option>Disabled</option>
                             <option>Show all</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
             </header>
             <!-- card-header end// -->
@@ -63,8 +61,8 @@
                                 <th scope="col">Date</th>
                                 <th scope="col">Actions</th>
                                 <th scope="col">Change Image</th>
-                                <th scope="col">Hide/Unhide</th>
-                                <th scope="col">Delete</th>
+                                <th scope="col">Block/Unblock</th>
+                                <!-- <th scope="col">Delete</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -80,7 +78,7 @@
                                         <%=products[i].productName%>
                                     </td>
                                     <td>
-                                        <%=products[i].regularPrice%>
+                                        ₹<%=products[i].regularPrice%>
                                     </td>
                                     <%if(products[i].isBlocked==false){%>
                                         <td>
@@ -88,7 +86,7 @@
                                         </td>
                                         <%}else{%>
                                             <td>
-                                                <span class="badge rounded-pill alert-danger">inactive</span>
+                                                <span class="badge rounded-pill alert-danger">Blocked</span>
                                             </td>
                                             <%}%>
                                                 <td>
@@ -108,19 +106,19 @@
                                                     <td>
                                                         <a href="/admin/unBlockProduct?id=<%=products[i]._id%>"
                                                             type="button" class="btn btn-warning"
-                                                            onclick="return confirmUnBlock()">Unhide</a>
+                                                            onclick="return confirmUnBlock()">Unblock</a>
                                                     </td>
                                                     <%}else{%>
                                                         <td>
                                                             <a href="/admin/blockProduct?id=<%=products[i]._id%>"
                                                                 type="button" class="btn btn-danger"
-                                                                onclick="return confirmBlock()">Hide</a>
+                                                                onclick="return confirmBlock()">Block</a>
                                                         </td>
                                                         <%}%>
-                                                            <td>
+                                                            <!-- <td>
                                                                 <a href="#" class="btn btn-sm btn-danger" id="deleteBtn"
                                                                     onclick="deleteProduct('<%=products[i]._id%>')">Delete</a>
-                                                            </td>
+                                                            </td> -->
                                 </tr>
                                 <%}%>
                         </tbody>

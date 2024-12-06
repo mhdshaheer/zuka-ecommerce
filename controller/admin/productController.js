@@ -188,6 +188,15 @@ const updateImages = async (req,res)=>{
         console.log("error in update images",error)
     }
 }
+
+const loadManageStock = async (req,res)=>{
+    try {
+        const products = await Product.aggregate([{$unwind:"$variant"}])
+        res.render('add product/manageStock',{products})
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = {
     loadProduct,
     addProduct,
@@ -196,5 +205,6 @@ module.exports = {
     editProduct,
     blockProduct,
     unBlockProduct,
-    updateImages
+    updateImages,
+    loadManageStock
 }
