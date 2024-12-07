@@ -1,0 +1,103 @@
+<%-include('../partials/user/header')%>
+    <style>
+        .product__cart__item__pic {
+            width: 150px;
+            /* or any fixed width */
+            height: 150px;
+            /* or any fixed height */
+            overflow: hidden;
+        }
+
+        .product__cart__item__pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Use 'contain' if you don't want cropping */
+        }
+    </style>
+
+    <!-- Breadcrumb Section Begin -->
+    <section class="breadcrumb-option">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="breadcrumb__text">
+                        <h4>Wishlist</h4>
+                        <div class="breadcrumb__links">
+                            <a href="/">Home</a>
+                            <span>wishlist</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Breadcrumb Section End -->
+
+    <!-- Shopping Cart Section Begin -->
+    <section class="shopping-cart spad">
+        <div class="container">
+            <div class="row">
+                <div class="col d-flex justify-content-center ">
+                    <div class="shopping__cart__table">
+                        <table class="mx-auto">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Total</th>
+                                    <th>Stock</th>
+                                    <th>Action</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%wishProducts.map(item=>{%>
+
+                                    <tr>
+                                        <td class="product__cart__item">
+                                            <div class="product__cart__item__pic">
+                                                <img src="<%=item.productId.images[0]%>" alt="">
+                                            </div>
+                                            <div class="product__cart__item__text">
+                                                <h6>
+                                                    <%=item.productIdproductName%>
+                                                </h6>
+                                            </div>
+                                        </td>
+                                        <td class="cart__price">₹ <%=item.productId.regularPrice%>
+                                        </td>
+
+                                        <td class="quantity__item">
+                                            <span class="badge bg-success">In stock</span>
+                                        </td>
+
+
+                                        <td class="pe-5">
+                                            <button class="btn btn-secondary">add to cart</button>
+                                        </td>
+                                        <td class="cart__close px-3"><i class="fa fa-close"></i></td>
+                                    </tr>
+                                    <%})%>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn">
+                                <a href="#">Continue Shopping</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6">
+                            <div class="continue__btn update__btn">
+                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <!-- Shopping Cart Section End -->
+
+    <%- include('../partials/user/footer') %>

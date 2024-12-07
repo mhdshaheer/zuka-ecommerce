@@ -11,7 +11,7 @@
                     </div>
                 </div>
                 <div class="card mb-4">
-                    <header class="card-header">
+                    <!-- <header class="card-header">
                         <div class="row gx-3">
                             <div class="col-lg-4 col-md-6 me-auto">
                                 <input type="text" placeholder="Search..." class="form-control" />
@@ -32,7 +32,7 @@
                                 </select>
                             </div>
                         </div>
-                    </header>
+                    </header> -->
                     <!-- card-header end// -->
                     <div class="card-body">
                         <div class="table-responsive">
@@ -44,7 +44,6 @@
                                         <!-- <th scope="col">Email</th> -->
                                         <th scope="col">Size</th>
                                         <th scope="col">Stock</th>
-                                        <!-- <th scope="col">Date</th> -->
                                         <th scope="col" class="text-end">Action</th>
                                     </tr>
                                 </thead>
@@ -56,7 +55,7 @@
                                             <td><%=item.variant.size%></td>
                                             <td><%=item.variant.stock%></td>
                                             <td class="text-end">
-                                                <a href="#" class="btn btn-md rounded font-sm">Add Stock</a>
+                                                <a href="#" class="btn btn-md rounded font-sm " data-bs-toggle="modal" data-bs-target="#updateStockModal" onclick="addStock('<%=item.variant._id%>')">Add Stock</a>
                                             </td>
                                         </tr>
                                     <%})%>
@@ -98,7 +97,61 @@
                     </div>
                 </div>
             </footer>
+<!-- modal===================== -->
+            <div class="modal fade" id="updateStockModal" tabindex="-1" aria-labelledby="updateStockModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="updateStockModalLabel">Update Stock</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form id="updateStockForm">
+                        <div class="mb-3">
+                          <label for="stockQuantity" class="form-label">Stock Quantity</label>
+                          <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" placeholder="Enter new stock quantity" required>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="submit" form="updateStockForm" class="btn btn-primary" id="updateStock">Update</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </main>
+
+        <script>
+            function addStock(variantId){
+                console.log(variantId);
+                document.getElementById('updateStock').addEventListener('click',(e)=>{
+                    e.preventDefault();
+                    const stock = document.getElementById('stockQuantity').value;
+                    console.log(stock);
+                    axios.patch('/admin/updateStock',{
+                        variantId,
+                        stock
+                    })
+                    .then(res=>{
+                        if(res.status==200){
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Product Stock updated successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            }).then(()=>{
+                                window.location.reload()
+                            })
+                        }
+                    })
+                })
+
+            }
+        </script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
         <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
         <script src="assets/js/vendors/select2.min.js"></script>

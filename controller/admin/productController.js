@@ -197,6 +197,20 @@ const loadManageStock = async (req,res)=>{
         console.log(error)
     }
 }
+
+const updateStock = async (req,res)=>{
+    try {
+        const {variantId,stock} = req.body;
+        console.log(variantId,stock);
+        const result = await Product.updateOne({'variant._id':variantId},{$inc:{['variant.$.stock']:Number(stock)}})
+        if(result){
+            console.log("update done");
+            res.status(200).json({success:true});
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 module.exports = {
     loadProduct,
     addProduct,
@@ -206,5 +220,6 @@ module.exports = {
     blockProduct,
     unBlockProduct,
     updateImages,
-    loadManageStock
+    loadManageStock,
+    updateStock
 }

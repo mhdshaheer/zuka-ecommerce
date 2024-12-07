@@ -2,6 +2,7 @@ const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
 const Cart = require('../../models/cartSchema')
+const Wishlist = require('../../models/wishlistSchema')
 const mongoose = require('mongoose')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema');
@@ -15,7 +16,7 @@ const loadShop = async (req, res) => {
             return res.redirect('/login')
         }
         // const findUser = await User.findOne({ isAdmin: 0, email: email });
-        const products = await Product.find({isBlocked:false}).populate('category')
+        const products = await Product.find({ isBlocked: false }).populate('category')
         console.log(products)
         const category = await Category.find()
         res.render('shop', {
@@ -56,23 +57,23 @@ const loadCart = async (req, res) => {
         const user = req.session.user || req.session.googleUser;
         const cartItem = await Cart.findOne({ userId: user._id });
         //===========================================================
-        console.log("user id is :",user)
-       
-       
-        const newCart = await Cart.findOne({userId:user._id}).populate('items.productId')
-        console.log("new Cart: ",cartItem)
+        console.log("user id is :", user)
+
+
+        const newCart = await Cart.findOne({ userId: user._id }).populate('items.productId')
+        console.log("new Cart: ", cartItem)
         //=====================================================================        
-        const total = cartItem?.items.reduce((acc,curr)=>{
-            return acc+curr.totalPrice;
-        },0) ?? 0
-        console.log("total : ",total)
+        const total = cartItem?.items.reduce((acc, curr) => {
+            return acc + curr.totalPrice;
+        }, 0) ?? 0
+        console.log("total : ", total)
 
         res.render('shopingCart', {
             activePage: 'cart',
             user,
             cartItem: newCart?.items,
             total,
-            cart:newCart
+            cart: newCart
         })
     } catch (error) {
         console.log(error)
@@ -82,17 +83,17 @@ const loadCart = async (req, res) => {
 const loadCheckout = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
-        const userAddress = await Address.findOne({userId:user._id});
-        const userCart = await Cart.findOne({userId:user._id}).populate('items.productId');
+        const userAddress = await Address.findOne({ userId: user._id });
+        const userCart = await Cart.findOne({ userId: user._id }).populate('items.productId');
         console.log(userCart)
         // console.log(userAddress)
 
-        res.render('checkout', { 
-            activePage: "", 
+        res.render('checkout', {
+            activePage: "",
             user,
             userAddress,
             userCart
-         })
+        })
     } catch (error) {
         console.log(error);
 
@@ -105,74 +106,74 @@ const addToCart = async (req, res) => {
         let { size, stock, productObj, quantity } = req.body
         console.log(size, stock, typeof quantity, productObj._id)
 
-        const sizeFound = await Cart.findOne({userId:user._id,'items.size':size,'items.productId':productObj._id});
-        console.log('Product obj: ',productObj)
-        console.log('size found : ',sizeFound)
+        const sizeFound = await Cart.findOne({ userId: user._id, 'items.size': size, 'items.productId': productObj._id });
+        console.log('Product obj: ', productObj)
+        console.log('size found : ', sizeFound)
 
         // For getting varienty id of the perticular varient
-        const varientDetail = await Product.findOne({_id:productObj._id,"variant.size":size},{'variant.$':1})
-        console.log("varient details id:",varientDetail)
+        const varientDetail = await Product.findOne({ _id: productObj._id, "variant.size": size }, { 'variant.$': 1 })
+        console.log("varient details id:", varientDetail)
 
 
         // manage duplicate adding to cart
-        if(sizeFound){
-            const itemIndex = sizeFound.items.findIndex(item => 
+        if (sizeFound) {
+            const itemIndex = sizeFound.items.findIndex(item =>
                 item.size === size && item.productId.toString() === productObj._id.toString()
-              );
-              console.log('item index is:',itemIndex)
-              console.log('stocks : ',sizeFound.items[itemIndex].quantity)
-              quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
-              console.log(quantity)
-              let totalPrice= Number(quantity) * Number(productObj.regularPrice)
-              const result = await Cart.updateOne({userId:user._id},{$set:{[`items.${itemIndex}.quantity`]:quantity}})
-              const resultPrice = await Cart.updateOne({userId:user._id},{$set:{[`items.${itemIndex}.totalPrice`]:totalPrice}})
-              if (result&&resultPrice) {
+            );
+            console.log('item index is:', itemIndex)
+            console.log('stocks : ', sizeFound.items[itemIndex].quantity)
+            quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
+            console.log(quantity)
+            let totalPrice = Number(quantity) * Number(productObj.regularPrice)
+            const result = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.quantity`]: quantity } })
+            const resultPrice = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.totalPrice`]: totalPrice } })
+            if (result && resultPrice) {
                 console.log('updated to db')
-                res.status(200).json({message:true})
+                res.status(200).json({ message: true })
             }
 
-        }else{
+        } else {
 
-        
-        const itemData = {
-            productId: productObj._id,
-            varientId:varientDetail.variant[0]._id,
-            quantity: Number(quantity),
-            price: productObj.regularPrice,
-            size,
-            totalPrice: Number(quantity) * Number(productObj.regularPrice),
 
+            const itemData = {
+                productId: productObj._id,
+                varientId: varientDetail.variant[0]._id,
+                quantity: Number(quantity),
+                price: productObj.regularPrice,
+                size,
+                totalPrice: Number(quantity) * Number(productObj.regularPrice),
+
+            }
+            const toCart = await Cart.findOneAndUpdate(
+                { userId: user._id },
+                { $push: { items: itemData } },
+                { upsert: true, new: true }
+            );
+            if (toCart) {
+                console.log('added to db')
+                res.status(200).json({ message: true })
+            }
         }
-        const toCart = await Cart.findOneAndUpdate(
-            { userId: user._id },
-            { $push: { items: itemData } },
-            { upsert: true, new: true }
-        );
-        if (toCart) {
-            console.log('added to db')
-            res.status(200).json({message:true})
-        }
-    }
     } catch (error) {
         console.log(error);
 
     }
 }
-const deleteFromCart = async (req,res)=>{
+const deleteFromCart = async (req, res) => {
     try {
-        const {index} = req.query;
-        console.log('index is :',index)
+        const { index } = req.query;
+        console.log('index is :', index)
         const user = req.session.user || req.session.googleUser;
-        const cart = await Cart.findOne({userId:user._id},{items:1})
-        cart.items.splice(Number(index),1)
-        console.log("cart is :",cart.items)
+        const cart = await Cart.findOne({ userId: user._id }, { items: 1 })
+        cart.items.splice(Number(index), 1)
+        console.log("cart is :", cart.items)
 
-        const result = await Cart.updateOne({userId:user._id},{$set:{items:cart.items}})
-        
-        if(result){
-            res.status(200).json({message:true})
+        const result = await Cart.updateOne({ userId: user._id }, { $set: { items: cart.items } })
+
+        if (result) {
+            res.status(200).json({ message: true })
             console.log("successfully deleted")
-        }   
+        }
 
     } catch (error) {
         console.log(error)
@@ -181,74 +182,76 @@ const deleteFromCart = async (req,res)=>{
 
 //Orders
 
-const addOrder = async (req,res)=>{
+const addOrder = async (req, res) => {
     try {
-        
+
         const user = req.session.user || req.session.googleUser;
-        const {totalPrice,address,paymentMethod,index} = req.body
-        const cart = await Cart.findOne({userId:user._id});
-        
+        const { totalPrice, address, paymentMethod, index } = req.body
+        const cart = await Cart.findOne({ userId: user._id });
+
         const addOrder = await Order.create({
-            cartId:cart._id,
-            userId:user._id,
-            orderedItems:cart.items,
+            cartId: cart._id,
+            userId: user._id,
+            orderedItems: cart.items,
             totalPrice,
-            finalAmount:totalPrice,
+            finalAmount: totalPrice,
             address: address._id,
-            index:Number(index),
+            index: Number(index),
             paymentMethod
         });
-        if(addOrder){
+        if (addOrder) {
             console.log("added to orders")
-            const order = await Order.findOne({cartId:cart._id})
-            console.log('order is :',order)
+            const order = await Order.findOne({ cartId: cart._id })
+            console.log('order is :', order)
             req.session.order = order
-           cart.items.map(async (item)=>{
-                let updateStock =  await Product.updateOne({[`variant._id`]:item.varientId },{$inc:{'variant.$.stock':-item.quantity}})
+            cart.items.map(async (item) => {
+                let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } })
             })
-            
-            await Cart.updateOne({ userId:user._id }, { $set: { items: [] } })
+
+            await Cart.deleteOne({ userId: user._id })
             console.log("")
             // res.status(200).redirect(`/orderSuccess?orderId=${order.orderId}`);
-            res.status(200).json({orderId:order._id})
+            res.status(200).json({ orderId: order._id })
         }
     } catch (error) {
         console.log(error)
-        res.status(500).json({success:false})
+        res.status(500).json({ success: false })
     }
 }
 
-const loadOrderSuccess = async (req,res)=>{
+const loadOrderSuccess = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
         let orderId = req.query.id
-        console.log('order id:',orderId);
-        const order = await Order.findOne({_id:orderId})
-        const findAddress =await Address.findOne({userId:user._id,'address._id':order.address},{'address.$':1})
-        console.log('address :',findAddress)
+        console.log('order id:', orderId);
+        const order = await Order.findOne({ _id: orderId })
+        const findAddress = await Address.findOne({ userId: user._id, 'address._id': order.address }, { 'address.$': 1 })
+        console.log('address :', findAddress)
 
-        
-        console.log('success: ',order)
-        res.render('orderSuccess',{
-            activePage:'',
+
+        console.log('success: ', order)
+        res.render('orderSuccess', {
+            activePage: '',
             user,
             order,
-            address:findAddress.address[0]
+            address: findAddress.address[0]
         })
     } catch (error) {
         console.log(error)
     }
 }
 
-const editCart = async (req,res)=>{
+const editCart = async (req, res) => {
     try {
-        const {itemIndex,itemId,cartId,quantity,regularPrice} = req.body;
-        console.log(itemIndex,itemId,cartId,quantity,regularPrice)
-        let total = Number(quantity)*Number(regularPrice)
-        const result = await Cart.updateOne({ _id:cartId,'items._id':itemId },{ $set: { 
-            [`items.${itemIndex}.quantity`]: Number(quantity),
-            [`items.${itemIndex}.totalPrice`] : total
-         } });
+        const { itemIndex, itemId, cartId, quantity, regularPrice } = req.body;
+        console.log(itemIndex, itemId, cartId, quantity, regularPrice)
+        let total = Number(quantity) * Number(regularPrice)
+        const result = await Cart.updateOne({ _id: cartId, 'items._id': itemId }, {
+            $set: {
+                [`items.${itemIndex}.quantity`]: Number(quantity),
+                [`items.${itemIndex}.totalPrice`]: total
+            }
+        });
         if (result.matchedCount === 0) {
             console.error("No cart found with the specified ID");
         } else if (result.modifiedCount === 0) {
@@ -258,7 +261,49 @@ const editCart = async (req,res)=>{
         }
     } catch (error) {
         console.log(error);
-        
+
+    }
+}
+
+const loadWishlist = async (req, res) => {
+    try {
+        const user = req.session.user || req.session.googleUser;
+        const wishlist = await Wishlist.findOne({userId:user._id}).populate('products.productId');
+        console.log(wishlist)
+        res.render('wishlist', {
+            activePage: '',
+            wishProducts:wishlist.products,
+            user
+        })
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const addToWishlist = async (req, res) => {
+    try {
+        const user = req.session.user || req.session.googleUser;
+        console.log(user)
+        const { productId } = req.body;
+        console.log("product id :", productId);
+        const addWishlist = await Wishlist.findOneAndUpdate(
+            { userId: user._id},
+            {
+                $push: {
+                    products: { 
+                        productId:productId,
+                        addedOn: new Date()
+                    }
+                }
+            },
+            { new: true,upsert: true }
+        )
+        if (addWishlist) {
+
+            console.log("Wishlist item push done")
+        }
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -271,5 +316,7 @@ module.exports = {
     deleteFromCart,
     addOrder,
     loadOrderSuccess,
-    editCart
+    editCart,
+    loadWishlist,
+    addToWishlist
 }

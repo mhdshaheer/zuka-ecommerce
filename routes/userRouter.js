@@ -65,7 +65,11 @@ router.patch('/cart',shopController.editCart)
 
 // Checkout
 router.post('/placeOrder',shopController.addOrder)
-router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess)
+router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess);
+
+// Wishlist
+router.get('/wishlist',shopController.loadWishlist);
+router.post('/wishlist',shopController.addToWishlist)
 
 //justcrop
 router.get('/crop',userController.cropImage)

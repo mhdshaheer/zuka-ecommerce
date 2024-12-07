@@ -231,9 +231,11 @@
                                       Cancel
                                     </button>
                                     <%}%>
+                                    <%if(order.status=='Delivered'){%>
                                     <button class="btn btn-secondary btn-sm" onclick="returnOrder('<%= order.orderId %>')">
                                       Return
                                     </button>
+                                    <%}%>
                                   </div>
                                 </div>
                                 <% }) %>
