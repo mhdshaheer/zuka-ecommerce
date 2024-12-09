@@ -51,7 +51,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <%wishProducts.map(item=>{%>
+                                <%wishProducts.map((item,index)=>{%>
 
                                     <tr>
                                         <td class="product__cart__item">
@@ -60,7 +60,7 @@
                                             </div>
                                             <div class="product__cart__item__text">
                                                 <h6>
-                                                    <%=item.productIdproductName%>
+                                                    <%=item.productId.productName%>
                                                 </h6>
                                             </div>
                                         </td>
@@ -73,9 +73,11 @@
 
 
                                         <td class="pe-5">
-                                            <button class="btn btn-secondary">add to cart</button>
+                                            <a href="/productInfo?id=<%=item.productId._id%>">
+                                                <button class="btn btn-secondary">add to cart</button>
+                                            </a>
                                         </td>
-                                        <td class="cart__close px-3"><i class="fa fa-close"></i></td>
+                                        <td class="cart__close px-3" onclick="removeWishlist('<%=index%>')"><i class="fa fa-close"></i></td>
                                     </tr>
                                     <%})%>
                             </tbody>
@@ -99,5 +101,46 @@
         </div>
     </section>
     <!-- Shopping Cart Section End -->
+     <script>
+        function removeWishlist(index){
+            console.log("index is :",index);
 
+            
+            Swal.fire({
+        title: 'Are you sure',
+        text: "Do you want to remove",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, do it!',
+        cancelButtonText: 'No, cancel!',
+        reverseButtons: true
+      }).then((result)=>{
+        if(result.isConfirmed){
+
+            axios.delete('/wishlist',{
+                params:{index}
+            })
+            .then(res=>{
+                if(res.status==200){
+                    Swal.fire({
+              title: 'Success!',
+              text: 'product Removed successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then(()=>{
+                window.location.reload()
+            })
+                }
+            })
+        }
+
+      })
+
+
+
+        }
+     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <%- include('../partials/user/footer') %>

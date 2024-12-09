@@ -37,7 +37,7 @@ router.post('/changePass',userController.changePass)
 
 
 //forgot password
-router.get('/forgotPassword',userAuth,userController.loadForgotPass);
+router.get('/forgotPassword',userController.loadForgotPass);
 router.post('/sentOtp',userController.sentOtp);
 router.get('/forgotOtpVerify',userAuth,userController.loadForgotOtpVerify);
 router.post('/verifyForgot',userController.verifyForgot)
@@ -53,7 +53,11 @@ router.post('/editAddress',userController.editAddressData)
 
 //orders
 router.get('/orders',userAuth,userController.loadOrders);
-router.patch('/cancelOrder',userController.cancelOrder)
+router.patch('/cancelOrder',userController.cancelOrder);
+router.patch('/returnOrder',userController.returnOrder)
+
+// Wallet
+router.get('/wallet',userController.loadWallet)
 
 
 
@@ -69,7 +73,8 @@ router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess);
 
 // Wishlist
 router.get('/wishlist',shopController.loadWishlist);
-router.post('/wishlist',shopController.addToWishlist)
+router.post('/wishlist',shopController.addToWishlist);
+router.delete('/wishlist',shopController.deleteFromWishlist)
 
 //justcrop
 router.get('/crop',userController.cropImage)

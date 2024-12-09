@@ -96,6 +96,9 @@ const orderSchema = new Schema({
     couponApplied: {
         type: Boolean,
         default: false
+    },
+    cancellationReason:{
+        type:String
     }
 }, { timestamps: true })
 

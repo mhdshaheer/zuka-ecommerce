@@ -5,10 +5,20 @@ const Address = require('../../models/addressSchema');
 
 const loadOrderList = async (req,res)=>{
     try {
-        const orders = await Order.find().populate('userId');
+        const page = parseInt(req.query.page) || 1;
+        const limit = 4;
+        const skip = (page - 1) * limit;
+
+
+        const orders = await Order.find().populate('userId').sort({createdAt:-1}).skip(skip).limit(limit);
         console.log('Orders admin :',orders)
+
+        const totalOrders = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrders / limit);
         res.render('orderList',{
-            orders
+            orders,
+            currentPage: page,
+            totalPages,
         })
     } catch (error) {
         console.log(error)

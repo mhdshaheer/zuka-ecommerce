@@ -52,8 +52,12 @@
                                 </select>
                             </div> -->
                     <div class="col-lg-2 col-6 col-md-3">
-                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
-                            onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
+                        <%if(orders.status=='Cancelled'){%>
+                        <button class="btn btn-danger" disabled>cancelled</button>
+                        <%}else{%>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
+                                onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
+                        <%}%>
                     </div>
                 </div>
             </header>
@@ -79,6 +83,9 @@
                             </p>
                             <p class="text-dark mb-2"><strong>Color:</strong>
                                 <%=item.productId.color%>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Size:</strong>
+                                <%=item.size%>
                             </p>
                             <p class="text-dark mb-2"><strong>Quantity:</strong>
                                 <%=item.quantity%>
@@ -188,8 +195,48 @@
                     <form id="updateStatusForm">
                         <div class="mb-3">
                             <label for="orderStatus" class="form-label">Order Status</label>
-                            <select class="form-select" id="orderStatus" name="status" required>
-                                <!-- <option value="">Select Status</option> -->
+                            <%if(orders.status=='Pending'){%>
+                                <select class="form-select" id="orderStatus" name="status" required>
+                                    <option value="Pending" selected>Pending</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Return Request">Return Request</option>
+                                    <option value="Returned">Returned</option>
+                                </select>
+                            <%}else if(orders.status=='Processing'){%>
+                                <select class="form-select" id="orderStatus" name="status" required>
+                                    <option value="Processing" selected>Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="Return Request">Return Request</option>
+                                    <option value="Returned">Returned</option>
+                                </select>
+                                <%}else if(orders.status=='Shipped'){%>
+                                    <select class="form-select" id="orderStatus" name="status" required>
+                                        <option value="Shipped" selected>Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                        <option value="Cancelled">Cancelled</option>
+                                        <option value="Return Request">Return Request</option>
+                                        <option value="Returned">Returned</option>
+                                    </select>
+                                    <%}else if(orders.status=='Delivered'){%>
+                                        <select class="form-select" id="orderStatus" name="status" required>
+                                            <option value="Delivered" selected>Delivered</option>
+                                            <option value="Cancelled">Cancelled</option>
+                                            <option value="Return Request">Return Request</option>
+                                            <option value="Returned">Returned</option>
+                                        </select>
+                                        <%}else if(orders.status=='Return Request'){%>
+                                            <select class="form-select" id="orderStatus" name="status" required>
+                                                <option value="Cancelled">Cancelled</option>
+                                                <option value="Return Request" selected>Return Request</option>
+                                                <option value="Returned">Returned</option>
+                                            </select>
+                            <%}%>
+                            <!-- <select class="form-select" id="orderStatus" name="status" required>
                                 <option value="Pending">Pending</option>
                                 <option value="Processing">Processing</option>
                                 <option value="Shipped">Shipped</option>
@@ -197,7 +244,7 @@
                                 <option value="Cancelled">Cancelled</option>
                                 <option value="Return Request">Return Request</option>
                                 <option value="Returned">Returned</option>
-                            </select>
+                            </select> -->
                         </div>
                         <input type="hidden" id="orderId" name="order_id" value="">
                     </form>
@@ -232,7 +279,7 @@
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
-                            console.log("hai")
+                            console.log("hai",statusOption.value)
                             axios.patch(`/admin/changeStatus?order_id=${order_id}`,{
                                 status : statusOption.value
                             })

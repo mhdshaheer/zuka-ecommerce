@@ -588,11 +588,11 @@ const editAddressData = async (req,res)=>{
 }
 
 
-//Orders
+//=============Orders===============
 const loadOrders = async (req,res)=>{
     try {
         const user = req.session.user || req.session.googleUser;
-        const userOrder = await Order.find({userId:user._id})
+        const userOrder = await Order.find({userId:user._id}).sort({createdAt:-1})
         const userAddress = await Address.findOne({userId:user._id})
         // const id = order.cartId
         // const address = await Cart.aggregate([{$match:{
@@ -634,6 +634,32 @@ const cancelOrder = async (req,res)=>{
         }
     } catch (error) {
         console.log(error)
+    }
+}
+
+const returnOrder = async (req,res)=>{
+    try {
+        const {orderId}= req.body
+        console.log(orderId);
+        const updateStatus = await Order.updateOne({orderId:orderId},{$set:{status:'Return Request'}});
+        if(updateStatus){
+            res.status(200).json({success:true})
+        }
+        
+    } catch (error) {
+        console.log(error)
+    }
+
+}
+
+//==============wallet================
+
+const loadWallet = async(req,res)=>{
+    try {
+        res.render('wallet',{activePage:''})
+    } catch (error) {
+        console.log(error);
+        
     }
 }
 
@@ -684,6 +710,10 @@ module.exports = {
     //Orders
     loadOrders,
     cancelOrder,
+    returnOrder,
+
+    //wallet
+    loadWallet,
 
     cropImage
 }

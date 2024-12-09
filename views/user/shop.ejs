@@ -26,7 +26,8 @@
                     <div class="shop__sidebar">
                         <div class="shop__sidebar__search">
                             <form action="#">
-                                <input type="text" placeholder="Search..." class="text-dark" id="search" oninput="searchItem(this.value,`<%= JSON.stringify(products) %>`)">
+                                <input type="text" placeholder="Search..." class="text-dark" id="search"
+                                    oninput="searchItem(this.value,`<%= JSON.stringify(products) %>`)">
                                 <button type="submit"><span class="icon_search"></span></button>
                             </form>
                         </div>
@@ -41,7 +42,8 @@
                                             <div class="shop__sidebar__categories">
                                                 <ul class="nice-scroll">
                                                     <%for(let i=0;i<category.length;i++){%>
-                                                        <li><a href="#" onclick="categorySort('<%=category[i]._id%>',`<%= JSON.stringify(products) %>`)">
+                                                        <li><a href="#"
+                                                                onclick="categorySort('<%=category[i]._id%>',`<%= JSON.stringify(products) %>`)">
                                                                 <%=category[i].name%>
                                                             </a></li>
                                                         <%}%>
@@ -196,11 +198,13 @@
                                 <div class="product__item">
                                     <div class="product__item__pic set-bg" data-setbg="<%=products[i].images[0]%>">
                                         <ul class="product__hover">
-                                            <li><a href="#"  onclick="addToWishlist('<%= products[i]._id %>')"><img src="img/icon/heart.png" alt=""></a></li>
+                                            <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>',event)"><img
+                                                        src="img/icon/heart.png" alt=""></a></li>
                                             <li><a href="#"><img src="img/icon/compare.png" alt="">
                                                     <span>Compare</span></a>
                                             </li>
-                                            <li><a href="#"><img src="img/icon/search.png" alt=""></a></li>
+                                            <li><a href="/productInfo?id=<%=products[i]._id%>"><img
+                                                        src="img/icon/search.png" alt=""></a></li>
                                         </ul>
                                     </div>
                                     <div class="product__item__text">
@@ -248,7 +252,7 @@
         </div>
     </section>
     <script>
-        
+
         const productList = document.getElementById('productList');
 
         function sortItem(value, data) {
@@ -257,7 +261,7 @@
 
             switch (value) {
                 case 'new-arrival':
-                newData.sort((a, b) => {
+                    newData.sort((a, b) => {
                         const dateA = a.createdAt;
                         const dateB = b.createdAt;
 
@@ -268,7 +272,7 @@
                     console.log('sort by new')
                     break;
                 case 'low-to-high':
-                newData.sort((a, b) => {
+                    newData.sort((a, b) => {
                         const priceA = a.regularPrice;
                         const priceB = b.regularPrice;
 
@@ -279,7 +283,7 @@
                     console.log('sort by price asc')
                     break;
                 case 'high-to-low':
-                newData.sort((a, b) => {
+                    newData.sort((a, b) => {
                         const priceA = a.regularPrice;
                         const priceB = b.regularPrice;
 
@@ -301,7 +305,7 @@
                     console.log('sort by name asc')
                     break;
                 case 'z-a':
-                newData.sort((a, b) => {
+                    newData.sort((a, b) => {
                         const nameA = a.productName.toLowerCase();
                         const nameB = b.productName.toLowerCase();
 
@@ -360,16 +364,16 @@
     </script>
 
     <script>
-        function searchItem(value,data){
+        function searchItem(value, data) {
             console.log("hai")
             // console.log(value)
             let products = JSON.parse(data);
-            let searchExp = new RegExp(`${value}`,"i");
-            let searchOut = products.filter(value=>searchExp.test(value.productName))
-            console.log("Products are :",searchOut);
+            let searchExp = new RegExp(`${value}`, "i");
+            let searchOut = products.filter(value => searchExp.test(value.productName))
+            console.log("Products are :", searchOut);
 
             productList.innerHTML = ''
-            if(searchOut&&searchOut.length>0){
+            if (searchOut && searchOut.length > 0) {
 
                 searchOut.map(products => {
                     let element = `
@@ -411,8 +415,8 @@
                 `;
                     productList.innerHTML += element
                 })
-            }else{
-                productList.innerHTML= `
+            } else {
+                productList.innerHTML = `
                 <div class="col text-center p-4 fs-4">
                     No product Found
                     </div>`
@@ -422,15 +426,15 @@
     </script>
 
     <script>
-        function categorySort(catId,data){
+        function categorySort(catId, data) {
             console.log(catId)
             let products = JSON.parse(data);
             console.log(products[0].category._id)
             console.log(products)
-            let catOut = products.filter(value=>value.category && value.category._id === catId)
-            console.log('cat out : ',catOut)
+            let catOut = products.filter(value => value.category && value.category._id === catId)
+            console.log('cat out : ', catOut)
             productList.innerHTML = ''
-            if(catOut&&catOut.length>0){
+            if (catOut && catOut.length > 0) {
 
                 catOut.map(products => {
                     let element = `
@@ -472,8 +476,8 @@
                 `;
                     productList.innerHTML += element
                 })
-            }else{
-                productList.innerHTML= `
+            } else {
+                productList.innerHTML = `
                 <div class="col text-center p-4 fs-4">
                     No product Found
                     </div>`
@@ -482,10 +486,44 @@
     </script>
 
     <script>
-        function addToWishlist(productId){
-            console.log('Product id is :',productId);
-            axios.post('/wishlist',{
+        function addToWishlist(productId, event) {
+            event.preventDefault();
+            console.log('Product id is :', productId);
+            axios.post('/wishlist', {
                 productId
+            }).then((res) => {
+                if (res.status == 200) {
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Added to Wishlist!',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true
+                    });
+                } else if (res.status == 201) {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'warning',
+                        title: 'Already in Wishlist!',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true
+                    });
+                }
+            }).catch((error) => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: 'Add to Wishlist failed!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    timerProgressBar: true
+                });
             })
         }
     </script>

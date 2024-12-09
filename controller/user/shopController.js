@@ -286,6 +286,21 @@ const addToWishlist = async (req, res) => {
         console.log(user)
         const { productId } = req.body;
         console.log("product id :", productId);
+        const wishlistExist = await Wishlist.findOne({userId:user._id});
+        console.log(wishlistExist)
+        if(wishlistExist){
+            console.log("inside exist")
+            const isIncluded = wishlistExist.products.some(item => 
+                item.productId.equals(new mongoose.Types.ObjectId(productId))
+              );
+              
+              console.log('is included:',isIncluded)
+            if(isIncluded){
+                console.log('inside included');
+                
+                return res.status(201).json({message:"product already exist"})
+            }
+        }
         const addWishlist = await Wishlist.findOneAndUpdate(
             { userId: user._id},
             {
@@ -301,7 +316,28 @@ const addToWishlist = async (req, res) => {
         if (addWishlist) {
 
             console.log("Wishlist item push done")
+            res.status(200).json({success:true})
         }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({success:false})
+    }
+}
+
+const deleteFromWishlist = async (req,res)=>{
+    try {
+
+        const user = req.session.user||req.session.googleUser;
+        const {index} = req.query;
+        const wishlist = await Wishlist.findOne({userId:user._id});
+        wishlist.products.splice(index,1)
+        console.log("index is :",index);
+        console.log("wishlist is :",wishlist)
+        const removeItem = await Wishlist.updateOne({userId:user._id},{$set:{products:wishlist.products}})
+        if(removeItem){
+            console.log("removed item")
+            return res.status(200).json({success:true})        }
+
     } catch (error) {
         console.log(error)
     }
@@ -318,5 +354,6 @@ module.exports = {
     loadOrderSuccess,
     editCart,
     loadWishlist,
-    addToWishlist
+    addToWishlist,
+    deleteFromWishlist
 }

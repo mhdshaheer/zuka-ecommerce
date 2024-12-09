@@ -122,6 +122,9 @@
                                     <div class="col-sm-9 d-flex">
                                         <input type="password" class="form-control" id="oldPassword"
                                             placeholder="Enter old password" value="">
+                                            <span>
+                                                <i class="fas fa-eye password-toggle" id="oldPasswordToggle"></i>
+                                              </span>
                                     </div>
                                 </div>
                                 <div class="row mb-4 align-items-center">
@@ -131,6 +134,9 @@
                                     <div class="col-sm-9 d-flex">
                                         <input type="password" class="form-control" id="newPassword"
                                             placeholder="Enter new password" value="">
+                                            <span>
+                                                <i class="fas fa-eye password-toggle" id="newPasswordToggle"></i>
+                                              </span>
                                     </div>
                                     <div id="message"></div>
                                 </div>
@@ -251,6 +257,33 @@
                     })
 
                 </script>
+
+<script>
+    const oldPasswordToggle = document.getElementById('oldPasswordToggle');
+    const oldPasswordField = document.getElementById('oldPassword');
+
+    oldPasswordToggle.addEventListener('click', () => {
+      // Toggle the type attribute of the password field
+      const type = oldPasswordField.type === 'password' ? 'text' : 'password';
+      oldPasswordField.type = type;
+
+      // Toggle the icon between eye and eye-slash
+      oldPasswordToggle.classList.toggle('fa-eye');
+      oldPasswordToggle.classList.toggle('fa-eye-slash');
+    });
+  </script>
+
+<script>
+    const newPasswordToggle = document.getElementById('newPasswordToggle');
+    const newPasswordField = document.getElementById('newPassword');
+
+    newPasswordToggle.addEventListener('click', () => {
+      const type = newPasswordField.type === 'password' ? 'text' : 'password';
+      newPasswordField.type = type;
+      newPasswordToggle.classList.toggle('fa-eye');
+      newPasswordToggle.classList.toggle('fa-eye-slash');
+    });
+  </script>
 
                 </body>
 
