@@ -656,6 +656,7 @@ const returnOrder = async (req,res)=>{
 
 const loadWallet = async(req,res)=>{
     try {
+        const user = req.session.user || req.session.googleUser
         res.render('wallet',{activePage:''})
     } catch (error) {
         console.log(error);

@@ -124,7 +124,7 @@
                                             <div id="nameError"></div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-lg-6">
                                         <div class="checkout__input">
                                             <p>Phone<span>*</span></p>
@@ -154,7 +154,7 @@
                                 <div class="checkout__input">
                                     <p>Address<span>*</span></p>
                                     <input type="text" placeholder="Street Address"
-                                    class="checkout__input__add text-dark" id="address">
+                                        class="checkout__input__add text-dark" id="address">
                                     <div id="addressError"></div>
                                 </div>
                                 <div class="row">
@@ -192,49 +192,49 @@
                                 </div>
                                 <div class="row">
                                     <%if(userAddress){%>
-                                    <% userAddress.address.map((item, index)=> { %>
-                                        <div class="card shadow-sm col-4 m-2">
-                                            <div class="card-body">
-                                                <div class="form-check">
-                                                    <input class="form-check-input text-danger" type="radio"
-                                                        name="selectedAddress" id="address_<%= index %>"
-                                                        value="<%= index %>" data-item='<%= JSON.stringify(item) %>'
-                                                        onclick="selectAddress(this)">
-                                                    <label class="form-check-label" for="address_<%= index %>">
-                                                        <b>Select </b>
-                                                    </label>
-                                                </div>
-                                                <hr>
-                                                <h5 class="card-title">
-                                                    <b>
-                                                        <%= item.addressType %> Address
-                                                    </b>
-                                                </h5>
-                                                <p class="card-text">
-                                                    <strong>Name:</strong>
-                                                    <%= item.name %><br>
-                                                        <strong>Address:</strong>
-                                                        <%= item.address %><br>
-                                                            <strong>City:</strong>
-                                                            <%= item.city %><br>
-                                                                <strong>State:</strong>
-                                                                <%= item.state %><br>
-                                                                    <strong>ZIP Code:</strong>
-                                                                    <%= item.pincode %><br>
-                                                                        <strong>Phone:</strong>
-                                                                        <%= item.phone %>
-                                                </p>
-
-                                            </div>
-                                        </div>
-                                        <% }) %>
-                                        <%}else{%>
+                                        <% userAddress.address.map((item, index)=> { %>
                                             <div class="card shadow-sm col-4 m-2">
                                                 <div class="card-body">
-                                                    <div>No saved address found</div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input text-danger" type="radio"
+                                                            name="selectedAddress" id="address_<%= index %>"
+                                                            value="<%= index %>" data-item='<%= JSON.stringify(item) %>'
+                                                            onclick="selectAddress(this)">
+                                                        <label class="form-check-label" for="address_<%= index %>">
+                                                            <b>Select </b>
+                                                        </label>
+                                                    </div>
+                                                    <hr>
+                                                    <h5 class="card-title">
+                                                        <b>
+                                                            <%= item.addressType %> Address
+                                                        </b>
+                                                    </h5>
+                                                    <p class="card-text">
+                                                        <strong>Name:</strong>
+                                                        <%= item.name %><br>
+                                                            <strong>Address:</strong>
+                                                            <%= item.address %><br>
+                                                                <strong>City:</strong>
+                                                                <%= item.city %><br>
+                                                                    <strong>State:</strong>
+                                                                    <%= item.state %><br>
+                                                                        <strong>ZIP Code:</strong>
+                                                                        <%= item.pincode %><br>
+                                                                            <strong>Phone:</strong>
+                                                                            <%= item.phone %>
+                                                    </p>
+
                                                 </div>
                                             </div>
-                                            <%}%>
+                                            <% }) %>
+                                                <%}else{%>
+                                                    <div class="card shadow-sm col-4 m-2">
+                                                        <div class="card-body">
+                                                            <div>No saved address found</div>
+                                                        </div>
+                                                    </div>
+                                                    <%}%>
                                 </div>
 
                                 <!-- <div>
@@ -263,6 +263,13 @@
                                     </label>
                                 </div>
 
+                                <div class="my-4">
+                                    <label class="custom-label">
+                                        <input type="radio" name="paymentMethod" class="form-check-input ml-2"
+                                            value="Razorpay">
+                                        <span class="pl-5">Razorpay</span>
+                                    </label>
+                                </div>
                                 <!-- <div class="my-4">
                                     <label class="custom-label">
                                         <input type="radio" name="options" class="form-check-input ml-2">
@@ -288,12 +295,6 @@
                                             <input type="text" class="text-dark" placeholder="CVC">
                                         </div>
                                     </div>
-                                </div> -->
-                                <!-- <div class="my-4">
-                                    <label class="custom-label">
-                                        <input type="radio" name="options" class="form-check-input ml-2">
-                                        <span class="pl-5">Paypal</span>
-                                    </label>
                                 </div> -->
                                 <!-- <div class="my-4">
                                     <label class="custom-label">
@@ -331,7 +332,7 @@
                                 </ul>
 
                                 <button id="placeOrder" type="submit" class="site-btn">PLACE
-                                        ORDER</button>
+                                    ORDER</button>
 
                             </div>
                         </div>
@@ -466,7 +467,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         let addressObj = null
         let selectAddress = (radioButton) => {
             const selectedIndex = radioButton.value;
@@ -533,27 +534,159 @@
         });
 
 
+    </script> -->
+
+    <script>
+        let addressObj = null;
+
+        let selectAddress = (radioButton) => {
+            const selectedIndex = radioButton.value;
+            const selectedItem = JSON.parse(radioButton.getAttribute('data-item'));
+
+            console.log("Selected Address Index:", selectedIndex);
+            console.log("Selected Address Details:", selectedItem);
+            addressObj = {
+                index: selectedIndex,
+                address: selectedItem
+            }
+        }
+
+        document.getElementById('placeOrder').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
+            let totalAmount = document.getElementById('totalAmount').textContent;
+            console.log(selectedOption.value)
+
+            if (!addressObj) {
+                Swal.fire({
+                    title: 'Address Missing!',
+                    text: 'Please choose an address!',
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+                return;
+            }
+
+            if (!selectedOption) {
+                Swal.fire({
+                    title: 'Payment Method Missing!',
+                    text: 'Please choose a payment method!',
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+                return;
+            }
+
+            console.log("Selected Address:", addressObj);
+            console.log("Selected Payment Method:", selectedOption.value);
+
+            // Proceed with payment flow based on the selected payment method
+            try {
+                if (selectedOption.value === "Razorpay") {
+                    // Create Razorpay order on the server
+                    console.log("it is razorPay")
+                    const { data } = await axios.post('/payment/createRazorpayOrder', {
+                        totalPrice: Number(totalAmount)
+                    });
+
+                    console.log("Razorpay Order Data:", data);
+
+                    // Initialize Razorpay checkout
+                    const options = {
+                        key: data.key,
+                        amount: data.order.amount,
+                        currency: data.order.currency,
+                        name: "Zuka Sports",
+                        description: "Order Payment",
+                        order_id: data.order.id,
+                        handler: async function (response) {
+                            console.log("Payment Successful!", response);
+
+                            // Verify payment on the server
+                            const verification = await axios.post('/payment/verifyRazorpayPayment', {
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                // paymentDetails: response,
+                                totalPrice: Number(totalAmount),
+                                address: addressObj.address,
+                                index: addressObj.index
+                            });
+                            console.log("verification done")
+
+                            if (verification.data.success) {
+                                Swal.fire({
+                                    title: 'Success!',
+                                    text: 'Payment completed successfully!',
+                                    icon: 'success',
+                                    confirmButtonText: 'Okay'
+                                }).then(() => {
+                                    window.location.href = `/orderSuccess?id=${verification.data.orderId}`;
+                                    // window.location.href = `/orderSuccessff?id=${985034285}`;
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Verification Failed!',
+                                    text: 'Payment verification failed. Please contact support.',
+                                    icon: 'error',
+                                    confirmButtonText: 'Okay'
+                                });
+                            }
+                        },
+                        theme: {
+                            color: "#3399cc"
+                        }
+                    };
+
+                    const rzp = new Razorpay(options);
+                    rzp.open();
+                } else {
+                    // Handle other payment methods (Wallet, Cash on Delivery)
+                    const response = await axios.post('/placeOrder', {
+                        totalPrice: Number(totalAmount),
+                        address: addressObj.address,
+                        paymentMethod: selectedOption.value,
+                        index: addressObj.index
+                    });
+
+                    if (response.status === 200) {
+                        let id = response.data.orderId;
+                        console.log("Order ID:", id);
+                        window.location.href = `/orderSuccess?id=${id}`;
+                    }
+                }
+            } catch (error) {
+                console.error("Error during payment:", error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again later.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay'
+                });
+            }
+        });
     </script>
+
 
     <script>
         //add address
         const addBtn = document.getElementById('addBtn');
-            const name = document.getElementById('name');
-            const phone = document.getElementById('phone');
-            const altPhone = document.getElementById('altPhone');
-            const addressType = document.getElementById('addressType');
-            const address = document.getElementById('address');
-            const country = document.getElementById('country');
-            const state = document.getElementById('state');
-            const city = document.getElementById('city');
-            const pincode = document.getElementById('pincode');
+        const name = document.getElementById('name');
+        const phone = document.getElementById('phone');
+        const altPhone = document.getElementById('altPhone');
+        const addressType = document.getElementById('addressType');
+        const address = document.getElementById('address');
+        const country = document.getElementById('country');
+        const state = document.getElementById('state');
+        const city = document.getElementById('city');
+        const pincode = document.getElementById('pincode');
 
-            addBtn.addEventListener('click', (e) => {
-              e.preventDefault();
-              console.log("inside button click")
+        addBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log("inside button click")
 
-              //=============================
-              function validateAddressForm() {
+            //=============================
+            function validateAddressForm() {
                 const nameError = document.getElementById('nameError');
                 const phoneError = document.getElementById('phoneError');
                 const addressTypeError = document.getElementById('addressTypeError');
@@ -571,108 +704,110 @@
 
 
                 if (!nameRegex.test(name.value.trim())) {
-                  nameError.style.color = "red";
-                  nameError.innerHTML = "Invalid name. Please enter only alphabets";
-                  name.focus();
-                  return false;
+                    nameError.style.color = "red";
+                    nameError.innerHTML = "Invalid name. Please enter only alphabets";
+                    name.focus();
+                    return false;
                 } else {
-                  nameError.innerHTML = "";
+                    nameError.innerHTML = "";
 
                 }
 
                 if (!phoneRegex.test(phone.value.trim())) {
-                  phoneError.style.color = "red";
-                  phoneError.innerHTML = "Invalid phone number. Please enter a 10-digit number.";
-                  phone.focus();
-                  return false;
-                }else{
-                  phoneError.innerHTML = "";
+                    phoneError.style.color = "red";
+                    phoneError.innerHTML = "Invalid phone number. Please enter a 10-digit number.";
+                    phone.focus();
+                    return false;
+                } else {
+                    phoneError.innerHTML = "";
                 }
 
                 if (addressType.value.trim() === "") {
-                  addressTypeError.style.color = "red";
-                  addressTypeError.innerHTML = "Please select an address type.";
-                  addressType.focus();
-                  return false;
-                }else{
-                  addressTypeError.innerHTML = "";
+                    addressTypeError.style.color = "red";
+                    addressTypeError.innerHTML = "Please select an address type.";
+                    addressType.focus();
+                    return false;
+                } else {
+                    addressTypeError.innerHTML = "";
                 }
 
                 if (!addressRegex.test(address.value.trim())) {
-                  addressError.style.color = "red";
-                  addressError.innerHTML = "Invalid address. Please check for special characters.";
-                  address.focus();
-                  return false;
-                }else{
-                  addressError.innerHTML = "";
+                    addressError.style.color = "red";
+                    addressError.innerHTML = "Invalid address. Please check for special characters.";
+                    address.focus();
+                    return false;
+                } else {
+                    addressError.innerHTML = "";
                 }
 
                 if (country.value.trim() === "") {
-                  countryError.style.color = "red";
-                  countryError.innerHTML = "Please select a country.";
-                  country.focus();
-                  return false;
-                }else{
-                  countryError.innerHTML = "";
+                    countryError.style.color = "red";
+                    countryError.innerHTML = "Please select a country.";
+                    country.focus();
+                    return false;
+                } else {
+                    countryError.innerHTML = "";
                 }
 
                 if (state.value.trim() === "") {
-                  stateError.style.color = "red";
-                  stateError.innerHTML = "Please select a state.";
-                  state.focus();
-                  return false;
-                }else{
-                  stateError.innerHTML = "";
+                    stateError.style.color = "red";
+                    stateError.innerHTML = "Please select a state.";
+                    state.focus();
+                    return false;
+                } else {
+                    stateError.innerHTML = "";
                 }
 
                 if (!cityRegex.test(city.value.trim())) {
-                  cityError.style.color = "red";
-                  cityError.innerHTML = "Invalid city. Please enter only alphabets.";
-                  city.focus();
-                  return false;
-                }else{
-                  cityError.innerHTML = "";
+                    cityError.style.color = "red";
+                    cityError.innerHTML = "Invalid city. Please enter only alphabets.";
+                    city.focus();
+                    return false;
+                } else {
+                    cityError.innerHTML = "";
                 }
 
                 if (!pincodeRegex.test(pincode.value.trim())) {
-                  pincodeError.style.color = "red";
-                  pincodeError.innerHTML = "Invalid pincode. Please enter a 6-digit number.";
-                  pincode.focus();
-                  return false;
-                }else{
-                  pincodeError.innerHTML = "";
+                    pincodeError.style.color = "red";
+                    pincodeError.innerHTML = "Invalid pincode. Please enter a 6-digit number.";
+                    pincode.focus();
+                    return false;
+                } else {
+                    pincodeError.innerHTML = "";
                 }
                 return true;
-              }
-              //=============================
-              if (validateAddressForm()) {
+            }
+            //=============================
+            if (validateAddressForm()) {
                 console.log("inside validate")
 
                 axios.post('/addAddress', {
-                  name: name.value,
-                  // email:email.value,
-                  phone: phone.value,
-                  altPhone: altPhone.value,
-                  addressType: addressType.value,
-                  address: address.value,
-                  country: country.value,
-                  state: state.value,
-                  city: city.value,
-                  pincode: pincode.value
+                    name: name.value,
+                    // email:email.value,
+                    phone: phone.value,
+                    altPhone: altPhone.value,
+                    addressType: addressType.value,
+                    address: address.value,
+                    country: country.value,
+                    state: state.value,
+                    city: city.value,
+                    pincode: pincode.value
                 }).then(res => {
-                  if (res.status == 200) {
-                    Swal.fire({
-                      title: 'Success!',
-                      text: 'Address added successfully!',
-                      icon: 'success',
-                      confirmButtonText: 'Okay'
-                    }).then(() => {
-                      window.location.reload()
-                    })
-                  }
+                    if (res.status == 200) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Address added successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(() => {
+                            window.location.reload()
+                        })
+                    }
                 })
-              }
-            })
+            }
+        })
     </script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

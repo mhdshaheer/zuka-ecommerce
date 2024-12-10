@@ -7,7 +7,8 @@ const morgan = require('morgan')
 const passport = require("./config/passport")
 const env = require("dotenv").config();
 const userRouter = require('./routes/userRouter')
-const adminRouter = require("./routes/adminRouter")
+const adminRouter = require("./routes/adminRouter");
+const paymentRouter = require('./routes/paymentRouter')
 const db = require('./config/db');
 const axios = require('axios');
 const nocache = require('nocache')
@@ -39,6 +40,7 @@ app.use(passport.session())
 
 app.use("/",userRouter);
 app.use("/admin",adminRouter);
+app.use("/payment",paymentRouter);
 
 
 const PORT = 5000 || process.env.PORT

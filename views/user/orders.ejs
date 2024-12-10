@@ -204,7 +204,7 @@
                                         <%= order.status %>
                                       </span>
                                     <%}else{%>
-                                    <span class="order-status badge <%= order.status === 'Delivered' ? 'badge-success' : 'badge-warning' %>">
+                                    <span class="order-status badge text-dark <%= order.status === 'Delivered' ? 'badge-success' : 'badge-warning' %>">
                                       <%= order.status %>
                                     </span>
                                     <%}%>
@@ -222,7 +222,10 @@
                                     </div>
                                     <div class="order-detail">
                                       <strong>Payment:</strong>
-                                      <p><%= order.paymentMethod %></p>
+                                      <p><%= order.paymentMethod %> <span class="order-status badge  <%= order.paymentStatus === 'Paid' ? 'badge-success ' : 'badge-warning' %>">
+                                        <%= order.paymentStatus%>
+                                      </span></p>
+                                      
                                     </div>
                                   </div>
                                   <div class="order-actions">
