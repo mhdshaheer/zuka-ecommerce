@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const {Schema} = mongoose;
 
 const couponSchema = new mongoose.Schema({
-    name:{
+    code:{
         type:String,
         required:true,
         unique:true
@@ -17,7 +17,7 @@ const couponSchema = new mongoose.Schema({
         type:Date,
         required:true
     },
-    offerPrice:{
+    discountPrice:{
         type:Number,
         required:true
     },
@@ -28,6 +28,14 @@ const couponSchema = new mongoose.Schema({
     isList:{
         type:Boolean,
         default:true
+    },
+    usageLimit: {
+        type: Number,
+        default: 1
+    },
+    usedCount: {
+        type: Number,
+        default: 0 
     },
     userId:[{
         type:mongoose.Schema.Types.ObjectId,

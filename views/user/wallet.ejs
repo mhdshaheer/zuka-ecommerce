@@ -161,13 +161,13 @@
                             <hr>
                             <div class="accordion" id="accordionExample">
                                 <div class="card categories-text">
-                                    <a href="" class="text-dark">Orders</a>
+                                    <a href="/orders" class="text-secondary text-decoration-none hover:text-danger">Orders</a>
                                 </div>
                             </div>
                             <hr>
                             <div class="accordion" id="accordionExample">
                                 <div class="card categories-text">
-                                    <a href="" class="text-secondary text-decoration-none hover:text-danger">Wallet</a>
+                                    <a href="#" class="text-dark">Wallet</a>
                                 </div>
                             </div>
                             <hr>
@@ -193,7 +193,11 @@
                                 <div class="card bg-light text-left mb-4">
                                     <div class="card-body">
                                         <h6 class="card-title">Current Balance</h6>
-                                        <p class="card-text"><b>₹5,000.00</b></p>
+                                        <%if(wallet){%>
+                                        <p class="card-text"><b>₹<%=wallet.balance.toFixed(2)%></b></p>
+                                        <%}else{%>
+                                            <p class="card-text"><b>₹0.00</b></p>
+                                        <%}%>
                                     </div>
                                 </div>
                             </div>
@@ -212,38 +216,32 @@
                         <div class="transaction-history">
                             <h4 class="mb-3">Transaction History</h4>
                             <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Transaction ID</th>
-                                        <th>Type</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>2024-12-01</td>
-                                        <td>#TXN12345</td>
-                                        <td>Refund</td>
-                                        <td>₹1,500.00</td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2024-11-25</td>
-                                        <td>#TXN67890</td>
-                                        <td>Purchase</td>
-                                        <td>-₹2,000.00</td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2024-11-20</td>
-                                        <td>#TXN54321</td>
-                                        <td>Top-Up</td>
-                                        <td>₹5,000.00</td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                    </tr>
-                                </tbody>
+                                <%if(wallet){%>
+
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <!-- <th>Transaction ID</th> -->
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <%wallet.transactions.map((item)=>{%>
+                                            <tr>
+                                                <td><%=item.createdAt.toLocaleDateString()%></td>
+                                                <!-- <td>2024-12-01</td> -->
+                                                <td>₹<%=item.amount%></td>
+                                                <td><span class="badge <%= item.type == 'Debit' ? 'badge-danger' : 'badge-success' %>"><%=item.type%></span></td>
+                                            </tr>
+                                           <%})%> 
+                                        
+                                    </tbody>
+                                <%}else{%>
+                                    <div>
+                                        No transactions found
+                                    </div>
+                                <%}%>
                             </table>
                         </div>
                     </div>

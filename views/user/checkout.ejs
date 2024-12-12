@@ -252,7 +252,10 @@
                                     <label class="custom-label">
                                         <input type="radio" name="paymentMethod" value="Wallet"
                                             class="form-check-input ml-2">
-                                        <span class="pl-5">Wallet</span>
+                                        <span class="pl-5">Wallet <span class="fs-6 text-secondary">Rs:
+                                                <%=wallet?.balance?wallet.balance.toFixed(2):0%>
+                                            </span></span>
+
                                     </label>
                                 </div>
                                 <div class="my-4">
@@ -325,9 +328,16 @@
                                     <li>04. Cluten free mini dozen <span>110.00</span></li> -->
                                 </ul>
                                 <ul class="checkout__total__all">
-                                    <!-- <li>Subtotal <span>Rs: 750.99</span></li> -->
-                                    <li>Total Rs:<span id="totalAmount">
-                                            <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%>
+                                    <li>Subtotal <span class="text-dark">₹ <%=(userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0).toFixed(2))%></span></li>
+                                    <li>Discount <span>-₹ <%=couponDiscount%></span></li>
+                                    <li>Total:<span id="totalAmount" class="text-dark">
+                                           
+                                            <!-- ₹ <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%> -->
+                                            <% 
+                                            const totalPrice = userCart.items.reduce((acc, curr) => acc + curr.totalPrice, 0);
+                                            const finalPrice = totalPrice >= couponMin ? (totalPrice - couponDiscount) : totalPrice;
+                                          %>
+                                          <%= finalPrice %>
                                         </span></li>
                                 </ul>
 
@@ -555,7 +565,6 @@
             e.preventDefault();
             const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
             let totalAmount = document.getElementById('totalAmount').textContent;
-            console.log(selectedOption.value)
 
             if (!addressObj) {
                 Swal.fire({
@@ -641,28 +650,51 @@
                     const rzp = new Razorpay(options);
                     rzp.open();
                 } else {
-                    // Handle other payment methods (Wallet, Cash on Delivery)
-                    const response = await axios.post('/placeOrder', {
-                        totalPrice: Number(totalAmount),
-                        address: addressObj.address,
-                        paymentMethod: selectedOption.value,
-                        index: addressObj.index
-                    });
 
-                    if (response.status === 200) {
-                        let id = response.data.orderId;
-                        console.log("Order ID:", id);
-                        window.location.href = `/orderSuccess?id=${id}`;
-                    }
+                    Swal.fire({
+                        title: "Place Order?",
+                        text: "Are you sure you want to confirm this order?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "Yes, Place Order!",
+                        cancelButtonText: "No, Cancel"
+                    }).then(async result => {
+                        if (result.isConfirmed) {
+
+                            const response = await axios.post('/placeOrder', {
+                                totalPrice: Number(totalAmount),
+                                address: addressObj.address,
+                                paymentMethod: selectedOption.value,
+                                index: addressObj.index
+                            });
+
+                            if (response.status === 200) {
+                                let id = response.data.orderId;
+                                console.log("Order ID:", id);
+                                window.location.href = `/orderSuccess?id=${id}`;
+                            }
+                        }
+                    })
                 }
+
             } catch (error) {
                 console.error("Error during payment:", error);
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Something went wrong. Please try again later.',
-                    icon: 'error',
-                    confirmButtonText: 'Okay'
-                });
+                if (error.response && error.response.status == 402) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Insufficient Balance',
+                        text: error.response.data.message,
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Something went wrong. Please try again later.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
             }
         });
     </script>

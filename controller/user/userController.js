@@ -3,7 +3,8 @@ const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
 const Product = require('../../models/productSchema')
 const mongoose = require('mongoose')
-const Order = require('../../models/orderSchema')
+const Order = require('../../models/orderSchema');
+const Wallet = require('../../models/walletSchema')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const { truncateSync } = require('fs-extra');
@@ -592,13 +593,16 @@ const editAddressData = async (req,res)=>{
 const loadOrders = async (req,res)=>{
     try {
         const user = req.session.user || req.session.googleUser;
-        const userOrder = await Order.find({userId:user._id}).sort({createdAt:-1})
+
+        //pagination
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const startIndex = (page - 1) * limit;
+        const totalOrders = await Order.countDocuments({ userId: user._id });
+
+        const userOrder = await Order.find({userId:user._id}).sort({createdAt:-1}).skip(startIndex).limit(limit);
+
         const userAddress = await Address.findOne({userId:user._id})
-        // const id = order.cartId
-        // const address = await Cart.aggregate([{$match:{
-        //    _id:mongoose.Types.ObjectId(id)
-        // }},{$unwind:'$item'}])
-        // console.log("unwind result : ",address)
         console.log('orders',userOrder);
         console.log('address',userAddress);
         
@@ -606,7 +610,10 @@ const loadOrders = async (req,res)=>{
             activePage:'',
             user,
             userOrder,
-            address:userAddress.address
+            address: userAddress?.address || null,
+            totalOrders,
+            currentPage: page,
+            totalPages: Math.ceil(totalOrders / limit),
         })
     } catch (error) {
         console.log(error)
@@ -616,10 +623,31 @@ const loadOrders = async (req,res)=>{
 const cancelOrder = async (req,res)=>{
     try {
         const {orderId} = req.body;
+        const user = req.session.user;
         console.log('order id :',orderId)
+        
         const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}});
         const orders = await Order.findOne({orderId:orderId})
+        
+        if(orders.paymentStatus==='Paid'){
+            let transactions={
+                type:'Refund',
+                amount:orders.finalAmount,
+
+            }
+            const wallet = await Wallet.findOneAndUpdate(
+                {userId:user._id},
+                {
+                    $inc: { balance: orders.finalAmount },
+                    $push:{
+                    transactions:transactions
+                }},
+                {upsert:true,new:true}
+            )
+        }
+
         //Return the stock to dataBase
+
         orders.orderedItems.map(async (item)=>{
             let updateStock =  await Product.updateOne({[`variant._id`]:item.varientId },{$inc:{'variant.$.stock':item.quantity}})
         })
@@ -656,8 +684,14 @@ const returnOrder = async (req,res)=>{
 
 const loadWallet = async(req,res)=>{
     try {
-        const user = req.session.user || req.session.googleUser
-        res.render('wallet',{activePage:''})
+        const user = req.session.user || req.session.googleUser;
+        const wallet = await Wallet.findOne({userId:user._id});
+        console.log("wallet is:",wallet)
+        res.render('wallet',{
+            activePage:'',
+            user,
+            wallet
+        })
     } catch (error) {
         console.log(error);
         

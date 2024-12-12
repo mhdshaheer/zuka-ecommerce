@@ -97,6 +97,10 @@ const orderSchema = new Schema({
         type: Boolean,
         default: false
     },
+    couponDiscount:{
+        type:Number,
+        default:0
+    },
     cancellationReason:{
         type:String
     }

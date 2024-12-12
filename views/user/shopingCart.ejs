@@ -31,38 +31,40 @@
                 <div class="col-lg-8">
                     <div class="shopping__cart__table">
                         <%if(!cartItem){%>
-                            <div class="card p-3 text-center"><h4>Your cart is empty.</h4></div>
-                        <%}else{%>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Size</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <!-- <th>Edit</th> -->
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                
-                                <%cartItem.map((item,index)=>{%>
-                                    <tr>
-                                        <td class="product__cart__item">
-                                            <div class="product__cart__item__pic">
-                                                <img src="<%=item.productId.images[0]%>" alt="">
-                                            </div>
-                                            <div class="product__cart__item__text">
-                                                <h6>
-                                                    <%=item.productId.productName%>
-                                                </h6>
-                                                <h5>Rs :<%=item.price%>.00</h5>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <%=item.size%>
-                                        </td>
-                                        <!-- <td class="quantity__item">
+                            <div class="card p-3 text-center">
+                                <h4>Your cart is empty.</h4>
+                            </div>
+                            <%}else{%>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Size</th>
+                                            <th>Quantity</th>
+                                            <th>Total</th>
+                                            <!-- <th>Edit</th> -->
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <%cartItem.map((item,index)=>{%>
+                                            <tr>
+                                                <td class="product__cart__item">
+                                                    <div class="product__cart__item__pic">
+                                                        <img src="<%=item.productId.images[0]%>" alt="">
+                                                    </div>
+                                                    <div class="product__cart__item__text">
+                                                        <h6>
+                                                            <%=item.productId.productName%>
+                                                        </h6>
+                                                        <h5>₹ <%=item.price%>.00</h5>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <%=item.size%>
+                                                </td>
+                                                <!-- <td class="quantity__item">
                                             <div class="quantity">
                                                 <div class="pro-qty-2">
                                                     <input id="itemQty" type="text" value="<%=item.quantity%>" class="quantity-input">
@@ -71,30 +73,30 @@
                                         </td>
                                         <td class="cart__price">Rs :<%=item.totalPrice%>.00</td>
                                         -->
-                                        
-                                        
-                                        <td>
-                                            <div>
-                                                <div>
-                                                    <input id="itemQty-<%=index%>" type="number"
-                                                        value="<%=item.quantity%>" class="quantity-input" min="1"
-                                                        max="10" data-price="<%=item.price%>"
-                                                        oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>')">
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="cart__price" id="price-<%=index%>">Rs :
-                                            <%=item.totalPrice.toFixed(2)%>
-                                        </td>
-                                        <td class="cart__close" onclick="deleteItem('<%=index%>')"><i
-                                            class="fa fa-close"></i>
-                                        </td> 
-                                    </tr>
-                                    <%})%>
-                                    
-                            </tbody>
-                        </table>
-                        <%}%>
+
+
+                                                <td>
+                                                    <div>
+                                                        <div>
+                                                            <input id="itemQty-<%=index%>" type="number"
+                                                                value="<%=item.quantity%>" class="quantity-input"
+                                                                min="1" max="10" data-price="<%=item.price%>"
+                                                                oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>')">
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="cart__price" id="price-<%=index%>">₹
+                                                    <%=item.totalPrice.toFixed(2)%>
+                                                </td>
+                                                <td class="cart__close" onclick="deleteItem('<%=index%>')"><i
+                                                        class="fa fa-close"></i>
+                                                </td>
+                                            </tr>
+                                            <%})%>
+
+                                    </tbody>
+                                </table>
+                                <%}%>
                     </div>
                     <div class="row">
                         <div class="col-lg-6 col-md-6 col-sm-6">
@@ -104,7 +106,8 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-sm-6">
                             <div class="continue__btn update__btn">
-                                <a href="#" id="updateCartBtn" onclick="window.location.reload()"><i class="fa fa-spinner"></i> Update cart</a>
+                                <a href="#" id="updateCartBtn" onclick="window.location.reload()"><i
+                                        class="fa fa-spinner"></i> Update cart</a>
                             </div>
                         </div>
                     </div>
@@ -113,17 +116,21 @@
                     <div class="cart__discount">
                         <h6>Discount codes</h6>
                         <form action="#">
-                            <input type="text" placeholder="Coupon code">
-                            <button type="submit">Apply</button>
+                            <input type="text" placeholder="Coupon code" id="couponField" class="text-dark">
+                            <button type="submit" id="couponAppyBtn" onclick="applyCoupon('<%=total%>',event)">Apply</button>
                         </form>
+                        <div style="color: green;" id="couponApplied"></div>
                     </div>
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
-                            <!-- <li>Subtotal <span>Rs : 169.50</span></li> -->
-                            <li>Total <span id="totalAmount">Rs : <%=total%></span></li>
+                            <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span></li>
+                            <li >Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
+
+                            <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span></li>
                         </ul>
-                        <a href="/checkout" class="primary-btn">Proceed to checkout</a>
+                        <a href="/checkout" class="primary-btn" id="checkOutBtn">Proceed to checkout</a>
+                        <!-- <button class="primary-btn" id="checkOutBtn">Proceed to checkout</button> -->
                     </div>
                 </div>
             </div>
@@ -131,83 +138,7 @@
     </section>
     <!-- Shopping Cart Section End -->
 
-    <!-- Footer Section Begin -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="footer__about">
-                        <div class="footer__logo">
-                            <a href="#"><img src="img/footer-logo.png" alt=""></a>
-                        </div>
-                        <p>The customer is at the heart of our unique business model, which includes design.</p>
-                        <a href="#"><img src="img/payment.png" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>Shopping</h6>
-                        <ul>
-                            <li><a href="#">Clothing Store</a></li>
-                            <li><a href="#">Trending Shoes</a></li>
-                            <li><a href="#">Accessories</a></li>
-                            <li><a href="#">Sale</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>Shopping</h6>
-                        <ul>
-                            <li><a href="#">Contact Us</a></li>
-                            <li><a href="#">Payment Methods</a></li>
-                            <li><a href="#">Delivary</a></li>
-                            <li><a href="#">Return & Exchanges</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>NewLetter</h6>
-                        <div class="footer__newslatter">
-                            <p>Be the first to know about new arrivals, look books, sales & promos!</p>
-                            <form action="#">
-                                <input type="text" placeholder="Your email">
-                                <button type="submit"><span class="icon_mail_alt"></span></button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="footer__copyright__text">
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        <p>Copyright ©
-                            <script>
-                                document.write(new Date().getFullYear());
-                            </script>2020
-                            All rights reserved | This template is made with <i class="fa fa-heart-o"
-                                aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        </p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Section End -->
 
-    <!-- Search Begin -->
-    <div class="search-model">
-        <div class="h-100 d-flex align-items-center justify-content-center">
-            <div class="search-close-switch">+</div>
-            <form class="search-model-form">
-                <input type="text" id="search-input" placeholder="Search here.....">
-            </form>
-        </div>
-    </div>
-    <!-- Search End -->
 
     <script>
         function deleteItem(index) {
@@ -246,6 +177,7 @@
         }
 
     </script>
+
     <script>
         function saveItem(index) {
             console.log(index);
@@ -255,12 +187,13 @@
     </script>
 
     <script>
-        function updatePrice(index,itemId,cartId) {
+        let totalAfterAll = null;
+        function updatePrice(index, itemId, cartId) {
             // Get the quantity input and unit price
             const quantityInput = document.getElementById(`itemQty-${index}`);
             const price = parseFloat(quantityInput.dataset.price); // Get  price from data attribute
 
-            console.log("Unit Price:", price); 
+            console.log("Unit Price:", price);
             console.log("Quantity Input Value:", quantityInput.value);
 
             // Validate and get the quantity
@@ -282,22 +215,96 @@
 
             // Update the price element
             const priceElement = document.getElementById(`price-${index}`);
-            priceElement.textContent = `Rs : ${totalPrice.toFixed(2)}`;
+            priceElement.textContent = `₹ ${totalPrice.toFixed(2)}`;
             // const totalAmount = document.getElementById('totalAmount');
-            console.log('quantity:',quantityInput.value)
+            console.log('quantity:', quantityInput.value)
 
-            axios.patch('/cart',{
-                itemIndex : index,
+            axios.patch('/cart', {
+                itemIndex: index,
                 itemId,
                 cartId,
-                quantity:quantityInput.value,
-                regularPrice:price
+                quantity: quantityInput.value,
+                regularPrice: price
+            })
+            .then(response=>{
+                if(response.status==200){
+                    totalAfterAll = response.data.totalSum
+                    console.log("total amount is :",totalAfterAll)
+                    document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
+                    if(discountAmount && response.data.totalSum>=minimumPrice){
+
+                        document.getElementById('discountId').innerHTML = `₹ -${discountAmount}`
+                        document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll-discountAmount).toFixed(2)}`
+                    }else{
+                        document.getElementById('discountId').innerHTML = `₹ 0.00`
+                        document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`
+                    }
+                }
             })
             console.log("fetch done cart")
-            
+
         }
 
 
+    </script>
+
+    <script>
+        let discountAmount = null;
+        let minimumPrice = null;
+        function applyCoupon(total,event){
+            event.preventDefault();
+            const couponField = document.getElementById('couponField');
+            console.log(couponField.value)
+            axios.post('/couponApply', {
+                couponCode: couponField.value.toUpperCase()
+            })
+                .then(response => {
+                    if (response.status == 200) {
+                        discountAmount= response.data.coupon.discountPrice;
+                        minimumPrice= response.data.coupon.minimumPrice;
+                        if(totalAfterAll>=minimumPrice){
+                            document.getElementById('couponApplied').style.color="green"
+                            document.getElementById('couponApplied').innerHTML=`Discount amount ₹${discountAmount.toFixed(2)}`
+                            console.log("apply total:",total,discountAmount)
+                            
+                            document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(2)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll)-Number(discountAmount)).toFixed(2)}`
+                            // document.getElementById('couponAppyBtn').disabled=true
+                        }else{
+                            document.getElementById('couponApplied').style.color="red"
+                            document.getElementById('couponApplied').innerHTML=`${response.data.coupon.code} - min purchase ₹${minimumPrice.toFixed(2)}`
+
+                            document.getElementById('discountId').innerHTML = `₹ 0.00`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${total.toFixed(2)}`
+                        }
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Coupon added successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        })
+                    }
+                })
+                .catch(error=>{
+                    if(error.response&&error.response.status==402){
+                        document.getElementById('couponApplied').innerHTML=''
+                        Swal.fire({
+                                    title: 'Invalid!',
+                                    text: error.response.data.message,
+                                    icon: 'warning',
+                                    confirmButtonText: 'Okay'
+                                })
+                    }
+                })
+        }
+
+        // const checkOutBtn = document.getElementById('checkOutBtn');
+        // checkOutBtn.addEventListener('click',(e)=>{
+        //     e.preventDefault();
+        //     console.log('inside checklist');
+        //     window.location.href = `/checkout?${discountAmount}&${totalAfterAll}`;
+        //     console.log('hai')
+        // })
     </script>
 
 
@@ -306,16 +313,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-    <script src="js/jquery-3.3.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.nice-select.min.js"></script>
-    <script src="js/jquery.nicescroll.min.js"></script>
-    <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/jquery.countdown.min.js"></script>
-    <script src="js/jquery.slicknav.js"></script>
-    <script src="js/mixitup.min.js"></script>
-    <script src="js/owl.carousel.min.js"></script>
-    <script src="js/main.js"></script>
-    </body>
-
-    </html>
+    
+    <%-include('../partials/user/footer')%>

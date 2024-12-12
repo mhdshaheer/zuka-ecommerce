@@ -65,7 +65,8 @@ router.get('/wallet',userController.loadWallet)
 //addtoCart
 router.post('/addToCart',shopController.addToCart);
 router.delete('/deleteItem',shopController.deleteFromCart)
-router.patch('/cart',shopController.editCart)
+router.patch('/cart',shopController.editCart);
+router.post('/couponApply',shopController.couponApply)
 
 // Checkout
 router.post('/placeOrder',shopController.addOrder)

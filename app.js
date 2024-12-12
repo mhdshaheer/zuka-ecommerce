@@ -12,6 +12,7 @@ const paymentRouter = require('./routes/paymentRouter')
 const db = require('./config/db');
 const axios = require('axios');
 const nocache = require('nocache')
+
 db();
 app.use(nocache())
 app.use(morgan('tiny'))

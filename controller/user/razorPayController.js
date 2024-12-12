@@ -17,12 +17,14 @@ const createOrder = async (req, res) => {
     try {
         console.log("hai")
         const { totalPrice } = req.body;
+        console.log('total:',totalPrice)
 
         const order = await razorpay.orders.create({
             amount: totalPrice * 100, // Convert to paise
             currency: "INR",
             receipt: "order_rcptid_11"
         });
+        console.log('hhhhh ahhaha h')
 
         res.status(200).json({ key: razorpay.key_id, order });
     } catch (error) {

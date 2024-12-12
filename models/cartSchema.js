@@ -42,7 +42,11 @@ const cartSchema = new Schema({
         //     default: "none"
         // }
 
-    }]
+    }],
+    // totalAmount:{
+    //     type:Number,
+    //     default:0,
+    // },
     
 },{timestamps:true})
 
