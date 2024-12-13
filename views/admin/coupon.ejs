@@ -1,4 +1,9 @@
 <%-include('../../views/partials/admin/adminHeader')%>
+<style>
+    .blockBtn{
+        background-color: red !important;
+    }
+</style>
             <section class="content-main">
                 <div class="content-header">
                     <div>
@@ -65,16 +70,12 @@
                                             <td class="text-center"><%=item.userId.length%></td>
                                             <td><span class="badge rounded-pill <%=item.isList?'alert-success':'alert-danger'%>"><%=item.isList?'Active':'Inactive'%></span></td>
                                             <td class="text-end">
-                                                <a href="#" class="btn btn-md rounded font-sm">Delete</a>
-                                                <!-- <div class="dropdown">
-                                                    <a href="#" data-bs-toggle="dropdown" class="btn btn-light rounded btn-sm font-sm"> <i class="material-icons md-more_horiz"></i> </a>
-                                                    <div class="dropdown-menu">
-                                                        <a class="dropdown-item" href="#">View detail</a>
-                                                        <a class="dropdown-item" href="#">Edit info</a>
-                                                        <a class="dropdown-item text-danger" href="#">Delete</a>
-                                                    </div>
-                                                </div> -->
-                                                <!-- dropdown //end -->
+                                                <%if(item.isList){%>
+                                                    <a href="#" class="btn btn-md rounded font-sm blockBtn" onclick="blockCoupon('<%=item._id%>')">Block</a>
+                                                <%}else{%>
+                                                    <a href="#" class="btn  btn-md rounded font-sm " onclick="unBlockCoupon('<%=item._id%>')">Unblock</a>
+                                                <%}%>
+                                                
                                             </td>
                                         </tr>
                                     <%})%>
@@ -221,8 +222,39 @@
             discountValue:discountValue.value,
             activationDate:new Date(activationDate.value),
             expiryDate:new Date(expiryDate.value)
+        }).then((res)=>{
+            if(res.status==200){
+                Swal.fire({
+              title: 'Success!',
+              text: 'Category added successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then((result)=>{
+                window.location.reload();
+            })
+            }
         })
     })
+  </script>
+  <script>
+    function blockCoupon(couponId){
+        console.log("id is:",couponId);
+        axios.patch('/admin/blockCoupon',{couponId})
+        .then((res)=>{
+            if(res.status==200){
+                window.location.reload()
+            }
+        })
+    }
+    function unBlockCoupon(couponId){
+        console.log("id is:",couponId);
+        axios.patch('/admin/unBlockCoupon',{couponId})
+        .then((res)=>{
+            if(res.status==200){
+                window.location.reload()
+            }
+        })
+    }
   </script>
   
 

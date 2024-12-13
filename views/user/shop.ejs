@@ -197,6 +197,9 @@
                             <div class="col-lg-4 col-md-6 col-sm-6">
                                 <div class="product__item">
                                     <div class="product__item__pic set-bg" data-setbg="<%=products[i].images[0]%>">
+                                        <%if(products[i].offerPrice!=0){%>
+                                            <span class="label text-light bg-dark"><%=((products[i].regularPrice - products[i].offerPrice) / products[i].regularPrice) * 100%>%</span>
+                                        <%}%>
                                         <ul class="product__hover">
                                             <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>',event)"><img
                                                         src="img/icon/heart.png" alt=""></a></li>
@@ -219,7 +222,12 @@
                                             <i class="fa fa-star-o"></i>
                                             <i class="fa fa-star-o"></i>
                                         </div>
-                                        <h5>RS: <%=products[i].regularPrice%>.00/-</h5>
+                                        <%if(products[i].offerPrice!==0){%>
+                                            <h5>Rs: <%=products[i].offerPrice%>/-</h5>
+                                            <h6 style="text-decoration: line-through;">Rs: <%=products[i].regularPrice%>.00/-</h6>
+                                            <%}else{%>
+                                                <h5>Rs: <%=products[i].regularPrice%>.00/-</h5>
+                                        <%}%>
                                         <div class="product__color__select">
                                             <label for="pc-4">
                                                 <input type="radio" id="pc-4">

@@ -139,7 +139,11 @@
                                         <%=product[0].status%>
                                     </span>
                             </h3>
-                            <h3>RS: <%=product[0].regularPrice%>/- <span>70.00</span></h3>
+                            <%if(product[0].offerPrice!==0){%>
+                                <h3>RS: <%=product[0].offerPrice%>/- <span><%=product[0].regularPrice%>/-</span></h3>
+                            <%}else{%>
+                                <h3>RS: <%=product[0].regularPrice%>/-</h3>
+                            <%}%>
                             <p>
                                 <%=product[0].description%>
                             </p>
@@ -211,7 +215,7 @@
                             <div class="product__details__cart__option">
                                 <div class="quantity">
                                     <div class="pro-qty">
-                                        <input id="itemQuantity" type="text" value="1">
+                                        <input id="itemQuantity" type="text" value="1" readonly>
                                     </div>
                                 </div>
                                 <a href="#" class="primary-btn" id="addToCart">add to cart</a>
@@ -571,6 +575,38 @@
             })
         }
 
+    </script>
+    <script>
+        //Stock add field
+        document.querySelectorAll('.pro-qty, .pro-qty-2').forEach(container => {
+    // Determine the type to set the correct icons
+    const isType1 = container.classList.contains('pro-qty');
+
+    // Add decrement and increment buttons
+    const decButton = document.createElement('span');
+    decButton.className = `fa ${isType1 ? 'fa-angle-up' : 'fa-angle-left'} dec qtybtn`;
+    container.insertBefore(decButton, container.firstChild);
+
+    const incButton = document.createElement('span');
+    incButton.className = `fa ${isType1 ? 'fa-angle-down' : 'fa-angle-right'} inc qtybtn`;
+    container.appendChild(incButton);
+
+    // Add event listener for increment and decrement
+    container.addEventListener('click', function (event) {
+        if (event.target.classList.contains('qtybtn')) {
+            const input = container.querySelector('input');
+            let value = parseInt(input.value);
+
+            if (event.target.classList.contains('inc')) {
+                value = Math.min(value + 1, 10); // Increment up to 10
+            } else if (event.target.classList.contains('dec')) {
+                value = Math.max(value - 1, 1); // Decrement down to 1
+            }
+
+            input.value = value;
+        }
+    });
+});
     </script>
 
     <%- include('../partials/user/footer') %>

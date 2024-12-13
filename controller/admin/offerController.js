@@ -1,3 +1,4 @@
+const Offer = require('../../models/offerSchema')
 
 const loadOfferPage = async (req,res)=>{
     try {

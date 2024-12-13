@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
+const Product = require("./productSchema");
 
 const {Schema} = mongoose;
 
-const couponSchema = new mongoose.Schema({
-    code:{
+const offerSchema = new Schema({
+    name:{
         type:String,
         required:true,
         unique:true
@@ -17,7 +18,7 @@ const couponSchema = new mongoose.Schema({
         type:Date,
         required:true
     },
-    discountPrice:{
+    discountPercentage:{
         type:Number,
         required:true
     },
@@ -29,22 +30,20 @@ const couponSchema = new mongoose.Schema({
         type:Boolean,
         default:true
     },
-    usageLimit: {
-        type: Number,
-        default: 1
-    },
-    usedCount: {
-        type: Number,
-        default: 0 
-    },
-    userId:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+    products:[{
+        ProductId:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Product'
+        },
+        usedCount:{
+            type:Number,
+            default:0
+        }
     }]
 
 
 })
 
-const Coupon = mongoose.model("Coupon",couponSchema);
+const Offer = mongoose.model("Offer",offerSchema);
 
-module.exports = Coupon;
+module.exports = Offer;

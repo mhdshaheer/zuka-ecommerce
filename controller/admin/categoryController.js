@@ -1,4 +1,5 @@
 const Category = require("../../models/categorySchema");
+const Product = require("../../models/productSchema");
 const { updateOne } = require("../../models/userSchema");
 
 
@@ -82,6 +83,17 @@ const addOffer = async (req, res) => {
         const { newPrice } = req.body;
         console.log("new price is :", newPrice);
         await Category.updateOne({ _id: id }, { $set: { categoryOffer: newPrice } })
+        const products = await Product.find({category:id})
+
+        for (const product of products) {
+            const offerPrice = product.regularPrice * ((100 - newPrice) / 100);
+            await Product.updateOne(
+                { _id: product._id }, 
+                { $set: { offerPrice: offerPrice } }
+            );
+        }
+        // let offerPrice = product.regularPrice*((100-newPrice)/100)
+        // await Product.updateOne({category:id},{$set:{offerPrice:offerPrice}})
         res.status(201).json({ success: true, message: 'Offer added successfully' });
     } catch (error) {
         console.log("Error in add category offer", error);
@@ -93,6 +105,16 @@ const removeOffer = async (req, res) => {
     try {
         const { id } = req.params;
         await Category.updateOne({ _id: id }, { $set: { categoryOffer: 0 } });
+
+        //up
+        const products = await Product.find({category:id})
+        for (const product of products) {
+            const offerPrice = 0;
+            await Product.updateOne(
+                { _id: product._id }, 
+                { $set: { offerPrice: offerPrice } }
+            );
+        }
         res.status(201).json({ success: true, message: 'Offer is removed Successfully' })
     } catch (error) {
         console.log("Error in removing category offer", error);

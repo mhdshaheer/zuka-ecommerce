@@ -31,9 +31,12 @@ const login = async (req, res) => {
             console.log(passwordMatch)
             if (passwordMatch) {
                 req.session.admin = true;
-                return res.redirect('/admin/dashboard')
+                // return res.redirect('/admin/dashboard')
+                return res.status(200).json({message:""})
+
             } else {
-                return res.redirect('/admin/login')
+                // return res.redirect('/admin/login')
+                return res.status(200).json({message:"Incorrect password"})
             }
         } else {
             return res.redirect('/admin/login')

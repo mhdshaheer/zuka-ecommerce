@@ -113,8 +113,9 @@ const loadCheckout = async (req, res) => {
 const couponApply = async (req,res)=>{
     try {
         const {couponCode} = req.body;
+        const user = req.session.user|| req.session.googleUser
         const coupon = await Coupon.findOne({code:couponCode});
-        const userCoupon = await Coupon.findOne({code:couponCode,userId: { $elemMatch: { $eq: req.session.user._id } }})
+        const userCoupon = await Coupon.findOne({code:couponCode,userId: { $elemMatch: { $eq: user._id } }})
         console.log("coupon is :",coupon)
         if(!coupon){
             req.session.coupon = 0;
@@ -161,7 +162,7 @@ const addToCart = async (req, res) => {
             console.log('stocks : ', sizeFound.items[itemIndex].quantity)
             quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
             console.log(quantity)
-            let totalPrice = Number(quantity) * Number(productObj.regularPrice)
+            let totalPrice = Number(quantity) * Number(productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice) //edit
             const result = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.quantity`]: quantity } })
             const resultPrice = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.totalPrice`]: totalPrice } })
             if (result && resultPrice) {
@@ -170,15 +171,16 @@ const addToCart = async (req, res) => {
             }
 
         } else {
-
+            let lastPrice = productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice //edit
 
             const itemData = {
                 productId: productObj._id,
                 varientId: varientDetail.variant[0]._id,
                 quantity: Number(quantity),
-                price: productObj.regularPrice,
+                // price: productObj.regularPrice,
+                price: lastPrice,
                 size,
-                totalPrice: Number(quantity) * Number(productObj.regularPrice),
+                totalPrice: Number(quantity) * Number(lastPrice),
 
             }
             const toCart = await Cart.findOneAndUpdate(
