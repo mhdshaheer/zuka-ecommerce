@@ -69,6 +69,7 @@ router.get('/offer',offerController.loadOfferPage)
 
 //Sales report
 router.get('/salesReport',salesController.loadSalesReportPage)
-
+router.get('/salesReport/export/excel', salesController.exportExcel);
+router.get('/salesReport/export/pdf', salesController.exportPDF);
 
 module.exports = router;

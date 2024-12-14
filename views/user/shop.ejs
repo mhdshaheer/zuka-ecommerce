@@ -373,8 +373,6 @@
 
     <script>
         function searchItem(value, data) {
-            console.log("hai")
-            // console.log(value)
             let products = JSON.parse(data);
             let searchExp = new RegExp(`${value}`, "i");
             let searchOut = products.filter(value => searchExp.test(value.productName))

@@ -4,6 +4,7 @@ const env = require("dotenv").config()
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema')
 const Product = require('../../models/productSchema')
+const Coupon = require('../../models/couponSchema')
 
 
 // Initialize Razorpay instance
@@ -55,16 +56,25 @@ const verifyPayment = async (req, res) => {
                 cartId: cart._id,
                 userId: user._id,
                 orderedItems: cart.items,
-                totalPrice,
+                totalPrice:totalPrice+req.session.discountPrice,
                 finalAmount: totalPrice,
                 address: address._id,
                 index: Number(index),
                 paymentMethod:'Razorpay',
-                paymentStatus:'Paid'
+                paymentStatus:'Paid',
+                couponDiscount:req.session.discountPrice || 0,
+                couponApplied:req.session.discountPrice?true:false
             });
             if (addOrder) {
                 console.log("added to orders")
                 const order = await Order.findOne({ cartId: cart._id })
+                const addToCoupon = await Coupon.updateOne(
+                    {_id:req.session.couponId},
+                    {
+                        $push:{userId:user._id},
+                        $inc: { usedCount: 1 }
+                    }
+                )
                 console.log('order is :', order)
                 req.session.order = order
                 cart.items.map(async (item) => {

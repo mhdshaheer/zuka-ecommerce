@@ -93,7 +93,6 @@ const login = async (req, res) => {
             return res.render('login', { message: "Incorrect password" });
         }
 
-        // req.session.user = findUser._id;
         req.session.user = findUser;
         console.log('time to redirect')
         res.redirect('/');
@@ -623,7 +622,7 @@ const loadOrders = async (req,res)=>{
 const cancelOrder = async (req,res)=>{
     try {
         const {orderId} = req.body;
-        const user = req.session.user;
+        const user = req.session.user||req.session.googleUser;
         console.log('order id :',orderId)
         
         const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}});
@@ -643,7 +642,8 @@ const cancelOrder = async (req,res)=>{
                     transactions:transactions
                 }},
                 {upsert:true,new:true}
-            )
+            );
+            await Order.updateOne({orderId:orderId},{$set:{paymentStatus:'Refunded'}})
         }
 
         //Return the stock to dataBase

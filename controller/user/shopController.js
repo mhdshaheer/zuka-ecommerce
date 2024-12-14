@@ -85,8 +85,6 @@ const loadCart = async (req, res) => {
 const loadCheckout = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
-        const {discountAmount,totalAfterAll} = req.query;
-        console.log("discount:",discountAmount,totalAfterAll)
         const userAddress = await Address.findOne({ userId: user._id });
         const userCart = await Cart.findOne({ userId: user._id }).populate('items.productId');
         const wallet = await Wallet.findOne({userId:user._id});
@@ -100,7 +98,6 @@ const loadCheckout = async (req, res) => {
             userAddress,
             userCart,
             wallet,
-            totalAfterAll,
             couponDiscount:req.session.discountPrice || 0,
             couponMin : req.session.minimumPrice || 0
         })
@@ -230,6 +227,8 @@ const addOrder = async (req, res) => {
         const { totalPrice, address, paymentMethod, index } = req.body
         const cart = await Cart.findOne({ userId: user._id });
         const userWallet = await Wallet.findOne({userId:user._id})
+        console.log("discount amount is:",req.session.discountPrice);
+        console.log("total",totalPrice)
 
         // Insufficient balance 
         if(paymentMethod=='Wallet'){
@@ -255,12 +254,12 @@ const addOrder = async (req, res) => {
             console.log("Successfully added to orders")
             const order = await Order.findOne({ cartId: cart._id })
             console.log("coupon id:",req.session.couponId);
-            console.log("coupon id:",req.session.user._id);
+            console.log("coupon id:",user._id);
 
             const addToCoupon = await Coupon.updateOne(
                 {_id:req.session.couponId},
                 {
-                    $push:{userId:req.session.user._id},
+                    $push:{userId:user._id},
                     $inc: { usedCount: 1 }
                 }
             )
