@@ -1,10 +1,31 @@
 <%-include('../../views/partials/admin/adminHeader')%>
+    <style>
+        .spinner {
+            border: 5px solid #f3f3f3;
+            /* Light grey */
+            border-top: 5px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
 
-<!-- CSS -->
-<link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet">
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
 
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -113,6 +134,7 @@
                                             </div>
                                             <!-- col.// -->
                                         </div>
+                                        <!-- ====================================================================================== -->
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Product Images*</label>
                                             <div class="col-lg-9">
@@ -125,12 +147,71 @@
                                                             style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
                                                             No image uploaded
                                                         </div>
-                                                        <button id="cropButton-1"
-                                                            class="btn btn-primary ms-3">Crop</button>
+                                                        <button type="button" id="cropButton-1" class="btn btn-primary ms-3"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#cropModal">Crop</button>
                                                     </div>
-
                                                     <!-- Image Upload 2 -->
                                                     <div class="d-flex align-items-center mb-4" id="image-container-2">
+                                                        <input id="images-2" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-2"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button type="button" id="cropButton-2" class="btn btn-primary ms-3"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#cropModal">Crop</button>
+                                                    </div>
+                                                    <!-- Image Upload 3 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-3">
+                                                        <input id="images-3" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-3"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button type="button" id="cropButton-3" class="btn btn-primary ms-3"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#cropModal">Crop</button>
+                                                    </div>
+                                                    <!-- Image Upload 4 -->
+                                                    <div class="d-flex align-items-center mb-4" id="image-container-4">
+                                                        <input id="images-4" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-4"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button type="button" id="cropButton-4" class="btn btn-primary ms-3"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#cropModal">Crop</button>
+                                                    </div>
+
+                                                    <!-- Repeat for other image inputs (Image Upload 2, 3, 4) -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- ====================================================================================== -->
+
+                                        <!-- <div class="row mb-4">
+                                            <label class="col-lg-3 col-form-label">Product Images*</label>
+                                            <div class="col-lg-9">
+                                                <div id="image-list"> -->
+                                        <!-- Image Upload 1 -->
+                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-1">
+                                                        <input id="images-1" type="file" class="form-control me-3"
+                                                            name="images" accept="image/*" style="max-width: 70%;">
+                                                        <div id="preview-1"
+                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
+                                                            No image uploaded
+                                                        </div>
+                                                        <button id="cropButton-1"
+                                                            class="btn btn-primary ms-3">Crop</button>
+                                                    </div> -->
+
+                                        <!-- Image Upload 2 -->
+                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-2">
                                                         <input id="images-2" type="file" class="form-control me-3"
                                                             name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-2"
@@ -139,10 +220,10 @@
                                                         </div>
                                                         <button id="cropButton-2"
                                                             class="btn btn-primary ms-3">Crop</button>
-                                                    </div>
+                                                    </div> -->
 
-                                                    <!-- Image Upload 3 -->
-                                                    <div class="d-flex align-items-center mb-4" id="image-container-3">
+                                        <!-- Image Upload 3 -->
+                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-3">
                                                         <input id="images-3" type="file" class="form-control me-3"
                                                             name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-3"
@@ -151,10 +232,10 @@
                                                         </div>
                                                         <button id="cropButton-3"
                                                             class="btn btn-primary ms-3">Crop</button>
-                                                    </div>
+                                                    </div> -->
 
-                                                    <!-- Image Upload 4 -->
-                                                    <div class="d-flex align-items-center mb-4" id="image-container-4">
+                                        <!-- Image Upload 4 -->
+                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-4">
                                                         <input id="images-4" type="file" class="form-control me-3"
                                                             name="images" accept="image/*" style="max-width: 70%;" required>
                                                         <div id="preview-4"
@@ -166,7 +247,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
 
 
 
@@ -210,8 +291,8 @@
                                                         <span class="badge rounded-pill alert-success">Added</span>
                                                     </td>
                                                     <td>
-                                                        <button class="btn btn-danger btn-sm"
-                                                            onclick="deleteItem()">Delete</button>
+                                                        <button type="button" class="btn btn-danger btn-sm"
+                                                            >Delete</button>
                                                     </td>
                                                 </tr>
 
@@ -316,6 +397,13 @@
     </div>
 
     <!-- ==========modal end============== -->
+    <!-- loading animation -->
+    <div id="loading-spinner"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 9999;">
+        <div class="spinner"></div>
+    </div>
+    <!-- loading animation -->
+
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
             <div class="col-sm-6">
@@ -329,6 +417,27 @@
             </div>
         </div>
     </footer>
+    <!-- ======================crop modal======================== -->
+    <!-- Crop Modal -->
+    <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <canvas id="cropCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="saveCrop" type="button" class="btn btn-primary">Save Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================crop modal======================== -->
     </main>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
@@ -567,6 +676,12 @@
 
                 console.log("varient array ... is:", formData.get('varient'))
                 // formData.append("image", image1);
+                // const imageInputs = [
+                //     document.getElementById('images-1'),
+                //     document.getElementById('images-2'),
+                //     document.getElementById('images-3'),
+                //     document.getElementById('images-4'),
+                // ];
                 const imageInputs = [
                     document.getElementById('images-1'),
                     document.getElementById('images-2'),
@@ -587,6 +702,7 @@
                 //form data end
 
                 console.log('to post')
+                showSpinner()
                 fetch('/admin/addProduct', {
                     method: "POST",
                     body: formData
@@ -595,7 +711,7 @@
                         console.log("inside swal")
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Category Edited successfully!',
+                            text: 'Product adeded successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
                         }).then(() => {
@@ -607,11 +723,13 @@
                         console.error('Error:', err);
                         Swal.fire({
                             title: 'Error!',
-                            text: 'Failed to Edit category.',
+                            text: 'Failed to add product.',
                             icon: 'error',
                             confirmButtonText: 'Okay'
                         });
-                    });
+                    }).finally(()=>{
+                        hideSpinner()
+                    })
             }
         })
 
@@ -664,7 +782,7 @@
         }
 
     </script>
-    <script>
+    <!-- <script>
         for (let i = 1; i <= 4; i++) {
             const imageInput = document.getElementById(`images-${i}`);
             const previewDiv = document.getElementById(`preview-${i}`);
@@ -682,6 +800,101 @@
                     previewDiv.innerHTML = "No image uploaded";
                 }
             });
+        }
+    </script> -->
+    <script>
+        let cropper;
+        let activeInputId;
+
+        for (let i = 1; i <= 4; i++) {
+            const imageInput = document.getElementById(`images-${i}`);
+            const previewDiv = document.getElementById(`preview-${i}`);
+            const cropButton = document.getElementById(`cropButton-${i}`);
+
+            // Display uploaded image and prepare for cropping
+            imageInput.addEventListener('change', (event) => {
+                event.preventDefault()
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; max-height: 150px;">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewDiv.innerHTML = "No image uploaded";
+                }
+            });
+
+            // Set up cropper when "Crop" button is clicked
+            cropButton.addEventListener('click', () => {
+                const file = imageInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const canvas = document.getElementById('cropCanvas');
+                        const ctx = canvas.getContext('2d');
+
+                        const image = new Image();
+                        image.onload = () => {
+                            canvas.width = image.width;
+                            canvas.height = image.height;
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(image, 0, 0);
+
+                            // Initialize Cropper.js
+                            if (cropper) cropper.destroy();
+                            cropper = new Cropper(canvas, {
+                                aspectRatio: 1,
+                                viewMode: 2,
+                            });
+
+                            activeInputId = `images-${i}`;
+                        };
+                        image.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Save cropped image and update preview
+        document.getElementById('saveCrop').addEventListener('click', (e) => {
+            e.preventDefault()
+            if (cropper) {
+                const canvas = cropper.getCroppedCanvas();
+                const croppedImageURL = canvas.toDataURL('image/png');
+
+                // Update the preview div with cropped image
+                const previewDiv = document.getElementById(`preview-${activeInputId.split('-')[1]}`);
+                previewDiv.innerHTML = `<img src="${croppedImageURL}" alt="Cropped Image" style="max-width: 100%; max-height: 150px;">`;
+
+                // Convert the cropped image to a Blob for backend submission
+                canvas.toBlob((blob) => {
+                    const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
+                    document.getElementById(activeInputId).files = createFileList([file]);
+                });
+
+                // Close the modal
+                const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropModal'));
+                cropModal.hide();
+            }
+        });
+
+        // Helper function to create a FileList object
+        function createFileList(files) {
+            const dataTransfer = new DataTransfer();
+            files.forEach((file) => dataTransfer.items.add(file));
+            return dataTransfer.files;
+        }
+    </script>
+    <script>
+        const loadingSpinner = document.getElementById('loading-spinner');
+        function showSpinner() {
+            loadingSpinner.style.display = 'block';
+        }
+        function hideSpinner() {
+            loadingSpinner.style.display = 'none';
         }
     </script>
     </body>

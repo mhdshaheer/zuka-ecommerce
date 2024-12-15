@@ -248,12 +248,13 @@ const loadHomePage = async (req, res) => {
         if(user?.isBlocked ==true){
             return res.redirect('/login')
         }
+        const products = await Product.find().limit(8).sort({createdAt:-1})
         if (user) {
             const userData = await User.findOne({ _id: user._id });
             console.log(userData)
             console.log("userData is :",userData?.name)
             console.log("hai home")
-            res.render('home', { user: userData,activePage:'home'});
+            res.render('home', { user: userData,activePage:'home',products});
         } 
         // else if(googleUser){
         //     console.log("google user:",googleUser)
@@ -262,7 +263,7 @@ const loadHomePage = async (req, res) => {
         else {
             console.log("hai home iiii")
             console.log("userData is :",user)
-            return res.render('home',{user,activePage:'home'})
+            return res.render('home',{user,activePage:'home',products})
         }
 
     } catch (error) {
