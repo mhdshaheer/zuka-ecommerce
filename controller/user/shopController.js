@@ -17,16 +17,43 @@ const loadShop = async (req, res) => {
         if (user?.isBlocked == true) {
             return res.redirect('/login')
         }
-        // const findUser = await User.findOne({ isAdmin: 0, email: email });
-        const products = await Product.find({ isBlocked: false }).populate('category')
-        console.log(products)
-        const category = await Category.find()
+        
+        const page = parseInt(req.query.page) || 1;
+        const limit = 12;
+        const skip = (page - 1) * limit;
+
+        const [products, totalProducts] = await Promise.all([
+            Product.find({ isBlocked: false })
+                .populate('category')
+                .skip(skip)
+                .limit(limit),
+            Product.countDocuments({ isBlocked: false }),
+        ]);
+
+        const totalPages = Math.ceil(totalProducts / limit);
+
+        const category = await Category.find();
+
+        // const products = await Product.find({ isBlocked: false }).populate('category')
+        // console.log(products)
+        // const category = await Category.find()
+        // res.render('shop', {
+        //     activePage: 'shop',
+        //     products,
+        //     category,
+        //     user
+        // })
         res.render('shop', {
             activePage: 'shop',
             products,
             category,
-            user
-        })
+            user,
+            currentPage: page,
+            totalPages,
+            page,
+            limit,
+            totalProducts
+        });
     } catch (error) {
         console.log("error in shop page", error)
     }
@@ -70,12 +97,16 @@ const loadCart = async (req, res) => {
         }, 0) ?? 0
         console.log("total : ", total);
 
+        const currentDate = new Date(); // Get the current date and time
+       const coupons = await Coupon.find({ expireOn: { $gte: currentDate } })
+
         res.render('shopingCart', {
             activePage: 'cart',
             user,
             cartItem: newCart?.items,
             total,
-            cart: newCart
+            cart: newCart,
+            coupons
         })
     } catch (error) {
         console.log(error)
@@ -110,17 +141,23 @@ const loadCheckout = async (req, res) => {
 const couponApply = async (req,res)=>{
     try {
         const {couponCode} = req.body;
-        const user = req.session.user|| req.session.googleUser
+        const user = req.session.user|| req.session.googleUser;
+        const currentDate = new Date();
         const coupon = await Coupon.findOne({code:couponCode});
         const userCoupon = await Coupon.findOne({code:couponCode,userId: { $elemMatch: { $eq: user._id } }})
         console.log("coupon is :",coupon)
         if(!coupon){
             req.session.coupon = 0;
+            req.session.discountPrice=0;
             console.log("no coupon")
             return res.status(402).json({message:"Coupon is invalid!"})
         }
+        if(currentDate>coupon.expireOn){
+            return res.status(402).json({message:"Coupon is Expired!"})
+        }
         if(userCoupon){
             req.session.coupon = 0;
+            req.session.discountPrice=0;
             return res.status(402).json({message:"Coupon is already used!"})
         }
 

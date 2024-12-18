@@ -73,7 +73,7 @@ router.post('/placeOrder',shopController.addOrder)
 router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess);
 
 // Wishlist
-router.get('/wishlist',shopController.loadWishlist);
+router.get('/wishlist',userAuth,shopController.loadWishlist);
 router.post('/wishlist',shopController.addToWishlist);
 router.delete('/wishlist',shopController.deleteFromWishlist)
 

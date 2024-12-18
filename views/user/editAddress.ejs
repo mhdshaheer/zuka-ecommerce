@@ -182,7 +182,9 @@
             const queryString = window.location.search;
             const params = new URLSearchParams(queryString);
             const index = params.get("index");
-            console.log(index)
+            const addressId = params.get("addressId")
+            console.log(index);
+            console.log('address id :',addressId)
             //===============================================
 
             addBtn.addEventListener('click', (e) => {
@@ -295,6 +297,7 @@
 
                 axios.post('/editAddress', {
                   index,
+                  addressId,
                   editedData
                  
                 }).then(res => {

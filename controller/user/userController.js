@@ -521,16 +521,19 @@ const addAddress = async (req,res)=>{
 //delete address
 const deleteAddress = async(req,res)=>{
     try {
-        const {index} = req.query;
-        const user = req.session.user || req.session.googleUser
-        console.log("index is : ",index)
-        const addressData = await Address.findOne({userId:user._id});
-        const addressArr = addressData.address
-        addressArr.splice(index,1);
-        console.log(addressArr);
-        await Address.updateOne({userId:user._id},{$set:{address:addressArr}})
-        res.status(200).json({success:true})
+        const {index,addressId} = req.query;
+        const user = req.session.user || req.session.googleUser;
+        await Address.updateOne(
+            { userId: user._id },
+            { $pull: { address: { _id: addressId } } }
+        );
+        
+        // const addressData = await Address.findOne({userId:user._id});
+        // const addressArr = addressData.address
+        // addressArr.splice(index,1);
+        // await Address.updateOne({userId:user._id},{$set:{address:addressArr}})
         console.log("Address deleted successfully")
+        res.status(200).json({success:true})
         
 
         
@@ -564,20 +567,34 @@ const editAddressData = async (req,res)=>{
         const index= Number(req.body.index)
         const user = req.session.user || req.session.googleUser;
         const editedData = req.body.editedData;
-        console.log(editedData,index);
-        const result = await Address.updateOne({userId:user._id},
+        const {addressId} = req.body
+        const result = await Address.updateOne(
+            {"address._id":addressId},
             {$set:{
-                [`address.${index}.name`]:editedData.name,
-                [`address.${index}.phone`]:editedData.phone,
-                [`address.${index}.altPhone`]:editedData.altPhone,
-                [`address.${index}.addressType`]:editedData.addressType,
-                [`address.${index}.address`]:editedData.address,
-                [`address.${index}.country`]:editedData.country,
-                [`address.${index}.state`]:editedData.state,
-                [`address.${index}.pincode`]:editedData.pincode,
-                [`address.${index}.city`]:editedData.city,
+                'address.$.name':editedData.name,
+                'address.$.phone':editedData.phone,
+                'address.$.altPhone':editedData.altPhone,
+                'address.$.addressType':editedData.addressType,
+                'address.$.address':editedData.address,
+                'address.$.country':editedData.country,
+                'address.$.state':editedData.state,
+                'address.$.pincode':editedData.pincode,
+                'address.$.city':editedData.city,
             }}
         )
+        // const result = await Address.updateOne({userId:user._id},
+        //     {$set:{
+        //         [`address.${index}.name`]:editedData.name,
+        //         [`address.${index}.phone`]:editedData.phone,
+        //         [`address.${index}.altPhone`]:editedData.altPhone,
+        //         [`address.${index}.addressType`]:editedData.addressType,
+        //         [`address.${index}.address`]:editedData.address,
+        //         [`address.${index}.country`]:editedData.country,
+        //         [`address.${index}.state`]:editedData.state,
+        //         [`address.${index}.pincode`]:editedData.pincode,
+        //         [`address.${index}.city`]:editedData.city,
+        //     }}
+        // )
         if(result){
             console.log("Address edited successfully");
             res.status(200).json({success:true})
@@ -622,11 +639,14 @@ const loadOrders = async (req,res)=>{
 
 const cancelOrder = async (req,res)=>{
     try {
-        const {orderId} = req.body;
+        const {orderId,reason} = req.body;
         const user = req.session.user||req.session.googleUser;
         console.log('order id :',orderId)
         
-        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{status:'Cancelled'}});
+        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{
+            status:'Cancelled',
+            cancellationReason:reason
+        }});
         const orders = await Order.findOne({orderId:orderId})
         
         if(orders.paymentStatus==='Paid'){

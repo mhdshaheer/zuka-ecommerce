@@ -164,15 +164,19 @@
                                 <div class="product__details__option__size">
                                     <span>Size:</span>
                                     <%for(let i=0;i<product[0].variant.length;i++){%>
-                                        <label id="sizeLabel" for="xl"
+                                        <%if(product[0].variant[i].stock>0){%>
+                                                
+                                            <label id="sizeLabel" for="xl"
                                             onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
                                             <%=product[0].variant[i].size%>
-                                                <input type="radio" id="itemSize" name="variant">
-                                                <span> </span>
-                                                <span class="badge rounded-pill bg-dark text-light" id="itemStock">
-                                                    <%=product[0].variant[i].stock%>
-                                                </span>
+                                            
+                                            <input type="radio" id="itemSize" name="variant" >
+                                            <span> </span>
+                                            <span class="badge rounded-pill bg-dark text-light" id="itemStock">
+                                                <%=product[0].variant[i].stock%>
+                                            </span>
                                         </label>
+                                        <%}%>
                                         <%}%>
                                 </div>
                                 <!-- <div class="product__details__option__size">

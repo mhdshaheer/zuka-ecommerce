@@ -171,8 +171,15 @@
                     <div class="shop__product__option">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
-                                <div class="shop__product__option__left">
+                                <!-- <div class="shop__product__option__left">
                                     <p>Showing 1–12 of 18 results</p>
+                                </div> -->
+                                <div class="shop__product__option__left">
+                                    <% 
+                                        const start = (page - 1) * limit + 1;
+                                        const end = Math.min(page * limit, totalProducts);
+                                    %>
+                                    <p>Showing <%= start %>–<%= end %> of <%= totalProducts %> results</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
@@ -192,8 +199,10 @@
                         </div>
                     </div>
 
-                    <div class="row" id="productList">
+                    <!-- <div class="row" id="productList">
                         <%for(let i=0;i<products.length;i++){%>
+                            <% let totalStock = products[i].variant.reduce((acc,curr)=>acc+curr.stock,0) %>
+                            <%if(totalStock>0){%>
                             <div class="col-lg-4 col-md-6 col-sm-6">
                                 <div class="product__item">
                                     <div class="product__item__pic set-bg" data-setbg="<%=products[i].images[0]%>">
@@ -228,33 +237,71 @@
                                             <%}else{%>
                                                 <h5>Rs: <%=products[i].regularPrice%>.00/-</h5>
                                         <%}%>
-                                        <div class="product__color__select">
-                                            <label for="pc-4">
-                                                <input type="radio" id="pc-4">
-                                            </label>
-                                            <label class="active black" for="pc-5">
-                                                <input type="radio" id="pc-5">
-                                            </label>
-                                            <label class="grey" for="pc-6">
-                                                <input type="radio" id="pc-6">
-                                            </label>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            <%}%>
                             <%}%>
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
                                 <a class="active" href="#">1</a>
-                                <!-- <a href="#">2</a>
-                                <a href="#">3</a>
-                                <span>...</span>
-                                <a href="#">21</a> -->
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="row" id="productList">
+                        <% for (let i = 0; i < products.length; i++) { %>
+                            <% let totalStock = products[i].variant.reduce((acc, curr) => acc + curr.stock, 0); %>
+                            <% if (totalStock > 0) { %>
+                                <div class="col-lg-4 col-md-6 col-sm-6">
+                                    <div class="product__item">
+                                        <div class="product__item__pic set-bg" data-setbg="<%= products[i].images[0] %>">
+                                            <% if (products[i].offerPrice != 0) { %>
+                                                <span class="label text-light bg-dark">
+                                                    <%= Math.round(((products[i].regularPrice - products[i].offerPrice) / products[i].regularPrice) * 100) %> % Off
+                                                </span>
+                                            <% } %>
+                                            <ul class="product__hover">
+                                                <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>', event)"><img src="img/icon/heart.png" alt=""></a></li>
+                                                <li><a href="#"><img src="img/icon/compare.png" alt=""><span>Compare</span></a></li>
+                                                <li><a href="/productInfo?id=<%= products[i]._id %>"><img src="img/icon/search.png" alt=""></a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="product__item__text">
+                                            <h6><%= products[i].productName %></h6>
+                                            <a href="#" class="add-cart">+ Add To Cart</a>
+                                            <div class="rating">
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                                <i class="fa fa-star-o"></i>
+                                            </div>
+                                            <% if (products[i].offerPrice !== 0) { %>
+                                                <h5>Rs: <%= products[i].offerPrice %>/-</h5>
+                                                <h6 style="text-decoration: line-through;">Rs: <%= products[i].regularPrice %>.00/-</h6>
+                                            <% } else { %>
+                                                <h5>Rs: <%= products[i].regularPrice %>.00/-</h5>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% } %>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="product__pagination">
+                                <% for (let i = 1; i <= totalPages; i++) { %>
+                                    <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+                                <% } %>
                             </div>
                         </div>
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -374,7 +421,14 @@
     <script>
         function searchItem(value, data) {
             let products = JSON.parse(data);
-            let searchExp = new RegExp(`${value}`, "i");
+            //avoid .* searching
+            function escapeRegExp(str) {
+                return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            let sanitizedValue = escapeRegExp(value);
+            //avoid .* searching
+            let searchExp = new RegExp(sanitizedValue, "i");
+            // let searchExp = new RegExp(`${value}`, "i");
             let searchOut = products.filter(value => searchExp.test(value.productName))
             console.log("Products are :", searchOut);
 
