@@ -1,551 +1,622 @@
 <%-include('../partials/user/header')%>
 
-    <style>
-        .categories-text {
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: rgb(122, 121, 121);
+  <style>
+    .categories-text {
+      font-size: 16px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: rgb(122, 121, 121);
 
-            font-family: Arial, sans-serif;
-        }
+      font-family: Arial, sans-serif;
+    }
 
-        /* .categories-text:hover {
+    /* .categories-text:hover {
       color: black;
     } */
 
-        .form-container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin: auto;
-        }
+    .form-container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+    }
 
-        .form-label {
-            font-weight: 500;
-            color: #495057;
-        }
+    .form-label {
+      font-weight: 500;
+      color: #495057;
+    }
 
-        .form-control {
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-        }
+    .form-control {
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+    }
 
-        .form-control:focus {
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-            border-color: #80bdff;
-        }
+    .form-control:focus {
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      border-color: #80bdff;
+    }
 
-        .small {
-            font-size: 0.85rem;
-            /* Reduce font size */
-        }
+    .small {
+      font-size: 0.85rem;
+      /* Reduce font size */
+    }
 
-        .table th,
-        .table td {
-            padding: 0.5rem;
-            /* Reduce padding for compact look */
-        }
+    .table th,
+    .table td {
+      padding: 0.5rem;
+      /* Reduce padding for compact look */
+    }
 
-        .h4 {
-            font-size: 1.25rem;
-            /* Reduce header font size */
-        }
-        #ordersContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  margin: 20px;
-}
+    .h4 {
+      font-size: 1.25rem;
+      /* Reduce header font size */
+    }
 
-.order-card {
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  padding: 15px;
-  background: #f9f9f9;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s ease;
-}
+    #ordersContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin: 20px;
+    }
 
-.order-card:hover {
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
+    .order-card {
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      background: #f9f9f9;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
+    .order-card:hover {
+      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
 
-.order-header .order-id {
-  font-weight: bold;
-  font-size: 16px;
-}
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-.order-header .badge {
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-}
+    .order-header .order-id {
+      font-weight: bold;
+      font-size: 16px;
+    }
 
-.order-body {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 10px;
-}
+    .order-header .badge {
+      padding: 5px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
 
-.order-detail {
-  flex: 1;
-}
+    .order-body {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 10px;
+    }
 
-.order-actions {
-  display: flex;
-  gap: 10px;
-}
+    .order-detail {
+      flex: 1;
+    }
 
-.order-actions .btn {
-  padding: 5px 15px;
-  font-size: 14px;
-  border-radius: 5px;
-}
+    .order-actions {
+      display: flex;
+      gap: 10px;
+    }
 
-.btn-danger {
-  background-color: #d9534f;
-  color: #fff;
-}
+    .order-actions .btn {
+      padding: 5px 15px;
+      font-size: 14px;
+      border-radius: 5px;
+    }
 
-.btn-danger:hover {
-  background-color: #c9302c;
-}
+    .btn-danger {
+      background-color: #d9534f;
+      color: #fff;
+    }
 
-.btn-secondary {
-  background-color: #5bc0de;
-  color: #fff;
-}
+    .btn-danger:hover {
+      background-color: #c9302c;
+    }
 
-.btn-secondary:hover {
-  background-color: #31b0d5;
-}
+    .btn-secondary {
+      background-color: #5bc0de;
+      color: #fff;
+    }
 
-    </style>
-    <style>
-      .order-detail {
-  margin: 20px 0;
-}
+    .btn-secondary:hover {
+      background-color: #31b0d5;
+    }
+  </style>
+  <style>
+    .order-detail {
+      margin: 20px 0;
+    }
 
-.order-detail h5 {
-  margin-bottom: 10px;
-  font-size: 18px;
-}
+    .order-detail h5 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
 
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 15px;
-}
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 15px;
+    }
 
-.product-box {
-  border: 1px solid #ddd;
-  width: 120px;
-  border-radius: 8px;
-  padding: 10px;
-  text-align: center;
-  background-color: #f9f9f9;
-}
+    .product-box {
+      border: 1px solid #ddd;
+      width: 120px;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      background-color: #f9f9f9;
+    }
 
-.product-box img {
-  width: 100%;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 5px;
-}
-
-
-
-
-    </style>
-    <!-- Shop Section Begin -->
-    <section class="shop spad">
-        <div class="container">
-            <div class="breadcrumb__text">
-                <div class="breadcrumb__links">
-                    <a href="/">Home</a>
-                    <span>Orders</span>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-lg-3">
-                    <div class="shop__sidebar">
-                        <!-- <div class="shop__sidebar__search">
+    .product-box img {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      margin-bottom: 5px;
+    }
+  </style>
+  <!-- Shop Section Begin -->
+  <section class="shop spad">
+    <div class="container">
+      <div class="breadcrumb__text">
+        <div class="breadcrumb__links">
+          <a href="/">Home</a>
+          <span>Orders</span>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="shop__sidebar">
+            <!-- <div class="shop__sidebar__search">
               <form action="#">
                 <input type="text" placeholder="Search...">
                 <button type="submit"><span class="icon_search"></span></button>
               </form>
             </div> -->
-                        <div class="shop__sidebar__accordion">
-                            <div class="accordion" id="accordionExample">
-                                <div class="card categories-text ">
-                                    <a href="/profile"
-                                        class="text-secondary text-decoration-none hover:text-danger">Personal Info</a>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="accordion" id="accordionExample">
-                                <div class="card categories-text">
-                                    <a href="/address" class="text-secondary text-decoration-none hover:text-danger" >Address</a>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="accordion" id="accordionExample">
-                                <div class="card categories-text">
-                                    <a href="#" class="text-dark">Orders</a>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="accordion" id="accordionExample">
-                                <div class="card categories-text">
-                                    <a href="/wallet" class="text-secondary text-decoration-none hover:text-danger">Wallet</a>
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="accordion" id="accordionExample">
-                                <div class="card categories-text">
-                                    <a href="" class="text-secondary text-decoration-none hover:text-danger">My
-                                        Reviews</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="shop__sidebar__accordion">
+              <div class="accordion" id="accordionExample">
+                <div class="card categories-text ">
+                  <a href="/profile" class="text-secondary text-decoration-none hover:text-danger">Personal Info</a>
                 </div>
-                <div class="col-lg-9">
-                    <div class="container">
-                        <div class="row mb-4">
-                            <h2 class="h4"><b>Your Orders</b></h2>
-                        </div>
+              </div>
+              <hr>
+              <div class="accordion" id="accordionExample">
+                <div class="card categories-text">
+                  <a href="/address" class="text-secondary text-decoration-none hover:text-danger">Address</a>
+                </div>
+              </div>
+              <hr>
+              <div class="accordion" id="accordionExample">
+                <div class="card categories-text">
+                  <a href="#" class="text-dark">Orders</a>
+                </div>
+              </div>
+              <hr>
+              <div class="accordion" id="accordionExample">
+                <div class="card categories-text">
+                  <a href="/wallet" class="text-secondary text-decoration-none hover:text-danger">Wallet</a>
+                </div>
+              </div>
+              <hr>
+              <div class="accordion" id="accordionExample">
+                <div class="card categories-text">
+                  <a href="" class="text-secondary text-decoration-none hover:text-danger">My
+                    Reviews</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <div class="container">
+            <div class="row mb-4">
+              <h2 class="h4"><b>Your Orders</b></h2>
+            </div>
 
-                        <!-- Orders Table -->
-                        <%if(userOrder && userOrder.length > 0){%>
-                            <div id="ordersContainer">
-                                <% userOrder.map((order, index) => { %>
-                                <div class="order-card">
-                                  <div class="order-header">
-                                    <span class="order-id">Order ID: #<%= order.orderId %></span>
-                                    <%if(order.status==='Cancelled'){%>
-                                      <span class="order-status badge badge-danger">
-                                        <%= order.status %>
-                                      </span>
-                                    <%}else{%>
-                                    <span class="order-status badge text-dark <%= order.status === 'Delivered' ? 'badge-success' : 'badge-warning' %>">
-                                      <%= order.status %>
-                                    </span>
-                                    <%}%>
-                                  </div>
-                                  <div class="order-body">
-                                    <div class="order-detail">
-                                      <strong>Address:</strong>
-                                      <p>
-                                        <%= address[order.index].address || 'Address details here' %> <br>
-                                        <%= address[order.index].city %> , <%= address[order.index].state %> , <%= address[order.index].country %> <br>
-                                        <%= address[order.index].phone %>  <br> 
-                                        <%= address[order.index].altPhone %> 
+            <!-- Orders Table -->
+            <%if(userOrder && userOrder.length> 0){%>
+              <div id="ordersContainer">
+                <% userOrder.map((order, index)=> { %>
+                  <div class="order-card">
+                    <div class="order-header">
+                      <span class="order-id">Order ID: #<%= order.orderId %></span>
+                      <%if(order.paymentStatus=='Pending' && order.paymentMethod==='Razorpay' ){%>
+                        <span class="order-status badge badge-danger">
+                          Failed
+                        </span>
+                        <%}else if(order.status==='Cancelled' ){%>
+                          <span class="order-status badge badge-danger">
+                            <%= order.status %>
+                          </span>
+                          <%}else{%>
+                            <span
+                              class="order-status badge text-dark <%= order.status === 'Delivered' ? 'badge-success' : 'badge-warning' %>">
+                              <%= order.status %>
+                            </span>
+                            <%}%>
+                    </div>
+                    <div class="order-body">
+                      <div class="order-detail">
+                        <strong>Address:</strong>
+                        <p>
+                          <%= address[order.index].address || 'Address details here' %> <br>
+                            <%= address[order.index].city %> , <%= address[order.index].state %> , <%=
+                                  address[order.index].country %> <br>
+                                  <%= address[order.index].phone %> <br>
+                                    <%= address[order.index].altPhone %>
 
-                                    </p>
-                                    </div>
-                                    <div class="order-detail">
-                                      <strong>Payment:</strong>
-                                      <p><%= order.paymentMethod %> <span class="order-status badge  <%= order.paymentStatus === 'Paid' ? 'badge-success ' : 'badge-warning' %>">
-                                        <%= order.paymentStatus%>
-                                      </span></p>
-                                      <strong>Amount:</strong>
-                                      <P>₹<%=order.finalAmount%></P>
-                                      
-                                    </div>
+                        </p>
+                      </div>
+                      <div class="order-detail">
+                        <strong>Payment:</strong>
+                        <p>
+                          <%= order.paymentMethod %> <span
+                              class="order-status badge  <%= order.paymentStatus === 'Paid' ? 'badge-success ' : 'badge-warning' %>">
+                              <%= order.paymentStatus%>
+                            </span>
+                        </p>
+                        <strong>Amount:</strong>
+                        <P>₹<%=order.finalAmount%>
+                        </P>
 
-                                    <!-- <div class="order-detail">
+                      </div>
+
+                      <!-- <div class="order-detail">
                                       <h5>Ordered Products</h5>
                                       <div class="product-grid" id="productGrid">
                                         <img src="<%=order.orderedItems[0].productId.images[0]%>" alt="">
                                       </div>
                                     </div> -->
 
-                                    <!--  -->
-                                    <div class="order-detail">
-                                      <h5>Ordered Products</h5>
-                                      <div class="product-grid">
-                                        <% order.orderedItems.slice(0, 2).forEach((item,index) => { %>
-                                          <div class="product-box">
-                                            <img src="<%= item.productId.images[0] %>" alt="" />
-                                          </div>
-                                        <% }); %>
-                                      </div>
-                                    </div>
-                                    <!--  -->
-                                    
-                                    
-                                  </div>
-                                  <div class="order-actions">
-                                    <%if(order.status==='Pending'){%>
-                                    <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order.orderId %>')">
-                                      Cancel
-                                    </button>
-                                    
-                                  
-                                    <%}%>
-                                    <%if(order.status=='Delivered'){%>
-                                    <button class="btn btn-secondary btn-sm" onclick="returnOrder('<%= order.orderId %>')">
-                                      Return
-                                    </button>
-                                    <!-- <button class="btn btn-success btn-sm" >
-                                      Invoice
-                                    </button> -->
-                                    <!-- <button class="btn btn-success btn-sm">
-                                      <a 
-                                        href="/download-invoice/<%= order._id %> %>" 
-                                        class="text-white" 
-                                        style="text-decoration: none;" 
-                                        
-                                      >
-                                        Invoice
-                                      </a>
-                                    </button> -->
-                                    <button class="btn btn-success btn-sm">
-                                      <a 
-                                        href="/download-invoice/<%= order._id %>" 
-                                        class="text-white" 
-                                        style="text-decoration: none;" 
-                                        target="_blank">
-                                        Download Invoice
-                                      </a>
-                                    </button>
-                                    
-                                    
-                                    <%}%>
-                                  </div>
-                                </div>
-                                <% }) %>
-                              </div>
-                              
-                        <%}else{%>
-                        <div id="noOrdersMessage" class="text-center mt-4">
-                            <div class="alert alert-dark" role="alert">
-                                No Orders Found
+                      <!--  -->
+                      <div class="order-detail">
+                        <h5>Ordered Products</h5>
+                        <div class="product-grid">
+                          <% order.orderedItems.slice(0, 2).forEach((item,index)=> { %>
+                            <div class="product-box">
+                              <img src="<%= item.productId.images[0] %>" alt="" />
                             </div>
+                            <% }); %>
                         </div>
-                        <%}%>
+                      </div>
+                      <!--  -->
+
+
                     </div>
-                    <div class="row">
-                      <div class="col-lg-12">
-                          <div class="product__pagination">
-                              <% if (currentPage > 1) { %>
-                                  <a href="?page=<%= currentPage - 1 %>">«</a>
-                              <% } %>
-                              <% for (let i = 1; i <= totalPages; i++) { %>
-                                  <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
-                              <% } %>
-                              <% if (currentPage < totalPages) { %>
-                                  <a href="?page=<%= currentPage + 1 %>">»</a>
-                              <% } %>
-                          </div>
-                      </div>
-                  </div>
+                    <div class="order-actions">
+                      <%if(order.paymentStatus=='Pending' && order.paymentMethod==='Razorpay' ){%>
+                        <button class="btn btn-success btn-sm"
+                          onclick="razorPay(event,'<%=order.finalAmount%>','<%=order._id%>')">
+                          Pay Again
+                        </button>
+                        <%}else if(order.status==='Pending' ){%>
+                          <button class="btn btn-danger btn-sm" onclick="cancelOrder('<%= order.orderId %>')">
+                            Cancel
+                          </button>
 
-
-                </div>
-
-
-                <!-- modal -->
-                <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="cancelModalLabel">Cancel Order</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body">
-                        <form id="cancelForm">
-                          <p>Please select a reason for canceling your order:</p>
-                          
-                          <!-- Predefined Reasons -->
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason1" value="Found a better price">
-                            <label class="form-check-label" for="reason1">Found a better price</label>
-                          </div>
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason2" value="Order placed by mistake">
-                            <label class="form-check-label" for="reason2">Order placed by mistake</label>
-                          </div>
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason3" value="Delivery is too slow">
-                            <label class="form-check-label" for="reason3">Delivery is too slow</label>
-                          </div>
-                
-                          <!-- Custom Reason -->
-                          <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reasonOther" value="Other">
-                            <label class="form-check-label" for="reasonOther">Other (please specify)</label>
-                          </div>
-                          <div class="mt-2">
-                            <textarea class="form-control" id="customReason" name="customReason" placeholder="Type your reason here..." disabled></textarea>
-                          </div>
-                
-                          <!-- Hidden Input for Order ID -->
-                          <input type="hidden" id="orderIdField" name="orderId">
-                        </form>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="submitCancel">Submit</button>
-                      </div>
+                          <%}%>
+                            <%if(order.status=='Delivered'){%>
+                              <button class="btn btn-secondary btn-sm" onclick="returnOrder('<%= order.orderId %>')">
+                                Return
+                              </button>
+                              <button class="btn btn-success btn-sm">
+                                <a href="/download-invoice/<%= order._id %>" class="text-white"
+                                  style="text-decoration: none;" target="_blank">
+                                  Download Invoice
+                                </a>
+                              </button>
+                              <%}%>
                     </div>
                   </div>
+                  <% }) %>
+              </div>
+
+              <%}else{%>
+                <div id="noOrdersMessage" class="text-center mt-4">
+                  <div class="alert alert-dark" role="alert">
+                    No Orders Found
+                  </div>
                 </div>
-                <!-- modal -->
-                
+                <%}%>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="product__pagination">
+                <% if (currentPage> 1) { %>
+                  <a href="?page=<%= currentPage - 1 %>">«</a>
+                  <% } %>
+                    <% for (let i=1; i <=totalPages; i++) { %>
+                      <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
+                        <%= i %>
+                      </a>
+                      <% } %>
+                        <% if (currentPage < totalPages) { %>
+                          <a href="?page=<%= currentPage + 1 %>">»</a>
+                          <% } %>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+
+        <!-- modal -->
+        <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Cancel Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="cancelForm">
+                  <p>Please select a reason for canceling your order:</p>
+
+                  <!-- Predefined Reasons -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="reason" id="reason1"
+                      value="Found a better price">
+                    <label class="form-check-label" for="reason1">Found a better price</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="reason" id="reason2"
+                      value="Order placed by mistake">
+                    <label class="form-check-label" for="reason2">Order placed by mistake</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="reason" id="reason3"
+                      value="Delivery is too slow">
+                    <label class="form-check-label" for="reason3">Delivery is too slow</label>
+                  </div>
+
+                  <!-- Custom Reason -->
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="reason" id="reasonOther" value="Other">
+                    <label class="form-check-label" for="reasonOther">Other (please specify)</label>
+                  </div>
+                  <div class="mt-2">
+                    <textarea class="form-control" id="customReason" name="customReason"
+                      placeholder="Type your reason here..." disabled></textarea>
+                  </div>
+
+                  <!-- Hidden Input for Order ID -->
+                  <input type="hidden" id="orderIdField" name="orderId">
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitCancel">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- modal -->
 
 
 
-<script>
- 
-  function returnOrder(orderId){
-    console.log("order id:",orderId);
+
+        <script>
+
+          function returnOrder(orderId) {
+            console.log("order id:", orderId);
 
 
-    Swal.fire({
-  title: "Return product?",
-  text: "Do you want to return!",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Yes, Cancel it!"
-}).then((result) => {
-  if (result.isConfirmed) {
-    axios.patch('/returnOrder',{
-      orderId
-    }).then(res=>{
-      if(res.status===200){
-        Swal.fire({
-          title: "Return Order!",
-          text: "Return requested.",
-          icon: "success"
-        }).then(()=>{
-          window.location.reload()
-        })
-      }
-    })
-  }
-});
+            Swal.fire({
+              title: "Return product?",
+              text: "Do you want to return!",
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, Cancel it!"
+            }).then((result) => {
+              if (result.isConfirmed) {
+                axios.patch('/returnOrder', {
+                  orderId
+                }).then(res => {
+                  if (res.status === 200) {
+                    Swal.fire({
+                      title: "Return Order!",
+                      text: "Return requested.",
+                      icon: "success"
+                    }).then(() => {
+                      window.location.reload()
+                    })
+                  }
+                })
+              }
+            });
 
 
-    
-  }
 
-</script>
+          }
 
-<script>
+        </script>
 
-document.addEventListener("DOMContentLoaded", () => {
-  const customReasonRadio = document.getElementById("reasonOther");
-  const customReason = document.getElementById("customReason");
-  const orderIdField = document.getElementById("orderIdField");
-  const submitCancel = document.getElementById("submitCancel");
-  const cancelForm = document.getElementById("cancelForm");
+        <script>
 
-  // Enable/Disable custom reason textarea
-  document.querySelectorAll('input[name="reason"]').forEach((input) => {
-    input.addEventListener("change", () => {
-      customReason.disabled = input.id !== "reasonOther";
-      if (input.id !== "reasonOther") {
-        customReason.value = ""; // Clear custom reason if not selected
-      }
-    });
-  });
+          document.addEventListener("DOMContentLoaded", () => {
+            const customReasonRadio = document.getElementById("reasonOther");
+            const customReason = document.getElementById("customReason");
+            const orderIdField = document.getElementById("orderIdField");
+            const submitCancel = document.getElementById("submitCancel");
+            const cancelForm = document.getElementById("cancelForm");
 
-  // Open modal and pass order ID
-  window.cancelOrder = (orderId) => {
-    orderIdField.value = orderId; // Set the order ID in the hidden field
-    const modal = new bootstrap.Modal(document.getElementById("cancelModal"));
-    modal.show();
-  };
+            // Enable/Disable custom reason textarea
+            document.querySelectorAll('input[name="reason"]').forEach((input) => {
+              input.addEventListener("change", () => {
+                customReason.disabled = input.id !== "reasonOther";
+                if (input.id !== "reasonOther") {
+                  customReason.value = ""; // Clear custom reason if not selected
+                }
+              });
+            });
 
-  // Submit form logic
-  submitCancel.addEventListener("click", () => {
-    const formData = new FormData(cancelForm);
-    const reason = formData.get("reason");
-    const customReasonText = formData.get("customReason");
-    const orderId = formData.get("orderId");
+            // Open modal and pass order ID
+            window.cancelOrder = (orderId) => {
+              orderIdField.value = orderId; // Set the order ID in the hidden field
+              const modal = new bootstrap.Modal(document.getElementById("cancelModal"));
+              modal.show();
+            };
 
-    // Validation for custom reason
-    if (reason === "Other" && customReasonText.trim() === "") {
-      alert("Please provide a reason for cancellation.");
-      return;
-    }
+            // Submit form logic
+            submitCancel.addEventListener("click", () => {
+              const formData = new FormData(cancelForm);
+              const reason = formData.get("reason");
+              const customReasonText = formData.get("customReason");
+              const orderId = formData.get("orderId");
 
-    // Log the cancellation details (replace with actual server call)
-    console.log("Order ID:", orderId);
-    console.log("Reason for cancellation:", reason === "Other" ? customReasonText : reason);
+              // Validation for custom reason
+              if (reason === "Other" && customReasonText.trim() === "") {
+                alert("Please provide a reason for cancellation.");
+                return;
+              }
 
-    // ===========================================================
-    Swal.fire({
-  title: "Are you sure?",
-  text: "Do you cancel your order!",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Yes, Cancel it!"
-}).then((result) => {
-  if (result.isConfirmed) {
-    axios.patch('/cancelOrder',{
-        orderId:orderId,
-        reason : reason === "Other" ? customReasonText : reason
-    }).then(res=>{
-      if(res.status===200){
-        Swal.fire({
-          title: "Cancelled!",
-          text: "Your order cancelled.",
-          icon: "success"
-        }).then(()=>{
-          bootstrap.Modal.getInstance(document.getElementById("cancelModal")).hide();
-          window.location.reload()
-        })
-      }
-    })
-  }
-});
-    // ===========================================================
+              // Log the cancellation details (replace with actual server call)
+              console.log("Order ID:", orderId);
+              console.log("Reason for cancellation:", reason === "Other" ? customReasonText : reason);
 
-    // Close the modal after submission
-    // alert("Order cancellation submitted successfully.");
-  });
-});
+              // ===========================================================
+              Swal.fire({
+                title: "Are you sure?",
+                text: "Do you cancel your order!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Cancel it!"
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  axios.patch('/cancelOrder', {
+                    orderId: orderId,
+                    reason: reason === "Other" ? customReasonText : reason
+                  }).then(res => {
+                    if (res.status === 200) {
+                      Swal.fire({
+                        title: "Cancelled!",
+                        text: "Your order cancelled.",
+                        icon: "success"
+                      }).then(() => {
+                        bootstrap.Modal.getInstance(document.getElementById("cancelModal")).hide();
+                        window.location.reload()
+                      })
+                    }
+                  })
+                }
+              });
+              // ===========================================================
+
+              // Close the modal after submission
+              // alert("Order cancellation submitted successfully.");
+            });
+          });
 
 
-</script>
+        </script>
 
-                <!-- Js Plugins -->
-                <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-                <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
 
-                <script src="js/jquery-3.3.1.min.js"></script>
-                <script src="js/bootstrap.min.js"></script>
-                <script src="js/jquery.nice-select.min.js"></script>
-                <script src="js/jquery.nicescroll.min.js"></script>
-                <script src="js/jquery.magnific-popup.min.js"></script>
-                <script src="js/jquery.countdown.min.js"></script>
-                <script src="js/jquery.slicknav.js"></script>
-                <script src="js/mixitup.min.js"></script>
-                <script src="js/owl.carousel.min.js"></script>
-                <script src="js/main.js"></script>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+          async function razorPay(event, finalAmount, order_id) {
+            event.preventDefault();
+            console.log('Data are:', finalAmount, order_id);
 
-                </body>
+            const { data } = await axios.post('/payment/createRazorpayPageOrder', {
+              finalAmount
+            });
+            console.log("Razorpay Order Data:", data);
+            const options = {
+              key: data.key,
+              amount: data.order.amount,
+              currency: data.order.currency,
+              name: "Zuka Sports",
+              description: "Order Payment",
+              order_id: data.order.id,
+              handler: async function (response) {
+                console.log("Payment Successful!", response);
 
-                </html>
+                // Verify payment on the server
+                const verification = await axios.post('/payment/verifyRazorpayRetryPayment', {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  order_id:order_id
+                });
+                console.log("verification done");
+
+                if (verification.data.success) {
+                  Swal.fire({
+                    title: 'Success!',
+                    text: 'Payment completed successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                  }).then(() => {
+                    window.location.reload();
+                  });
+                } else {
+                  Swal.fire({
+                    title: 'Verification Failed!',
+                    text: 'Payment verification failed. Please contact support.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay'
+                  });
+                }
+              },
+              modal: {
+                ondismiss: function () {
+                  Swal.fire({
+                    title: 'Payment Failed!',
+                    text: 'Your last payment was failed',
+                    icon: 'error',
+                    confirmButtonText: 'Go to Orders'
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      window.location.href = "/orders";
+                    }
+                  });
+                }
+              },
+              theme: {
+                color: "#FF0000"
+              }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+
+
+          }
+        </script>
+
+        <!-- Js Plugins -->
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/jquery.nice-select.min.js"></script>
+        <script src="js/jquery.nicescroll.min.js"></script>
+        <script src="js/jquery.magnific-popup.min.js"></script>
+        <script src="js/jquery.countdown.min.js"></script>
+        <script src="js/jquery.slicknav.js"></script>
+        <script src="js/mixitup.min.js"></script>
+        <script src="js/owl.carousel.min.js"></script>
+        <script src="js/main.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+        </body>
+
+        </html>

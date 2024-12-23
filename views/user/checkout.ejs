@@ -258,27 +258,27 @@
 
                                     </label>
                                 </div>
-                                <% 
-                                    const priceTotal = userCart.items.reduce((acc, curr) => acc + curr.totalPrice, 0);
-                                    const priceFinal = priceTotal >= couponMin ? (priceTotal - couponDiscount) : priceTotal;
-                                %>
-                                <%if(priceFinal<=1000){%>
-                                <div class="my-4">
-                                    <label class="custom-label">
-                                        <input type="radio" name="paymentMethod" value="Cash on Delivery"
-                                            class="form-check-input ml-2">
-                                        <span class="pl-5">Cash on Delivery </span>
-                                    </label>
-                                </div>
-                                <%}%>
-                                <div class="my-4">
-                                    <label class="custom-label">
-                                        <input type="radio" name="paymentMethod" class="form-check-input ml-2"
-                                            value="Razorpay">
-                                        <span class="pl-5">Razorpay</span>
-                                    </label>
-                                </div>
-                                <!-- <div class="my-4">
+                                <% const priceTotal=userCart.items.reduce((acc, curr)=> acc + curr.totalPrice, 0);
+                                    const priceFinal = priceTotal >= couponMin ? (priceTotal - couponDiscount) :
+                                    priceTotal;
+                                    %>
+                                    <%if(priceFinal<=1000){%>
+                                        <div class="my-4">
+                                            <label class="custom-label">
+                                                <input type="radio" name="paymentMethod" value="Cash on Delivery"
+                                                    class="form-check-input ml-2">
+                                                <span class="pl-5">Cash on Delivery </span>
+                                            </label>
+                                        </div>
+                                        <%}%>
+                                            <div class="my-4">
+                                                <label class="custom-label">
+                                                    <input type="radio" name="paymentMethod"
+                                                        class="form-check-input ml-2" value="Razorpay">
+                                                    <span class="pl-5">Razorpay</span>
+                                                </label>
+                                            </div>
+                                            <!-- <div class="my-4">
                                     <label class="custom-label">
                                         <input type="radio" name="options" class="form-check-input ml-2">
                                         <span class="pl-5">Credit or debit card</span>
@@ -304,13 +304,13 @@
                                         </div>
                                     </div>
                                 </div> -->
-                                <!-- <div class="my-4">
+                                            <!-- <div class="my-4">
                                     <label class="custom-label">
                                         <input type="radio" name="options" class="form-check-input ml-2">
                                         <span class="pl-5">Gpay </span>
                                     </label>
                                 </div> -->
-                                <!-- <div>
+                                            <!-- <div>
                                     <button id="submitBtn" class="btn btn-dark py-3 px-5 mb-5 ml-5">Next</button>
                                 </div> -->
                             </div>
@@ -333,26 +333,28 @@
                                     <li>04. Cluten free mini dozen <span>110.00</span></li> -->
                                 </ul>
                                 <ul class="checkout__total__all">
-                                    <li>Subtotal <span class="text-dark">₹ <%=(userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0).toFixed(2))%></span></li>
+                                    <li>Subtotal <span class="text-dark">₹ <%=(userCart.items.reduce((acc,curr)=>
+                                                acc+curr.totalPrice,0).toFixed(2))%></span></li>
                                     <li>Discount <span>-₹ <%=couponDiscount%></span></li>
                                     <%if(priceFinal>=500){%>
                                         <li>Delivery charge <span class="text-dark">Free</span></li>
-                                    <%}else{%>
-                                        <li>Delivery charge <span>+ ₹ 40</span></li>
-                                    <%}%>
-                                    <li>Total:<span id="totalAmount" class="text-dark">
-                                           
-                                            <!-- ₹ <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%> -->
-                                            <% 
-                                            const totalPrice = userCart.items.reduce((acc, curr) => acc + curr.totalPrice, 0);
-                                            const finalPrice = totalPrice >= couponMin ? (totalPrice - couponDiscount) : totalPrice;
-                                          %>
-                                          <%if(finalPrice<=500){%>
-                                            <%= finalPrice+40 %>
-                                          <%}else{%>
-                                            <%= finalPrice %>
-                                           <%}%>
-                                        </span></li>
+                                        <%}else{%>
+                                            <li>Delivery charge <span>+ ₹ 40</span></li>
+                                            <%}%>
+                                                <li>Total:<span id="totalAmount" class="text-dark">
+
+                                                        <!-- ₹ <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%> -->
+                                                        <% const totalPrice=userCart.items.reduce((acc, curr)=> acc +
+                                                            curr.totalPrice, 0);
+                                                            const finalPrice = totalPrice >= couponMin ? (totalPrice -
+                                                            couponDiscount) : totalPrice;
+                                                            %>
+                                                            <%if(finalPrice<=500){%>
+                                                                <%= finalPrice+40 %>
+                                                                    <%}else{%>
+                                                                        <%= finalPrice %>
+                                                                            <%}%>
+                                                    </span></li>
                                 </ul>
 
                                 <button id="placeOrder" type="submit" class="site-btn">PLACE
@@ -579,7 +581,7 @@
             e.preventDefault();
             const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
             let totalAmount = document.getElementById('totalAmount').textContent;
-            console.log("total amount is:",totalAmount,typeof totalAmount,Number(totalAmount))
+            console.log("total amount is:", totalAmount, typeof totalAmount, Number(totalAmount))
 
             if (!addressObj) {
                 Swal.fire({
@@ -610,12 +612,61 @@
                     // Create Razorpay order on the server
                     console.log("it is razorPay")
                     const { data } = await axios.post('/payment/createRazorpayOrder', {
-                        totalPrice: Number(totalAmount)
+                        totalPrice: Number(totalAmount),
+                        address: addressObj.address,
+                        index: addressObj.index
                     });
 
                     console.log("Razorpay Order Data:", data);
 
                     // Initialize Razorpay checkout
+                    // const options = {
+                    //     key: data.key,
+                    //     amount: data.order.amount,
+                    //     currency: data.order.currency,
+                    //     name: "Zuka Sports",
+                    //     description: "Order Payment",
+                    //     order_id: data.order.id,
+                    //     handler: async function (response) {
+                    //         console.log("Payment Successful!", response);
+
+                    //         // Verify payment on the server
+                    //         const verification = await axios.post('/payment/verifyRazorpayPayment', {
+                    //             razorpay_order_id: response.razorpay_order_id,
+                    //             razorpay_payment_id: response.razorpay_payment_id,
+                    //             razorpay_signature: response.razorpay_signature,
+                    //             // paymentDetails: response,
+                    //             totalPrice: Number(totalAmount),
+                    //             address: addressObj.address,
+                    //             index: addressObj.index,
+                    //             order_id:data.order_id
+
+                    //         });
+                    //         console.log("verification done")
+
+                    //         if (verification.data.success) {
+                    //             Swal.fire({
+                    //                 title: 'Success!',
+                    //                 text: 'Payment completed successfully!',
+                    //                 icon: 'success',
+                    //                 confirmButtonText: 'Okay'
+                    //             }).then(() => {
+                    //                 window.location.href = `/orderSuccess?id=${verification.data.orderId}`;
+                    //                 // window.location.href = `/orderSuccessff?id=${985034285}`;
+                    //             });
+                    //         } else {
+                    //             Swal.fire({
+                    //                 title: 'Verification Failed!',
+                    //                 text: 'Payment verification failed. Please contact support.',
+                    //                 icon: 'error',
+                    //                 confirmButtonText: 'Okay'
+                    //             });
+                    //         }
+                    //     },
+                    //     theme: {
+                    //         color: "#3399cc"
+                    //     }
+                    // };
                     const options = {
                         key: data.key,
                         amount: data.order.amount,
@@ -631,12 +682,12 @@
                                 razorpay_order_id: response.razorpay_order_id,
                                 razorpay_payment_id: response.razorpay_payment_id,
                                 razorpay_signature: response.razorpay_signature,
-                                // paymentDetails: response,
                                 totalPrice: Number(totalAmount),
                                 address: addressObj.address,
-                                index: addressObj.index
+                                index: addressObj.index,
+                                order_id: data.order_id
                             });
-                            console.log("verification done")
+                            console.log("verification done");
 
                             if (verification.data.success) {
                                 Swal.fire({
@@ -646,7 +697,6 @@
                                     confirmButtonText: 'Okay'
                                 }).then(() => {
                                     window.location.href = `/orderSuccess?id=${verification.data.orderId}`;
-                                    // window.location.href = `/orderSuccessff?id=${985034285}`;
                                 });
                             } else {
                                 Swal.fire({
@@ -657,8 +707,22 @@
                                 });
                             }
                         },
+                        modal: {
+                            ondismiss: function () {
+                                Swal.fire({
+                                    title: 'Payment Failed!',
+                                    text: 'Your last payment was failed',
+                                    icon: 'error',
+                                    confirmButtonText: 'Go to Orders'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "/orders";
+                                    }
+                                });
+                            }
+                        },
                         theme: {
-                            color: "#3399cc"
+                            color: "#FF0000"
                         }
                     };
 
