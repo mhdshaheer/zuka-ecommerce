@@ -4,7 +4,6 @@
             width: 80px;
             height: 80px;
         }
-        
     </style>
     <!-- Breadcrumb Section Begin -->
     <section class="breadcrumb-option">
@@ -82,7 +81,7 @@
                                                             <input id="itemQty-<%=index%>" type="number"
                                                                 value="<%=item.quantity%>" class="quantity-input"
                                                                 min="1" max="10" data-price="<%=item.price%>"
-                                                                oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>')" >
+                                                                oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>','<%=item.varientId%>')">
                                                         </div>
                                                     </div>
                                                 </td>
@@ -111,25 +110,30 @@
                                         class="fa fa-spinner"></i> Update cart</a>
                             </div>
                         </div>
-                       
+
                     </div>
                     <!-- <h3 class="my-2">Coupons</h3> -->
                     <div class="row mt-3">
                         <%for(let i=0;i<3;i++){%>
                             <div class="card col-3 mx-2">
-                                <p class="mt-2"><strong>CODE : </strong><%=coupons[i].code%></p>
-                                <p><strong>Min purchase : </strong><%=coupons[i].minimumPrice%></p>
+                                <p class="mt-2"><strong>CODE : </strong>
+                                    <%=coupons[i].code%>
+                                </p>
+                                <p><strong>Min purchase : </strong>
+                                    <%=coupons[i].minimumPrice%>
+                                </p>
                             </div>
-                        <%}%>  
+                            <%}%>
                     </div>
-                    
+
                 </div>
                 <div class="col-lg-4">
                     <div class="cart__discount">
                         <h6>Discount codes</h6>
                         <form action="#">
                             <input type="text" placeholder="Coupon code" id="couponField" class="text-dark">
-                            <button type="submit" id="couponAppyBtn" onclick="applyCoupon('<%=total%>',event)">Apply</button>
+                            <button type="submit" id="couponAppyBtn"
+                                onclick="applyCoupon('<%=total%>',event)">Apply</button>
                         </form>
                         <div style="color: green;" id="couponApplied"></div>
                     </div>
@@ -137,7 +141,7 @@
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span></li>
-                            <li >Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
+                            <li>Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
 
                             <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span></li>
                         </ul>
@@ -200,7 +204,7 @@
 
     <script>
         let totalAfterAll = null;
-        function updatePrice(index, itemId, cartId) {
+        async function updatePrice(index, itemId, cartId, variantId) {
             // Get the quantity input and unit price
             const quantityInput = document.getElementById(`itemQty-${index}`);
             const price = parseFloat(quantityInput.dataset.price); // Get  price from data attribute
@@ -208,15 +212,28 @@
             console.log("Unit Price:", price);
             console.log("Quantity Input Value:", quantityInput.value);
 
+            
+            // =============================
+
+            let dbStock = await getStock(variantId);
+            console.log("stock is :",dbStock)
+            quantityInput.setAttribute('max', dbStock)
+            // =============================
+
             // Validate and get the quantity
             let quantity = parseInt(quantityInput.value, 10);
             if (isNaN(quantity) || quantity < 1) {
                 quantity = 1;
                 quantityInput.value = 1;
-            } else if (quantity > 10) {
+            } else if (dbStock <= 10) {
+                console.log("less quantity")
+                // quantity = 10;
+                // quantityInput.value = 10;
+            } else if (quantity > 10 && dbStock > 10) {
                 quantity = 10;
                 quantityInput.value = 10;
             }
+
 
             // Ensure price is a valid number
             if (isNaN(price)) {
@@ -238,21 +255,21 @@
                 quantity: quantityInput.value,
                 regularPrice: price
             })
-            .then(response=>{
-                if(response.status==200){
-                    totalAfterAll = response.data.totalSum
-                    console.log("total amount is :",totalAfterAll)
-                    document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
-                    if(discountAmount && response.data.totalSum>=minimumPrice){
+                .then(response => {
+                    if (response.status == 200) {
+                        totalAfterAll = response.data.totalSum
+                        console.log("total amount is :", totalAfterAll)
+                        document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
+                        if (discountAmount && response.data.totalSum >= minimumPrice) {
 
-                        document.getElementById('discountId').innerHTML = `₹ -${discountAmount}`
-                        document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll-discountAmount).toFixed(2)}`
-                    }else{
-                        document.getElementById('discountId').innerHTML = `₹ 0.00`
-                        document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`
+                            document.getElementById('discountId').innerHTML = `₹ -${discountAmount}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll - discountAmount).toFixed(2)}`
+                        } else {
+                            document.getElementById('discountId').innerHTML = `₹ 0.00`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`
+                        }
                     }
-                }
-            })
+                })
             console.log("fetch done cart")
 
         }
@@ -263,7 +280,7 @@
     <script>
         let discountAmount = null;
         let minimumPrice = null;
-        function applyCoupon(total,event){
+        function applyCoupon(total, event) {
             event.preventDefault();
             const couponField = document.getElementById('couponField');
             console.log(couponField.value)
@@ -272,19 +289,19 @@
             })
                 .then(response => {
                     if (response.status == 200) {
-                        discountAmount= response.data.coupon.discountPrice;
-                        minimumPrice= response.data.coupon.minimumPrice;
-                        if(totalAfterAll>=minimumPrice){
-                            document.getElementById('couponApplied').style.color="green"
-                            document.getElementById('couponApplied').innerHTML=`Discount amount ₹${discountAmount.toFixed(2)}`
-                            console.log("apply total:",total,discountAmount)
-                            
+                        discountAmount = response.data.coupon.discountPrice;
+                        minimumPrice = response.data.coupon.minimumPrice;
+                        if (totalAfterAll >= minimumPrice) {
+                            document.getElementById('couponApplied').style.color = "green"
+                            document.getElementById('couponApplied').innerHTML = `Discount amount ₹${discountAmount.toFixed(2)}`
+                            console.log("apply total:", total, discountAmount)
+
                             document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(2)}`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll)-Number(discountAmount)).toFixed(2)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll) - Number(discountAmount)).toFixed(2)}`
                             // document.getElementById('couponAppyBtn').disabled=true
-                        }else{
-                            document.getElementById('couponApplied').style.color="red"
-                            document.getElementById('couponApplied').innerHTML=`${response.data.coupon.code} - min purchase ₹${minimumPrice.toFixed(2)}`
+                        } else {
+                            document.getElementById('couponApplied').style.color = "red"
+                            document.getElementById('couponApplied').innerHTML = `${response.data.coupon.code} - min purchase ₹${minimumPrice.toFixed(2)}`
 
                             document.getElementById('discountId').innerHTML = `₹ 0.00`
                             document.getElementById('totalAmount').innerHTML = `₹ ${total.toFixed(2)}`
@@ -297,15 +314,15 @@
                         })
                     }
                 })
-                .catch(error=>{
-                    if(error.response&&error.response.status==402){
-                        document.getElementById('couponApplied').innerHTML=''
+                .catch(error => {
+                    if (error.response && error.response.status == 402) {
+                        document.getElementById('couponApplied').innerHTML = ''
                         Swal.fire({
-                                    title: 'Invalid!',
-                                    text: error.response.data.message,
-                                    icon: 'warning',
-                                    confirmButtonText: 'Okay'
-                                })
+                            title: 'Invalid!',
+                            text: error.response.data.message,
+                            icon: 'warning',
+                            confirmButtonText: 'Okay'
+                        })
                     }
                 })
         }
@@ -317,6 +334,20 @@
         //     window.location.href = `/checkout?${discountAmount}&${totalAfterAll}`;
         //     console.log('hai')
         // })
+
+        async function getStock(variantId) {
+            let variantStock = null
+            await axios.post('/getStock', {
+                variantId
+            }).then((res) => {
+                if (res.data) {
+                    variantStock = res.data.variantStock
+                    console.log('stock from the data base:', res.data.variantStock)
+                }
+            })
+
+            return variantStock
+        }
     </script>
 
 
@@ -325,5 +356,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
-    
+
     <%-include('../partials/user/footer')%>

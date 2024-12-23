@@ -25,8 +25,6 @@ const createOrder = async (req, res) => {
             currency: "INR",
             receipt: "order_rcptid_11"
         });
-        console.log('hhhhh ahhaha h')
-
         res.status(200).json({ key: razorpay.key_id, order });
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
@@ -51,13 +49,13 @@ const verifyPayment = async (req, res) => {
             .digest("hex");
     
         if (hmac === razorpay_signature) {
-    
+            const priceTotal = Number(totalPrice)+(req.session.discountPrice??0)
             const addOrder = await Order.create({
                 cartId: cart._id,
                 userId: user._id,
                 orderedItems: cart.items,
-                totalPrice:totalPrice+req.session.discountPrice,
-                finalAmount: totalPrice,
+                totalPrice:priceTotal,
+                finalAmount: Number(totalPrice),
                 address: address._id,
                 index: Number(index),
                 paymentMethod:'Razorpay',

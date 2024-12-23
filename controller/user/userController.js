@@ -7,6 +7,7 @@ const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema')
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
+const puppeteer = require('puppeteer');
 const { truncateSync } = require('fs-extra');
 const env = require("dotenv").config()
 
@@ -16,7 +17,7 @@ const env = require("dotenv").config()
 
 const loadSignup = async (req, res) => {
     try {
-        res.render('signup',{message:""})
+        res.render('signup', { message: "" })
     } catch (error) {
         console.log('sign up page not found');
         res.status(500).send('Server error')
@@ -59,7 +60,7 @@ const signup = async (req, res) => {
 
 const loadLogin = async (req, res) => {
     try {
-        const user = req.session.user|| req.session.googleUser
+        const user = req.session.user || req.session.googleUser
         if (!user) {
             res.render('login', { message: '' })
         } else {
@@ -118,7 +119,7 @@ const logout = async (req, res) => {
         });
 
     } catch (error) {
-        console.log("Logout error...",error);
+        console.log("Logout error...", error);
         return res.redirect('/pageNotFound');
     }
 }
@@ -226,7 +227,7 @@ const verifyOtp = async (req, res) => {
             req.session.user = saveUserData;
 
             res.json({ success: true, redirectUrl: "/" });
-           
+
             console.log("redirected to home ")
         } else {
             res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
@@ -242,32 +243,32 @@ const verifyOtp = async (req, res) => {
 const loadHomePage = async (req, res) => {
     try {
         const googleUser = req.user;
-        req.session.googleUser=googleUser;
+        req.session.googleUser = googleUser;
         const user = req.session.user || req.session.googleUser;
-        console.log("home user:",user)
-        if(user?.isBlocked ==true){
+        console.log("home user:", user)
+        if (user?.isBlocked == true) {
             return res.redirect('/login')
         }
-        const products = await Product.find().limit(8).sort({createdAt:-1})
+        const products = await Product.find().limit(8).sort({ createdAt: -1 })
         if (user) {
             const userData = await User.findOne({ _id: user._id });
             console.log(userData)
-            console.log("userData is :",userData?.name)
+            console.log("userData is :", userData?.name)
             console.log("hai home")
-            res.render('home', { user: userData,activePage:'home',products});
-        } 
+            res.render('home', { user: userData, activePage: 'home', products });
+        }
         // else if(googleUser){
         //     console.log("google user:",googleUser)
         //     res.render('home', { user: googleUser,activePage:'home'});
         // }
         else {
             console.log("hai home iiii")
-            console.log("userData is :",user)
-            return res.render('home',{user,activePage:'home',products})
+            console.log("userData is :", user)
+            return res.render('home', { user, activePage: 'home', products })
         }
 
     } catch (error) {
-        console.log('Home page not found!',error);
+        console.log('Home page not found!', error);
         res.status(500).send('Server error')
     }
 
@@ -289,106 +290,106 @@ const pageNotFound = async (req, res) => {
 // ================ Profile -> profile Page ====================================
 
 // profile page
-const loadProfile = async (req,res)=>{
+const loadProfile = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser
-        res.render('profile',{
+        res.render('profile', {
             user,
-            activePage:''
+            activePage: ''
         })
     } catch (error) {
         console.log(error)
     }
 }
 //edit user name
-const editName = async (req,res)=>{
+const editName = async (req, res) => {
     try {
         const user = req.session.user;
-        const {userName} = req.body
-        const result = await User.updateOne({_id:user._id},{$set:{name:userName}})
+        const { userName } = req.body
+        const result = await User.updateOne({ _id: user._id }, { $set: { name: userName } })
         req.session.user.name = userName
-        res.status(200).json({success:"profile name successfully edited"})
+        res.status(200).json({ success: "profile name successfully edited" })
         res.redirect('/profile')
     } catch (error) {
-        
+
     }
 }
 //Load passChange page
-const loadPassChange = async (req,res)=>{
+const loadPassChange = async (req, res) => {
     try {
         const user = req.session.user
-        res.render('passChange',{activePage:'',user});
+        res.render('passChange', { activePage: '', user });
     } catch (error) {
-        
+
     }
 }
 
-const changePass = async(req,res)=>{
+const changePass = async (req, res) => {
     try {
-        const {oldPassword,newPassword} = req.body;
+        const { oldPassword, newPassword } = req.body;
         const user = req.session.user
         const userPass = req.session.user.password;
-        console.log(oldPassword,newPassword)
+        console.log(oldPassword, newPassword)
         console.log(userPass)
-        console.log(oldPassword,newPassword);
-        const compPass = await bcrypt.compare(oldPassword,userPass)
-        if(!compPass){
-            return res.status(401).json({message:"Password not match"})
+        console.log(oldPassword, newPassword);
+        const compPass = await bcrypt.compare(oldPassword, userPass)
+        if (!compPass) {
+            return res.status(401).json({ message: "Password not match" })
         }
         const changePass = await securePassword(newPassword);
-        await User.updateOne({_id:user._id},{$set:{password:changePass}})
+        await User.updateOne({ _id: user._id }, { $set: { password: changePass } })
         console.log("Password change succesfully")
-        console.log(compPass) 
-        return res.status(200).json({message:"success"})
+        console.log(compPass)
+        return res.status(200).json({ message: "success" })
     } catch (error) {
-        console.log("server error",error);
+        console.log("server error", error);
         res.redirect('/pageNotFound')
     }
 }
 //// ================ Forgot password ====================================
 
-const loadForgotPass = async (req,res)=>{
+const loadForgotPass = async (req, res) => {
     try {
         const user = req.session.user
-        res.render('forgotPassword',{
+        res.render('forgotPassword', {
             user,
-            activePage:""
+            activePage: ""
         })
     } catch (error) {
-        
+
     }
 }
 
-const sentOtp = async (req,res)=>{
+const sentOtp = async (req, res) => {
     try {
-        const {email}= req.body;
-        req.session.email= email;
-        const emailFound = await User.find({email:email})
+        const { email } = req.body;
+        req.session.email = email;
+        const emailFound = await User.find({ email: email })
         req.session.user = emailFound
-        if(emailFound){
+        if (emailFound) {
             console.log("match");
             const otp = generateOtp();
             req.session.forgotOtp = otp;
-            const sentOtp = await sendEmailVerify(email,otp);
-            if(sentOtp){
-                console.log("otp sent:",otp)
-                res.status(200).json({message:"success"});
+            const sentOtp = await sendEmailVerify(email, otp);
+            if (sentOtp) {
+                console.log("otp sent:", otp)
+                res.status(200).json({ message: "success" });
 
             }
 
-        }else{
-            res.status(401).json({message:"Email not match"});
+        } else {
+            res.status(401).json({ message: "Email not match" });
         }
         console.log(email)
     } catch (error) {
-        
+
     }
 }
-const loadForgotOtpVerify = async (req,res)=>{
+const loadForgotOtpVerify = async (req, res) => {
     try {
         res.render('forgotOtpVerify')
     } catch (error) {
-        
+
     }
 }
 
@@ -398,7 +399,7 @@ const verifyForgot = async (req, res) => {
         console.log("otp is:", otp);
         if (otp == req.session.forgotOtp) {
             console.log("OTP verified successfully")
-            return res.status(200).json({success:true})
+            return res.status(200).json({ success: true })
         } else {
             res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
         }
@@ -425,136 +426,136 @@ const resentForgotOtp = async (req, res) => {
         }
 
     } catch (error) {
-        console.error("error resenting otp",error);
+        console.error("error resenting otp", error);
         res.status(500).json({ success: false, message: "Internal server error,please try again" })
     }
 }
 
-const newPassSet = async (req,res)=>{
+const newPassSet = async (req, res) => {
     try {
         const user = req.session.user
-        res.render('newPassword',{activePage :"",user})
+        res.render('newPassword', { activePage: "", user })
     } catch (error) {
-        
+
     }
 }
-const updatePass = async (req,res)=>{
+const updatePass = async (req, res) => {
     try {
-        const {password} = req.body;
+        const { password } = req.body;
         const email = req.session.email;
         const bcryptPass = await securePassword(password);
-        const result = await User.updateOne({email:email},{$set:{password:bcryptPass}})
-        if(result){
+        const result = await User.updateOne({ email: email }, { $set: { password: bcryptPass } })
+        if (result) {
             // req.session.user.password=bcryptPass;
             req.session.destroy()
-            res.status(200).json({message:"Password changed successfully"});
+            res.status(200).json({ message: "Password changed successfully" });
             console.log("password changed successfully")
-        }else{
-            res.status(400).json({message:"Password change error"})
+        } else {
+            res.status(400).json({ message: "Password change error" })
             console.log("password change not done..! Error")
         }
 
     } catch (error) {
-        console.log("server error in password changing",error)
-        res.status(500).json({message:"Server while changing password"})
+        console.log("server error in password changing", error)
+        res.status(500).json({ message: "Server while changing password" })
     }
 }
 // ================ Profile -> address ====================================
 
 
 // Load Address
-const loadAddress = async (req,res)=>{
+const loadAddress = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser
-        const addressDb = await Address.findOne({userId:user?._id})
-        
-        return res.render('addAddress',{
-           user,
-           addressDb,
-           activePage:""
-       })
+        const addressDb = await Address.findOne({ userId: user?._id })
+
+        return res.render('addAddress', {
+            user,
+            addressDb,
+            activePage: ""
+        })
 
     } catch (error) {
-        console.log("error in load address",error)
+        console.log("error in load address", error)
     }
 }
 
 //Add address
-const addAddress = async (req,res)=>{
+const addAddress = async (req, res) => {
     try {
-        const address=req.body;
+        const address = req.body;
         console.log(address)
         const addressData = {
-            addressType:address.addressType,
-            name:address.name,
-            country:address.country,
-            city:address.city,
-            address:address.address,
-            state:address.state,
-            pincode:address.pincode,
-            phone:address.phone,
-            altPhone:address.altPhone
+            addressType: address.addressType,
+            name: address.name,
+            country: address.country,
+            city: address.city,
+            address: address.address,
+            state: address.state,
+            pincode: address.pincode,
+            phone: address.phone,
+            altPhone: address.altPhone
         }
-        const user  = req.session.user || req.session.googleUser;
-        console.log("session data:",user);
+        const user = req.session.user || req.session.googleUser;
+        console.log("session data:", user);
         // const userId = await User.findOne({_id:user._id},{_id:1})
         // console.log("user id from the session:",userId)
         const updateAddress = await Address.findOneAndUpdate(
-            {userId:user._id},
-            {$push:{address:addressData}},
-            {upsert:true,new:true}
+            { userId: user._id },
+            { $push: { address: addressData } },
+            { upsert: true, new: true }
         );
-        if(updateAddress){
+        if (updateAddress) {
             console.log("address added")
-            res.status(200).json({success:true})
-        }else{
+            res.status(200).json({ success: true })
+        } else {
             console.log("error in address adding")
-            res.status(400).json({success:false})
+            res.status(400).json({ success: false })
         }
         // await address.save()
     } catch (error) {
-        console.log("error in adding address",error)
-        res.status(500).json({success:false})
+        console.log("error in adding address", error)
+        res.status(500).json({ success: false })
     }
 }
 
 //delete address
-const deleteAddress = async(req,res)=>{
+const deleteAddress = async (req, res) => {
     try {
-        const {index,addressId} = req.query;
+        const { index, addressId } = req.query;
         const user = req.session.user || req.session.googleUser;
         await Address.updateOne(
             { userId: user._id },
             { $pull: { address: { _id: addressId } } }
         );
-        
+
         // const addressData = await Address.findOne({userId:user._id});
         // const addressArr = addressData.address
         // addressArr.splice(index,1);
         // await Address.updateOne({userId:user._id},{$set:{address:addressArr}})
         console.log("Address deleted successfully")
-        res.status(200).json({success:true})
-        
+        res.status(200).json({ success: true })
 
-        
+
+
     } catch (error) {
         console.log(error)
     }
 }
 
-const LoadEditAddress = async (req,res)=>{
+const LoadEditAddress = async (req, res) => {
     try {
-        const {addressId,index}=req.query;
+        const { addressId, index } = req.query;
         const user = req.session.user || req.session.googleUser
-        console.log(addressId,index);
-        const userAddress = await Address.findOne({userId:user._id})
-        const oneAddress = userAddress.address.splice(index,1)
+        console.log(addressId, index);
+        const userAddress = await Address.findOne({ userId: user._id })
+        const oneAddress = userAddress.address.splice(index, 1)
         console.log(oneAddress)
-        
-        res.render('editAddress',{
-            activePage:'',
+
+        res.render('editAddress', {
+            activePage: '',
             user,
-            address:oneAddress[0]
+            address: oneAddress[0]
         })
     } catch (error) {
         console.log(error);
@@ -562,25 +563,27 @@ const LoadEditAddress = async (req,res)=>{
 }
 
 //edit Address
-const editAddressData = async (req,res)=>{
+const editAddressData = async (req, res) => {
     try {
-        const index= Number(req.body.index)
+        const index = Number(req.body.index)
         const user = req.session.user || req.session.googleUser;
         const editedData = req.body.editedData;
-        const {addressId} = req.body
+        const { addressId } = req.body
         const result = await Address.updateOne(
-            {"address._id":addressId},
-            {$set:{
-                'address.$.name':editedData.name,
-                'address.$.phone':editedData.phone,
-                'address.$.altPhone':editedData.altPhone,
-                'address.$.addressType':editedData.addressType,
-                'address.$.address':editedData.address,
-                'address.$.country':editedData.country,
-                'address.$.state':editedData.state,
-                'address.$.pincode':editedData.pincode,
-                'address.$.city':editedData.city,
-            }}
+            { "address._id": addressId },
+            {
+                $set: {
+                    'address.$.name': editedData.name,
+                    'address.$.phone': editedData.phone,
+                    'address.$.altPhone': editedData.altPhone,
+                    'address.$.addressType': editedData.addressType,
+                    'address.$.address': editedData.address,
+                    'address.$.country': editedData.country,
+                    'address.$.state': editedData.state,
+                    'address.$.pincode': editedData.pincode,
+                    'address.$.city': editedData.city,
+                }
+            }
         )
         // const result = await Address.updateOne({userId:user._id},
         //     {$set:{
@@ -595,19 +598,19 @@ const editAddressData = async (req,res)=>{
         //         [`address.${index}.city`]:editedData.city,
         //     }}
         // )
-        if(result){
+        if (result) {
             console.log("Address edited successfully");
-            res.status(200).json({success:true})
+            res.status(200).json({ success: true })
         }
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
 
 //=============Orders===============
-const loadOrders = async (req,res)=>{
+const loadOrders = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
 
@@ -617,14 +620,14 @@ const loadOrders = async (req,res)=>{
         const startIndex = (page - 1) * limit;
         const totalOrders = await Order.countDocuments({ userId: user._id });
 
-        const userOrder = await Order.find({userId:user._id}).sort({createdAt:-1}).skip(startIndex).limit(limit);
+        const userOrder = await Order.find({ userId: user._id }).sort({ createdAt: -1 }).skip(startIndex).limit(limit).populate({ path: "orderedItems.productId" });
 
-        const userAddress = await Address.findOne({userId:user._id})
-        console.log('orders',userOrder);
-        console.log('address',userAddress);
-        
-        res.render('orders',{
-            activePage:'',
+        const userAddress = await Address.findOne({ userId: user._id })
+        console.log('orders', userOrder);
+        console.log('address', userAddress);
+
+        res.render('orders', {
+            activePage: '',
             user,
             userOrder,
             address: userAddress?.address || null,
@@ -637,40 +640,43 @@ const loadOrders = async (req,res)=>{
     }
 }
 
-const cancelOrder = async (req,res)=>{
+const cancelOrder = async (req, res) => {
     try {
-        const {orderId,reason} = req.body;
-        const user = req.session.user||req.session.googleUser;
-        console.log('order id :',orderId)
-        
-        const cancelOrder = await Order.updateOne({orderId:orderId},{$set:{
-            status:'Cancelled',
-            cancellationReason:reason
-        }});
-        const orders = await Order.findOne({orderId:orderId})
-        
-        if(orders.paymentStatus==='Paid'){
-            let transactions={
-                type:'Refund',
-                amount:orders.finalAmount,
+        const { orderId, reason } = req.body;
+        const user = req.session.user || req.session.googleUser;
+        console.log('order id :', orderId)
+
+        const cancelOrder = await Order.updateOne({ orderId: orderId }, {
+            $set: {
+                status: 'Cancelled',
+                cancellationReason: reason
+            }
+        });
+        const orders = await Order.findOne({ orderId: orderId })
+
+        if (orders.paymentStatus === 'Paid') {
+            let transactions = {
+                type: 'Refund',
+                amount: orders.finalAmount,
 
             }
             const wallet = await Wallet.findOneAndUpdate(
-                {userId:user._id},
+                { userId: user._id },
                 {
                     $inc: { balance: orders.finalAmount },
-                    $push:{
-                    transactions:transactions
-                }},
-                {upsert:true,new:true}
+                    $push: {
+                        transactions: transactions
+                    }
+                },
+                { upsert: true, new: true }
             );
-            await Order.updateOne({orderId:orderId},{$set:{paymentStatus:'Refunded'}})
+            await Order.updateOne({ orderId: orderId }, { $set: { paymentStatus: 'Refunded' } })
         }
 
         //Return the stock to dataBase
 
-        orders.orderedItems.map(async (item)=>{
-            let updateStock =  await Product.updateOne({[`variant._id`]:item.varientId },{$inc:{'variant.$.stock':item.quantity}})
+        orders.orderedItems.map(async (item) => {
+            let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': item.quantity } })
         })
         //=============================
         if (cancelOrder.matchedCount === 0) {
@@ -679,54 +685,230 @@ const cancelOrder = async (req,res)=>{
             console.warn("Status was not modified (maybe it was already the same)");
         } else {
             console.log("Status updated successfully");
-            res.status(200).json({success:true})
+            res.status(200).json({ success: true })
         }
     } catch (error) {
         console.log(error)
     }
 }
 
-const returnOrder = async (req,res)=>{
+const returnOrder = async (req, res) => {
     try {
-        const {orderId}= req.body
+        const { orderId } = req.body
         console.log(orderId);
-        const updateStatus = await Order.updateOne({orderId:orderId},{$set:{status:'Return Request'}});
-        if(updateStatus){
-            res.status(200).json({success:true})
+        const updateStatus = await Order.updateOne({ orderId: orderId }, { $set: { status: 'Return Request' } });
+        if (updateStatus) {
+            res.status(200).json({ success: true })
         }
-        
+
     } catch (error) {
         console.log(error)
     }
 
 }
+
+// const invoiceDownload = async (req,res)=>{
+//     try {
+//         const { orderId } = req.params;
+//         console.log(orderId,'hai');
+//         const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
+
+//         const htmlContent = `
+//       <html>
+//         <head>
+//           <style>
+//             body { font-family: Arial, sans-serif; margin: 20px; }
+//             h1 { text-align: center; }
+//             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+//             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+//             th { background-color: #f2f2f2; }
+//           </style>
+//         </head>
+//         <body>
+//           <h1>Invoice</h1>
+//           <p><strong>Order ID:</strong> ${order._id}</p>
+//           <table>
+//             <thead>
+//               <tr>
+//                 <th>Product Name</th>
+//                 <th>Quantity</th>
+//                 <th>Size</th>
+//                 <th>Price</th>
+//                 <th>Total</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               ${order.orderedItems.map(item => `
+//                 <tr>
+//                   <td>${item.productId.productName}</td>
+//                   <td>${item.quantity}</td>
+//                   <td>${item.size}</td>
+//                   <td>₹${item.price}</td>
+//                   <td>₹${item.totalPrice}</td>
+//                 </tr>
+//               `).join('')}
+//             </tbody>
+//           </table>
+//         </body>
+//       </html>
+//     `;
+
+//     const browser = await puppeteer.launch();
+//     const page = await browser.newPage();
+//     await page.setContent(htmlContent);
+//     const pdfBuffer = await page.pdf({ format: 'A4' });
+
+//     await browser.close();
+
+//     // Set headers and send the PDF to the client
+//     res.set({
+//       'Content-Type': 'application/pdf',
+//       'Content-Disposition': `attachment; filename=Invoice-${order._id}.pdf`,
+//     });
+//     res.send(pdfBuffer);
+
+
+//     } catch (error) {
+//         console.log(error)
+//     }
+// }
+
+
+const fs = require('fs');
+const PDFDocument = require('pdfkit');
+
+const invoiceDownload = async (req, res) => {
+    try {
+        const { orderId } = req.params;
+        console.log(orderId, 'Generating invoice for Order ID');
+
+        // Fetch the order from the database
+        const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Create a new PDF document
+        const doc = new PDFDocument();
+
+        // Set response headers to download the PDF
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=Invoice-${order._id}.pdf`);
+
+        // Pipe the PDF to the response
+        doc.pipe(res);
+
+        // Add the invoice title
+        doc.font('Helvetica-Bold').fontSize(20).text('Invoice', { align: 'center' });
+        doc.moveDown();
+
+        // Order details section
+
+        doc.font('Helvetica-Bold').fontSize(12).text('Order ID: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(order._id.toString());
+        doc.moveDown();
+
+        // Customer details with bold labels
+        doc.font('Helvetica-Bold').fontSize(12).text('Customer: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(order.userId.toString());
+        doc.moveDown();
+
+        // Payment method
+        doc.font('Helvetica-Bold').fontSize(12).text('Payment Method: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(order.paymentMethod);
+        doc.moveDown();
+
+        // Payment status
+        doc.font('Helvetica-Bold').fontSize(12).text('Payment Status: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(order.paymentStatus);
+        doc.moveDown();
+
+        // Order status
+        doc.font('Helvetica-Bold').fontSize(12).text('Status: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(order.status);
+        doc.moveDown();
+
+        // Total amount
+        doc.font('Helvetica-Bold').fontSize(12).text('Total Amount: ', { continued: true });
+        doc.font('Helvetica').fontSize(14).text(`₹${order.finalAmount}`);
+        doc.moveDown()
+        doc.text('---------------------------------------');
+        doc.moveDown();
+
+        // Add a small heading for product details
+        doc.fontSize(12).text('Product Details:', { underline: true });
+        doc.moveDown();
+
+        // Set up the table header (columns)
+        const columns = ['No', 'Product Name', 'Quantity', 'Size', 'Price', 'Total'];
+        const columnWidth = [50, 150, 50, 50, 50, 50]; // Adjusted column widths to ensure proper alignment
+
+        // Draw table header
+        let yPos = doc.y;
+        doc.font('Helvetica-Bold').fontSize(10).text(columns[0], 50, yPos, { width: columnWidth[0], align: 'left' });
+        doc.text(columns[1], 200, yPos, { width: columnWidth[1], align: 'center' });
+        doc.text(columns[2], 350, yPos, { width: columnWidth[2], align: 'center' });
+        doc.text(columns[3], 400, yPos, { width: columnWidth[3], align: 'center' });
+        doc.text(columns[4], 450, yPos, { width: columnWidth[4], align: 'right' });
+        doc.text(columns[5], 500, yPos, { width: columnWidth[5], align: 'right' });
+
+        // Draw a line after the header
+        doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+
+        // Draw the table rows (items in the order)
+        order.orderedItems.forEach((item, index) => {
+            yPos = doc.y + 10;
+
+            doc.font('Helvetica').fontSize(10).text((index + 1).toString(), 50, yPos, { width: columnWidth[0], align: 'left' });
+            doc.text(item.productId.productName, 200, yPos, { width: columnWidth[1], align: 'center' });
+            doc.text(item.quantity.toString(), 350, yPos, { width: columnWidth[2], align: 'center' });
+            doc.text(item.size, 400, yPos, { width: columnWidth[3], align: 'center' });
+            doc.text(`${item.price.toFixed(2)}`, 450, yPos, { width: columnWidth[4], align: 'right' });
+            doc.text(`${item.totalPrice.toFixed(2)}`, 500, yPos, { width: columnWidth[5], align: 'right' });
+
+            // Draw a line after each row
+            doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+        });
+
+
+        // Draw the total row at the end
+        doc.moveDown();
+        doc.text(`Total Amount: ${order.finalAmount.toFixed(2)}`, 300, doc.y, { width: 100, align: 'left' });
+
+        // End the document
+        doc.end();
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('An error occurred while generating the invoice.');
+    }
+};
 
 //==============wallet================
 
-const loadWallet = async(req,res)=>{
+const loadWallet = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
-        const wallet = await Wallet.findOne({userId:user._id});
-        console.log("wallet is:",wallet)
-        res.render('wallet',{
-            activePage:'',
+        const wallet = await Wallet.findOne({ userId: user._id });
+        console.log("wallet is:", wallet)
+        res.render('wallet', {
+            activePage: '',
             user,
             wallet
         })
     } catch (error) {
         console.log(error);
-        
+
     }
 }
 
 // ================ Testing ====================================
 
-const cropImage = async(req,res)=>{
+const cropImage = async (req, res) => {
     try {
 
         res.render('justForCrop');
     } catch (error) {
-        
+
     }
 }
 
@@ -743,7 +925,7 @@ module.exports = {
     loadProfile,//load
     loadAddress,//load
     editName,
-    
+
     //password change
     loadPassChange,//load
     changePass,
@@ -767,9 +949,12 @@ module.exports = {
     loadOrders,
     cancelOrder,
     returnOrder,
+    invoiceDownload,
 
     //wallet
     loadWallet,
+
+
 
     cropImage
 }

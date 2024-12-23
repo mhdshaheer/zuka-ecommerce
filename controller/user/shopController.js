@@ -177,6 +177,9 @@ const addToCart = async (req, res) => {
         const user = req.session.user || req.session.googleUser;
         let { size, stock, productObj, quantity } = req.body
         console.log(size, stock, typeof quantity, productObj._id)
+        if(!user){
+            return res.status(404).json({message:false})
+        }
 
         const sizeFound = await Cart.findOne({ userId: user._id, 'items.size': size, 'items.productId': productObj._id });
         console.log('Product obj: ', productObj)
@@ -189,20 +192,21 @@ const addToCart = async (req, res) => {
 
         // manage duplicate adding to cart
         if (sizeFound) {
-            const itemIndex = sizeFound.items.findIndex(item =>
-                item.size === size && item.productId.toString() === productObj._id.toString()
-            );
-            console.log('item index is:', itemIndex)
-            console.log('stocks : ', sizeFound.items[itemIndex].quantity)
-            quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
-            console.log(quantity)
-            let totalPrice = Number(quantity) * Number(productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice) //edit
-            const result = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.quantity`]: quantity } })
-            const resultPrice = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.totalPrice`]: totalPrice } })
-            if (result && resultPrice) {
-                console.log('updated to db')
-                res.status(200).json({ message: true })
-            }
+            return res.status(404).json({itemFound:1})
+            // const itemIndex = sizeFound.items.findIndex(item =>
+            //     item.size === size && item.productId.toString() === productObj._id.toString()
+            // );
+            // console.log('item index is:', itemIndex)
+            // console.log('stocks : ', sizeFound.items[itemIndex].quantity)
+            // quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
+            // console.log(quantity)
+            // let totalPrice = Number(quantity) * Number(productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice) //edit
+            // const result = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.quantity`]: quantity } })
+            // const resultPrice = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.totalPrice`]: totalPrice } })
+            // if (result && resultPrice) {
+            //     console.log('updated to db')
+            //     res.status(200).json({ message: true })
+            // }
 
         } else {
             let lastPrice = productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice //edit
@@ -255,6 +259,15 @@ const deleteFromCart = async (req, res) => {
     }
 }
 
+const getStock = async (req,res)=>{
+    const {variantId} = req.body
+    console.log('variant id:',variantId);
+    const product = await Product.findOne({'variant._id':variantId},{'variant.$':1})
+    console.log("product is :",product)
+    console.log("product is :",product?.variant[0]?.stock)
+    const variantStock = product?.variant[0]?.stock;
+    return res.status(200).json({variantStock})
+}
 //Orders
 
 const addOrder = async (req, res) => {
@@ -279,7 +292,7 @@ const addOrder = async (req, res) => {
             userId: user._id,
             orderedItems: cart.items,
             totalPrice,
-            finalAmount: totalPrice-req.session.discountPrice,
+            finalAmount: totalPrice-(req.session.discountPrice??0),
             address: address._id,
             index: Number(index),
             paymentMethod,
@@ -477,6 +490,7 @@ module.exports = {
     addOrder,
     loadOrderSuccess,
     editCart,
+    getStock,
     loadWishlist,
     addToWishlist,
     deleteFromWishlist,

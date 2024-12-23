@@ -132,6 +132,43 @@
 }
 
     </style>
+    <style>
+      .order-detail {
+  margin: 20px 0;
+}
+
+.order-detail h5 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+}
+
+.product-box {
+  border: 1px solid #ddd;
+  width: 120px;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.product-box img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+
+
+
+    </style>
     <!-- Shop Section Begin -->
     <section class="shop spad">
         <div class="container">
@@ -229,6 +266,28 @@
                                       <P>₹<%=order.finalAmount%></P>
                                       
                                     </div>
+
+                                    <!-- <div class="order-detail">
+                                      <h5>Ordered Products</h5>
+                                      <div class="product-grid" id="productGrid">
+                                        <img src="<%=order.orderedItems[0].productId.images[0]%>" alt="">
+                                      </div>
+                                    </div> -->
+
+                                    <!--  -->
+                                    <div class="order-detail">
+                                      <h5>Ordered Products</h5>
+                                      <div class="product-grid">
+                                        <% order.orderedItems.slice(0, 2).forEach((item,index) => { %>
+                                          <div class="product-box">
+                                            <img src="<%= item.productId.images[0] %>" alt="" />
+                                          </div>
+                                        <% }); %>
+                                      </div>
+                                    </div>
+                                    <!--  -->
+                                    
+                                    
                                   </div>
                                   <div class="order-actions">
                                     <%if(order.status==='Pending'){%>
@@ -242,6 +301,30 @@
                                     <button class="btn btn-secondary btn-sm" onclick="returnOrder('<%= order.orderId %>')">
                                       Return
                                     </button>
+                                    <!-- <button class="btn btn-success btn-sm" >
+                                      Invoice
+                                    </button> -->
+                                    <!-- <button class="btn btn-success btn-sm">
+                                      <a 
+                                        href="/download-invoice/<%= order._id %> %>" 
+                                        class="text-white" 
+                                        style="text-decoration: none;" 
+                                        
+                                      >
+                                        Invoice
+                                      </a>
+                                    </button> -->
+                                    <button class="btn btn-success btn-sm">
+                                      <a 
+                                        href="/download-invoice/<%= order._id %>" 
+                                        class="text-white" 
+                                        style="text-decoration: none;" 
+                                        target="_blank">
+                                        Download Invoice
+                                      </a>
+                                    </button>
+                                    
+                                    
                                     <%}%>
                                   </div>
                                 </div>
@@ -328,36 +411,7 @@
 
 
 <script>
-  // function cancelOrder(orderId){
-  //   console.log(orderId);
-//     Swal.fire({
-//   title: "Are you sure?",
-//   text: "Do you cancel your order!",
-//   icon: "warning",
-//   showCancelButton: true,
-//   confirmButtonColor: "#3085d6",
-//   cancelButtonColor: "#d33",
-//   confirmButtonText: "Yes, Cancel it!"
-// }).then((result) => {
-//   if (result.isConfirmed) {
-//     axios.patch('/cancelOrder',{
-//         orderId:orderId
-//     }).then(res=>{
-//       if(res.status===200){
-//         Swal.fire({
-//           title: "Cancelled!",
-//           text: "Your order cancelled.",
-//           icon: "success"
-//         }).then(()=>{
-//           window.location.reload()
-//         })
-//       }
-//     })
-//   }
-// });
-    
-  // }
-
+ 
   function returnOrder(orderId){
     console.log("order id:",orderId);
 

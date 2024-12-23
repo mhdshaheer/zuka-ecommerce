@@ -39,10 +39,10 @@ const productSchema = new Schema({
   },
   color: {
     type: String,
-    required: true, // e.g., "Red", "Blue"
+    required: true,
   },
   images: {
-    type: [String], // Array of image URLs
+    type: [String],
   },
   variant: [
     {

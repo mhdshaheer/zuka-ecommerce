@@ -53,7 +53,7 @@
                                         <td>#<%=item.orderId%></td>
                                         <td><b><%=item.userId.name%></b></td>
                                         <td><%=item.paymentMethod%></td>
-                                        <td>₹<%=item.totalPrice%></td>
+                                        <td>₹<%=item.finalAmount%></td>
                                         <%if(item.status==='Cancelled'){%>
                                             <td><span class="badge rounded-pill alert-danger"><%=item.status%></span></td>
                                         <%}else{%>
@@ -89,16 +89,7 @@
                     <!-- card-body end// -->
                 </div>
                 <!-- card end// -->
-                <!-- <div class="pagination-area mt-15 mb-50">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination justify-content-start">
-                            <li class="page-item active"><a class="page-link" href="#">01</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#"><i class="material-icons md-chevron_right"></i></a>
-                            </li>
-                        </ul>
-                    </nav>
-                </div> -->
+                
                 <div class="pagination-area mt-15 mb-50">
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-start">

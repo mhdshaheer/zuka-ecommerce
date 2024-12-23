@@ -108,8 +108,8 @@
                 <form>
                     <div class="row">
                         <div class="col-lg-8 col-md-6">
-                            <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
-                                    here</a> to enter your code</h6>
+                            <!-- <h6 class="coupon__code"><span class="icon_tag_alt"></span> Have a coupon? <a href="#">Click
+                                    here</a> to enter your code</h6> -->
                             <h6 class="checkout__title toggle-btn text-dark" id="toggle-billing">
                                 Billing Details
                             </h6>
@@ -258,14 +258,19 @@
 
                                     </label>
                                 </div>
+                                <% 
+                                    const priceTotal = userCart.items.reduce((acc, curr) => acc + curr.totalPrice, 0);
+                                    const priceFinal = priceTotal >= couponMin ? (priceTotal - couponDiscount) : priceTotal;
+                                %>
+                                <%if(priceFinal<=1000){%>
                                 <div class="my-4">
                                     <label class="custom-label">
                                         <input type="radio" name="paymentMethod" value="Cash on Delivery"
                                             class="form-check-input ml-2">
-                                        <span class="pl-5">Cash on Delivery</span>
+                                        <span class="pl-5">Cash on Delivery </span>
                                     </label>
                                 </div>
-
+                                <%}%>
                                 <div class="my-4">
                                     <label class="custom-label">
                                         <input type="radio" name="paymentMethod" class="form-check-input ml-2"
@@ -319,7 +324,7 @@
                                     <%userCart.items.map((item,index)=>{%>
                                         <li>
                                             <%=index+1%>. <%=item.productId.productName%> <span>
-                                                        ₹<%=item.totalPrice%>.00
+                                                        ₹<%=item.totalPrice.toFixed(2)%>
                                                     </span>
                                         </li>
                                         <%})%>
@@ -330,6 +335,11 @@
                                 <ul class="checkout__total__all">
                                     <li>Subtotal <span class="text-dark">₹ <%=(userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0).toFixed(2))%></span></li>
                                     <li>Discount <span>-₹ <%=couponDiscount%></span></li>
+                                    <%if(priceFinal>=500){%>
+                                        <li>Delivery charge <span class="text-dark">Free</span></li>
+                                    <%}else{%>
+                                        <li>Delivery charge <span>+ ₹ 40</span></li>
+                                    <%}%>
                                     <li>Total:<span id="totalAmount" class="text-dark">
                                            
                                             <!-- ₹ <%=userCart.items.reduce((acc,curr)=>acc+curr.totalPrice,0)%> -->
@@ -337,7 +347,11 @@
                                             const totalPrice = userCart.items.reduce((acc, curr) => acc + curr.totalPrice, 0);
                                             const finalPrice = totalPrice >= couponMin ? (totalPrice - couponDiscount) : totalPrice;
                                           %>
-                                          <%= finalPrice %>
+                                          <%if(finalPrice<=500){%>
+                                            <%= finalPrice+40 %>
+                                          <%}else{%>
+                                            <%= finalPrice %>
+                                           <%}%>
                                         </span></li>
                                 </ul>
 
@@ -565,6 +579,7 @@
             e.preventDefault();
             const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
             let totalAmount = document.getElementById('totalAmount').textContent;
+            console.log("total amount is:",totalAmount,typeof totalAmount,Number(totalAmount))
 
             if (!addressObj) {
                 Swal.fire({

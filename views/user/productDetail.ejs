@@ -140,46 +140,49 @@
                                     </span>
                             </h3>
                             <%if(product[0].offerPrice!==0){%>
-                                <h3>RS: <%=product[0].offerPrice%>/- <span><%=product[0].regularPrice%>/-</span></h3>
-                            <%}else{%>
-                                <h3>RS: <%=product[0].regularPrice%>/-</h3>
-                            <%}%>
-                            <p>
-                                <%=product[0].description%>
-                            </p>
-                            <div class="product-rating">
-                                <span id="average-rating">4.2</span>
-                                <div class="stars">
-                                    <!-- Dynamically add stars based on average rating -->
-                                    <span class="star" data-value="1">★</span>
-                                    <span class="star" data-value="2">★</span>
-                                    <span class="star" data-value="3">★</span>
-                                    <span class="star" data-value="4">★</span>
-                                    <span class="star" data-value="5">★</span>
-                                </div>
-                                <span id="rating-count">(123 ratings)</span>
-                            </div>
-                            <br>
-                            <div class="product__details__option">
-                                <div class="product__details__option__size">
-                                    <span>Size:</span>
-                                    <%for(let i=0;i<product[0].variant.length;i++){%>
-                                        <%if(product[0].variant[i].stock>0){%>
-                                                
-                                            <label id="sizeLabel" for="xl"
-                                            onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
-                                            <%=product[0].variant[i].size%>
-                                            
-                                            <input type="radio" id="itemSize" name="variant" >
-                                            <span> </span>
-                                            <span class="badge rounded-pill bg-dark text-light" id="itemStock">
-                                                <%=product[0].variant[i].stock%>
-                                            </span>
-                                        </label>
-                                        <%}%>
-                                        <%}%>
-                                </div>
-                                <!-- <div class="product__details__option__size">
+                                <h3>RS: <%=product[0].offerPrice%>/- <span>
+                                            <%=product[0].regularPrice%>/-
+                                        </span></h3>
+                                <%}else{%>
+                                    <h3>RS: <%=product[0].regularPrice%>/-</h3>
+                                    <%}%>
+                                        <p>
+                                            <%=product[0].description%>
+                                        </p>
+                                        <div class="product-rating">
+                                            <span id="average-rating">4.2</span>
+                                            <div class="stars">
+                                                <!-- Dynamically add stars based on average rating -->
+                                                <span class="star" data-value="1">★</span>
+                                                <span class="star" data-value="2">★</span>
+                                                <span class="star" data-value="3">★</span>
+                                                <span class="star" data-value="4">★</span>
+                                                <span class="star" data-value="5">★</span>
+                                            </div>
+                                            <span id="rating-count">(123 ratings)</span>
+                                        </div>
+                                        <br>
+                                        <div class="product__details__option">
+                                            <div class="product__details__option__size">
+                                                <span>Size:</span>
+                                                <%for(let i=0;i<product[0].variant.length;i++){%>
+                                                    <%if(product[0].variant[i].stock>0){%>
+
+                                                        <label id="sizeLabel" for="xl"
+                                                            onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
+                                                            <%=product[0].variant[i].size%>
+
+                                                                <input type="radio" id="itemSize" name="variant">
+                                                                <span> </span>
+                                                                <span class="badge rounded-pill bg-dark text-light"
+                                                                    id="itemStock">
+                                                                    <%=product[0].variant[i].stock%>
+                                                                </span>
+                                                        </label>
+                                                        <%}%>
+                                                            <%}%>
+                                            </div>
+                                            <!-- <div class="product__details__option__size">
                                     <span>Color:</span>
                                     
                                     <label for="xl"><%=product[0].color%>
@@ -187,14 +190,14 @@
                                     </label>
                                 </div> -->
 
-                                <div class="mt-2">
-                                    <p><b>COLOR: </b><span id="itemColor">
-                                            <%=product[0].color%>
-                                        </span></p>
-                                </div>
+                                            <div class="mt-2">
+                                                <p><b>COLOR: </b><span id="itemColor">
+                                                        <%=product[0].color%>
+                                                    </span></p>
+                                            </div>
 
 
-                                <!-- <div class="product__details__option__color">
+                                            <!-- <div class="product__details__option__color">
                                     <span>Color:</span>
                                     <label class="c-1" for="sp-1">
                                         <input type="radio" id="sp-1">
@@ -215,32 +218,32 @@
                                         <input type="radio" id="sp-9">
                                     </label>
                                 </div> -->
-                            </div>
-                            <div class="product__details__cart__option">
-                                <div class="quantity">
-                                    <div class="pro-qty">
-                                        <input id="itemQuantity" type="text" value="1" readonly>
-                                    </div>
-                                </div>
-                                <a href="#" class="primary-btn" id="addToCart">add to cart</a>
-                            </div>
+                                        </div>
+                                        <div class="product__details__cart__option">
+                                            <div class="quantity">
+                                                <div class="pro-qty">
+                                                    <input id="itemQuantity" type="text" value="1" readonly>
+                                                </div>
+                                            </div>
+                                            <a href="#" class="primary-btn" id="addToCart">add to cart</a>
+                                        </div>
 
 
-                            <div class="product__details__btns__option">
-                                <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
-                                <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
-                            </div>
-                            <div class="product__details__last__option">
-                                <!-- <h5><span>Guaranteed Safe Checkout</span></h5>
+                                        <div class="product__details__btns__option">
+                                            <a href="#"><i class="fa fa-heart"></i> add to wishlist</a>
+                                            <a href="#"><i class="fa fa-exchange"></i> Add To Compare</a>
+                                        </div>
+                                        <div class="product__details__last__option">
+                                            <!-- <h5><span>Guaranteed Safe Checkout</span></h5>
                                 <img src="img/shop-details/details-payment.png" alt=""> -->
-                                <ul>
-                                    <li><span>SKU:</span> 3812912</li>
-                                    <li><span>Categories:</span>
-                                        <%=category[0].name%>
-                                    </li>
-                                    <li><span>Tag:</span> Clothes, Skin, Body</li>
-                                </ul>
-                            </div>
+                                            <ul>
+                                                <li><span>SKU:</span> 3812912</li>
+                                                <li><span>Categories:</span>
+                                                    <%=category[0].name%>
+                                                </li>
+                                                <li><span>Tag:</span> Clothes, Skin, Body</li>
+                                            </ul>
+                                        </div>
                         </div>
                     </div>
                 </div>
@@ -545,6 +548,7 @@
     </script>
 
     <script>
+        let itemStock = null
         const addToCart = document.getElementById('addToCart');
         const itemSize = document.getElementById('itemSize');
         const sizeLabel = document.getElementById('sizeLabel')
@@ -555,6 +559,16 @@
 
                 e.preventDefault();
                 console.log(size, stock, itemQuantity.value)
+                itemStock = stock;
+                if(Number(stock)<Number(itemQuantity.value)){
+                    console.log("over loaded.....")
+                    return Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Quantity exceeded!',
+                                confirmButtonText: 'OK'
+                            })
+                }
                 const productObj = JSON.parse(product)
                 console.log("Products: ", productObj.color)
                 axios.post('addToCart', {
@@ -574,6 +588,33 @@
                                 window.location.reload();
                             })
                         }
+                    }).catch((error) => {
+                        if(error.response && error.response.data.itemFound){
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Item exist',
+                                text: 'Item already exist on cart!',
+                                confirmButtonText: 'OK'
+                            })
+                        }else if (error.response && error.response.status === 404 && !error.response.data.itemFound) {
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Please login first!',
+                                confirmButtonText: 'OK'
+                            }).then(()=>{
+                                window.location.href='/login'
+                            })
+                        } else {
+                            // Handle other errors
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'An Error Occurred',
+                                text: error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     })
 
             })
@@ -583,34 +624,34 @@
     <script>
         //Stock add field
         document.querySelectorAll('.pro-qty, .pro-qty-2').forEach(container => {
-    // Determine the type to set the correct icons
-    const isType1 = container.classList.contains('pro-qty');
+            // Determine the type to set the correct icons
+            const isType1 = container.classList.contains('pro-qty');
 
-    // Add decrement and increment buttons
-    const decButton = document.createElement('span');
-    decButton.className = `fa ${isType1 ? 'fa-angle-up' : 'fa-angle-left'} dec qtybtn`;
-    container.insertBefore(decButton, container.firstChild);
+            // Add decrement and increment buttons
+            const decButton = document.createElement('span');
+            decButton.className = `fa ${isType1 ? 'fa-angle-up' : 'fa-angle-left'} dec qtybtn`;
+            container.insertBefore(decButton, container.firstChild);
 
-    const incButton = document.createElement('span');
-    incButton.className = `fa ${isType1 ? 'fa-angle-down' : 'fa-angle-right'} inc qtybtn`;
-    container.appendChild(incButton);
+            const incButton = document.createElement('span');
+            incButton.className = `fa ${isType1 ? 'fa-angle-down' : 'fa-angle-right'} inc qtybtn`;
+            container.appendChild(incButton);
 
-    // Add event listener for increment and decrement
-    container.addEventListener('click', function (event) {
-        if (event.target.classList.contains('qtybtn')) {
-            const input = container.querySelector('input');
-            let value = parseInt(input.value);
+            // Add event listener for increment and decrement
+            container.addEventListener('click', function (event) {
+                if (event.target.classList.contains('qtybtn')) {
+                    const input = container.querySelector('input');
+                    let value = parseInt(input.value);
 
-            if (event.target.classList.contains('inc')) {
-                value = Math.min(value + 1, 10); // Increment up to 10
-            } else if (event.target.classList.contains('dec')) {
-                value = Math.max(value - 1, 1); // Decrement down to 1
-            }
+                    if (event.target.classList.contains('inc')) {
+                        value = Math.min(value + 1, 10); // Increment up to 10
+                    } else if (event.target.classList.contains('dec')) {
+                        value = Math.max(value - 1, 1); // Decrement down to 1
+                    }
 
-            input.value = value;
-        }
-    });
-});
+                    input.value = value;
+                }
+            });
+        });
     </script>
 
     <%- include('../partials/user/footer') %>

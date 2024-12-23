@@ -128,7 +128,12 @@
                         <div class="row align-items-center">
                             <!-- Shipping Information -->
                             <div class="col-md-4">
-                                <h6 class="text-dark fs-5">Shipping Information</h6>
+                                <p class="text-dark mb-1"><strong>Total Amount:</strong> <span class="text-secondary">
+                                    ₹<%=orders.finalAmount.toFixed(2)%>
+                                </span> 
+                            </p>
+                            <hr>
+                            <h6 class="text-dark fs-5">Shipping Information</h6>
                                 <p class="text-dark mb-1"><strong>Customer Name:</strong> <span class="text-secondary">
                                         <%=address.name%>
                                     </span> </p>

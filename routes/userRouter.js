@@ -54,7 +54,9 @@ router.post('/editAddress',userController.editAddressData)
 //orders
 router.get('/orders',userAuth,userController.loadOrders);
 router.patch('/cancelOrder',userController.cancelOrder);
-router.patch('/returnOrder',userController.returnOrder)
+router.patch('/returnOrder',userController.returnOrder);
+// router.get('/download-invoice/:orderId',userController.invoiceDownload)
+router.get('/download-invoice/:orderId', userController.invoiceDownload)
 
 // Wallet
 router.get('/wallet',userController.loadWallet)
@@ -66,7 +68,8 @@ router.get('/wallet',userController.loadWallet)
 router.post('/addToCart',shopController.addToCart);
 router.delete('/deleteItem',shopController.deleteFromCart)
 router.patch('/cart',shopController.editCart);
-router.post('/couponApply',shopController.couponApply)
+router.post('/couponApply',shopController.couponApply);
+router.post('/getStock',shopController.getStock)
 
 // Checkout
 router.post('/placeOrder',shopController.addOrder)
