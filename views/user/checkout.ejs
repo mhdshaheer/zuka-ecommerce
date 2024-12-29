@@ -373,96 +373,6 @@
         </div>
     </section>
     <!-- Checkout Section End -->
-
-    <!-- Footer Section Begin -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="footer__about">
-                        <div class="footer__logo">
-                            <a href="#"><img src="img/footer-logo.png" alt=""></a>
-                        </div>
-                        <p>The customer is at the heart of our unique business model, which includes design.</p>
-                        <a href="#"><img src="img/payment.png" alt=""></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 offset-lg-1 col-md-3 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>Shopping</h6>
-                        <ul>
-                            <li><a href="#">Clothing Store</a></li>
-                            <li><a href="#">Trending Shoes</a></li>
-                            <li><a href="#">Accessories</a></li>
-                            <li><a href="#">Sale</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-3 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>Shopping</h6>
-                        <ul>
-                            <li><a href="#">Contact Us</a></li>
-                            <li><a href="#">Payment Methods</a></li>
-                            <li><a href="#">Delivary</a></li>
-                            <li><a href="#">Return & Exchanges</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-lg-3 offset-lg-1 col-md-6 col-sm-6">
-                    <div class="footer__widget">
-                        <h6>NewLetter</h6>
-                        <div class="footer__newslatter">
-                            <p>Be the first to know about new arrivals, look books, sales & promos!</p>
-                            <form action="#">
-                                <input type="text" placeholder="Your email">
-                                <button type="submit"><span class="icon_mail_alt"></span></button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12 text-center">
-                    <div class="footer__copyright__text">
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        <p>Copyright ©
-                            <script>
-                                document.write(new Date().getFullYear());
-                            </script>2020
-                            All rights reserved | This template is made with <i class="fa fa-heart-o"
-                                aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
-                        </p>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-    <!-- Footer Section End -->
-
-    <!-- Search Begin -->
-    <div class="search-model">
-        <div class="h-100 d-flex align-items-center justify-content-center">
-            <div class="search-close-switch">+</div>
-            <form class="search-model-form">
-                <input type="text" id="search-input" placeholder="Search here.....">
-            </form>
-        </div>
-    </div>
-    <!-- Search End -->
-
-    <!-- Js Plugins -->
-    <script src="js/jquery-3.3.1.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.nice-select.min.js"></script>
-    <script src="js/jquery.nicescroll.min.js"></script>
-    <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/jquery.countdown.min.js"></script>
-    <script src="js/jquery.slicknav.js"></script>
-    <script src="js/mixitup.min.js"></script>
-    <script src="js/owl.carousel.min.js"></script>
-    <script src="js/main.js"></script>
     </body>
 
     </html>
@@ -493,74 +403,7 @@
         });
     </script>
 
-    <!-- <script>
-        let addressObj = null
-        let selectAddress = (radioButton) => {
-            const selectedIndex = radioButton.value;
-            const selectedItem = JSON.parse(radioButton.getAttribute('data-item'));
-
-            console.log("Selected Address Index:", selectedIndex);
-            console.log("Selected Address Details:", selectedItem);
-            addressObj = {
-                index: selectedIndex,
-                address: selectedItem
-            }
-
-        }
-        document.getElementById('placeOrder').addEventListener('click', (e) => {
-            e.preventDefault();
-            const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
-            let totalAmount = document.getElementById('totalAmount').textContent;
-            console.log(totalAmount)
-
-
-
-            if (addressObj !== null) {
-                console.log("select address : ", addressObj);
-            } else {
-                Swal.fire({
-                    title: 'Address Missing!',
-                    text: 'Please choose a address!',
-                    icon: 'warning',
-                    confirmButtonText: 'Okay'
-                })
-            }
-
-            if (selectedOption) {
-                console.log("Selected Payment Method:", selectedOption.value);
-            } else {
-                Swal.fire({
-                    title: 'Missing!',
-                    text: 'Please choose a payment method!',
-                    icon: 'warning',
-                    confirmButtonText: 'Okay'
-                })
-            }
-
-            try {
-                axios.post('/placeOrder', {
-                    totalPrice: Number(totalAmount),
-                    address: addressObj.address,
-                    paymentMethod: selectedOption.value,
-                    index:addressObj.index
-                })
-                .then(res=>{
-                    if(res.status==200){
-                        let id = res.data.orderId
-                        console.log("order id is : ",id)
-                        window.location.href = `/orderSuccess?id=${id}`
-                    }
-                })
-                
-                console.log("fetch done")
-            } catch (error) {
-                console.log(error)
-            }
-
-        });
-
-
-    </script> -->
+    
 
     <script>
         let addressObj = null;
@@ -730,6 +573,41 @@
                     rzp.open();
                 } else {
 
+                    //     Swal.fire({
+                    //         title: "Place Order?",
+                    //         text: "Are you sure you want to confirm this order?",
+                    //         icon: "warning",
+                    //         showCancelButton: true,
+                    //         confirmButtonColor: "#3085d6",
+                    //         cancelButtonColor: "#d33",
+                    //         confirmButtonText: "Yes, Place Order!",
+                    //         cancelButtonText: "No, Cancel"
+                    //     }).then(async result => {
+                    //         if (result.isConfirmed) {
+
+                    //             const response = await axios.post('/placeOrder', {
+                    //                 totalPrice: Number(totalAmount),
+                    //                 address: addressObj.address,
+                    //                 paymentMethod: selectedOption.value,
+                    //                 index: addressObj.index
+                    //             });
+
+                    //             if (response.status === 200) {
+                    //                 let id = response.data.orderId;
+                    //                 console.log("Order ID:", id);
+                    //                 window.location.href = `/orderSuccess?id=${id}`;
+                    //             }
+                    //             if (response &&response.status == 402) {
+                    //     Swal.fire({
+                    //         icon: 'error',
+                    //         title: 'Insufficient Balance',
+                    //         text: response.data.message,
+                    //     })
+                    // } 
+
+                    //         }
+                    //     })
+                    const token = localStorage.getItem("authToken");
                     Swal.fire({
                         title: "Place Order?",
                         text: "Are you sure you want to confirm this order?",
@@ -738,29 +616,75 @@
                         confirmButtonColor: "#3085d6",
                         cancelButtonColor: "#d33",
                         confirmButtonText: "Yes, Place Order!",
-                        cancelButtonText: "No, Cancel"
-                    }).then(async result => {
+                        cancelButtonText: "No, Cancel",
+                    }).then(async (result) => {
                         if (result.isConfirmed) {
+                            try {
+                                const response = await axios.post(
+                                    '/placeOrder',
+                                    {
+                                        totalPrice: Number(totalAmount),
+                                        address: addressObj.address,
+                                        paymentMethod: selectedOption.value,
+                                        index: addressObj.index,
+                                    },
+                                    {
+                                        headers: {
+                                            Authorization: `Bearer ${token}`, // Ensure the token is valid
+                                        },
+                                    }
+                                );
 
-                            const response = await axios.post('/placeOrder', {
-                                totalPrice: Number(totalAmount),
-                                address: addressObj.address,
-                                paymentMethod: selectedOption.value,
-                                index: addressObj.index
-                            });
+                                if (response.status === 200) {
+                                    const id = response.data.orderId;
+                                    window.location.href = `/orderSuccess?id=${id}`;
+                                }
+                            } catch (error) {
+                                console.error("Axios error:", error);
 
-                            if (response.status === 200) {
-                                let id = response.data.orderId;
-                                console.log("Order ID:", id);
-                                window.location.href = `/orderSuccess?id=${id}`;
+                                if (error.response) {
+                                    if (error.response.status === 401) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Blocked',
+                                            text: 'Cart contains Blocked Prouct',
+                                        });
+                                    } else if (error.response.status === 402) {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Insufficient Balance',
+                                            text: error.response.data.message || 'Payment failed due to insufficient balance.',
+                                        });
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: 'Error',
+                                            text: error.response.data.message || 'Something went wrong.',
+                                        });
+                                    }
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Something went wrong. Please try again later.',
+                                    });
+                                }
                             }
                         }
-                    })
+                    });
+
                 }
 
             } catch (error) {
                 console.error("Error during payment:", error);
                 if (error.response && error.response.status == 402) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Insufficient Balance',
+                        text: error.response.data.message,
+                    })
+                } else if (error.response.status == 401) {
+                    console.log("have blocked")
                     Swal.fire({
                         icon: 'error',
                         title: 'Insufficient Balance',
@@ -922,3 +846,4 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <%- include('../partials/user/footer') %>

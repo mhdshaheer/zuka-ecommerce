@@ -118,7 +118,7 @@ const loadDashboard = async (req, res) => {
             let topProducts = [];
             let topCategories = [];
 
-            // Top Products
+            // Top Products=======================
             if (dataType === "products") {
                 const productSalesAggregation = await Order.aggregate([
                     { 
@@ -161,13 +161,13 @@ const loadDashboard = async (req, res) => {
                 topProducts = productSalesAggregation;
             }
 
-            // Top Categories
+            // Top Categories=================
             if (dataType === "categories") {
                 const categorySalesAggregation = await Order.aggregate([
                     { $match: { 
                         status: "Delivered",
                         createdAt: { $gte: startDate }
-                     } }, // Filter delivered orders
+                     } },
                     { $unwind: "$orderedItems" },
                     {
                         $lookup: {
@@ -201,7 +201,7 @@ const loadDashboard = async (req, res) => {
                 topCategories = categorySalesAggregation;
             }
 
-            // Prepare data for chart
+            // for chart
             const labels = [];
             const data = [];
 
@@ -214,14 +214,13 @@ const loadDashboard = async (req, res) => {
 
             }
 
-            // Fetch other required data
             const orders = await Order.find();
             const noPendingOrder = await Order.find({ status: { $ne: 'Pending' } });
             const categories = await Category.find();
             const products = await Product.find();
             const totalRevenue = deliveredOrders.reduce((acc, order) => acc + (order.finalAmount || 0), 0);
 
-            // Calculate Current Month Revenue
+            // Current Month Revenue
             const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
             const startOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);
             const monthOrders = await Order.find({
@@ -230,7 +229,6 @@ const loadDashboard = async (req, res) => {
             });
             const monthlyRevenue = monthOrders.reduce((acc, order) => acc + (order.finalAmount || 0), 0);
 
-            // Render the dashboard page with all necessary data
             res.render("dashboard", {
                 orders,
                 noPendingOrder,
@@ -254,11 +252,6 @@ const loadDashboard = async (req, res) => {
         res.redirect("/admin/login");
     }
 };
-
-
-
-  
-
 
 const adminErrorLoad = async (req, res) => {
     try {

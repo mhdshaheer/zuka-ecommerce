@@ -20,7 +20,8 @@ const loadProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        console.log(req.files); // Files uploaded to Cloudinary
+        console.log("entered to this")
+        console.log('dffd',req.files); // Files uploaded to Cloudinary
 
         const imageUrls = req.files.map(file => file.path); // Cloudinary URLs
         const categoryId = await Category.findOne({ name: req.body.category }, { _id: 1 })
@@ -64,37 +65,35 @@ const addProduct = async (req, res) => {
 };
 
 const productList = async (req, res) => {
-    if(req.session.admin){
-    try {
-        const products = await Product.find()
-        const category = await Category.find()
+    if (req.session.admin) {
+        try {
+            const page = parseInt(req.query.page) || 1; 
+            const limit = parseInt(req.query.limit) || 10;
+            const skip = (page - 1) * limit;
 
-        const page = parseInt(req.query.page) || 1; // Current page number
-        const limit = parseInt(req.query.limit) || 10; // Number of products per page
-        const skip = (page - 1) * limit;
+            const totalProducts = await Product.countDocuments();
+            const products = await Product.find()
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit);
+            const category = await Category.find();
 
-        const totalProducts = await Product.countDocuments(); // Total number of products
-        const productCount = await Product.find()
-            .skip(skip)
-            .limit(limit);
-
-
-        console.log(products)
-        res.render('add product/productList', {
-            products,
-            productCount,
-            category, currentPage: page,
-            totalPages: Math.ceil(totalProducts / limit),
-            totalProducts
-        })
-    
-    } catch (error) {
-        console.log("error in product list", error)
+            res.render('add product/productList', {
+                products,
+                category,
+                currentPage: page,
+                totalPages: Math.ceil(totalProducts / limit),
+                totalProducts
+            });
+        } catch (error) {
+            console.log("Error in product list", error);
+            res.status(500).send("Server error while fetching products");
+        }
+    } else {
+        res.redirect('/admin/login');
     }
-}else{
-    res.redirect('/admin/login')
-}
-}
+};
+
 
 const deleteProduct = async (req, res) => {
     try {
@@ -119,7 +118,7 @@ const deleteProduct = async (req, res) => {
 const editProduct = async (req, res) => {
     try {
         console.log(req.body)
-        const { productName, description, category, regularPrice, offerPrice, totalStocks, color } = req.body;
+        const { productName, description, category, regularPrice, offerPrice, color } = req.body;
         const { id } = req.params;
 
         let updatedFields = {}
@@ -128,7 +127,6 @@ const editProduct = async (req, res) => {
         if (description !== undefined && description.trim() !== '') updatedFields.description = description;
         if (category !== undefined && category.trim() !== '') updatedFields.category = categoryId._id;
         if (regularPrice !== undefined && regularPrice.trim() !== '') updatedFields.regularPrice = Number(regularPrice);
-        if (totalStocks !== undefined && totalStocks.trim() !== '') updatedFields.totalStocks = Number(totalStocks);
         if (offerPrice !== undefined && offerPrice.trim() !== '') updatedFields.offerPrice = Number(offerPrice);
         if (color !== undefined && color.trim() !== '') updatedFields.color = color;
 

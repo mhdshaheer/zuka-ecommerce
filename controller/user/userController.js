@@ -784,6 +784,10 @@ const invoiceDownload = async (req, res) => {
 
         // Fetch the order from the database
         const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
+        const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 })
+        console.log("address is :", address)
+        const myAddress = address.address[0]
+        console.log("myAddress is :", myAddress)
         if (!order) {
             return res.status(404).send('Order not found');
         }
@@ -832,11 +836,24 @@ const invoiceDownload = async (req, res) => {
         doc.font('Helvetica-Bold').fontSize(12).text('Total Amount: ', { continued: true });
         doc.font('Helvetica').fontSize(14).text(`₹${order.finalAmount}`);
         doc.moveDown()
-        doc.text('---------------------------------------');
+
+        // For address
+        doc.font('Helvetica-Bold').fontSize(14).text('Shipping Address:', { underline: true });
+        doc.moveDown();
+
+
+       
+        doc.font('Helvetica').fontSize(10).text(`${myAddress.address.toString()}, ${myAddress.city.toString()}`);
+        doc.moveDown();
+        doc.font('Helvetica').fontSize(10).text(` ${myAddress.state.toString()}, ${myAddress.country.toString()}`);
+        doc.moveDown();
+        doc.font('Helvetica').fontSize(10).text(myAddress.pincode.toString());
+        doc.moveDown();
+        doc.font('Helvetica').fontSize(10).text(myAddress.phone);
         doc.moveDown();
 
         // Add a small heading for product details
-        doc.fontSize(12).text('Product Details:', { underline: true });
+        doc.font('Helvetica-Bold').fontSize(14).text('Product Details:', { underline: true });
         doc.moveDown();
 
         // Set up the table header (columns)

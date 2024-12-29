@@ -25,12 +25,25 @@
                 <div class="col-lg-3">
                     <div class="shop__sidebar">
                         <div class="shop__sidebar__search">
+                            <form onsubmit="event.preventDefault()">
+                                <input 
+                                    type="text" 
+                                    placeholder="Search..." 
+                                    class="text-dark" 
+                                    id="search"
+                                    value="<%= search %>"
+                                    oninput="searchItem(this.value)"
+                                >
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                        </div>
+                        <!-- <div class="shop__sidebar__search">
                             <form action="#">
                                 <input type="text" placeholder="Search..." class="text-dark" id="search"
                                     oninput="searchItem(this.value,`<%= JSON.stringify(products) %>`)">
                                 <button type="submit"><span class="icon_search"></span></button>
                             </form>
-                        </div>
+                        </div> -->
                         <div class="shop__sidebar__accordion">
                             <div class="accordion" id="accordionExample">
                                 <div class="card">
@@ -41,6 +54,27 @@
                                         <div class="card-body">
                                             <div class="shop__sidebar__categories">
                                                 <ul class="nice-scroll">
+                                                    <li>
+                                                        <a href="#" onclick="categorySort(''); return false;" 
+                                                           class="<%= !categoryId ? 'active' : '' %>">
+                                                            All Categories
+                                                        </a>
+                                                    </li>
+                                                    <% for(let i=0; i<category.length; i++) { %>
+                                                        <li>
+                                                            <a href="#" 
+                                                               onclick="categorySort('<%= category[i]._id %>'); return false;"
+                                                               class="<%= categoryId === category[i]._id.toString() ? 'active' : '' %>">
+                                                                <%= category[i].name %>
+                                                            </a>
+                                                        </li>
+                                                    <% } %>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
                                                     <%for(let i=0;i<category.length;i++){%>
                                                         <li><a href="#"
                                                                 onclick="categorySort('<%=category[i]._id%>',`<%= JSON.stringify(products) %>`)">
@@ -49,119 +83,9 @@
                                                         <%}%>
                                                 </ul>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
-                                    </div>
-                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__price">
-                                                <ul>
-                                                    <li><a href="#">$0.00 - $50.00</a></li>
-                                                    <li><a href="#">$50.00 - $100.00</a></li>
-                                                    <li><a href="#">$100.00 - $150.00</a></li>
-                                                    <li><a href="#">$150.00 - $200.00</a></li>
-                                                    <li><a href="#">$200.00 - $250.00</a></li>
-                                                    <li><a href="#">250.00+</a></li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
-                                    </div>
-                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__size">
-                                                <label for="xs">xs
-                                                    <input type="radio" id="xs">
-                                                </label>
-                                                <label for="sm">s
-                                                    <input type="radio" id="sm">
-                                                </label>
-                                                <label for="md">m
-                                                    <input type="radio" id="md">
-                                                </label>
-                                                <label for="xl">xl
-                                                    <input type="radio" id="xl">
-                                                </label>
-                                                <label for="2xl">2xl
-                                                    <input type="radio" id="2xl">
-                                                </label>
-                                                <label for="xxl">xxl
-                                                    <input type="radio" id="xxl">
-                                                </label>
-                                                <label for="3xl">3xl
-                                                    <input type="radio" id="3xl">
-                                                </label>
-                                                <label for="4xl">4xl
-                                                    <input type="radio" id="4xl">
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
-                                    </div>
-                                    <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__color">
-                                                <label class="c-1" for="sp-1">
-                                                    <input type="radio" id="sp-1">
-                                                </label>
-                                                <label class="c-2" for="sp-2">
-                                                    <input type="radio" id="sp-2">
-                                                </label>
-                                                <label class="c-3" for="sp-3">
-                                                    <input type="radio" id="sp-3">
-                                                </label>
-                                                <label class="c-4" for="sp-4">
-                                                    <input type="radio" id="sp-4">
-                                                </label>
-                                                <label class="c-5" for="sp-5">
-                                                    <input type="radio" id="sp-5">
-                                                </label>
-                                                <label class="c-6" for="sp-6">
-                                                    <input type="radio" id="sp-6">
-                                                </label>
-                                                <label class="c-7" for="sp-7">
-                                                    <input type="radio" id="sp-7">
-                                                </label>
-                                                <label class="c-8" for="sp-8">
-                                                    <input type="radio" id="sp-8">
-                                                </label>
-                                                <label class="c-9" for="sp-9">
-                                                    <input type="radio" id="sp-9">
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
-                                <!-- <div class="card">
-                                    <div class="card-heading">
-                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
-                                    </div>
-                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
-                                        <div class="card-body">
-                                            <div class="shop__sidebar__tags">
-                                                <a href="#">Product</a>
-                                                <a href="#">Bags</a>
-                                                <a href="#">Shoes</a>
-                                                <a href="#">Fashio</a>
-                                                <a href="#">Clothing</a>
-                                                <a href="#">Hats</a>
-                                                <a href="#">Accessories</a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -171,21 +95,24 @@
                     <div class="shop__product__option">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-6">
-                                <!-- <div class="shop__product__option__left">
-                                    <p>Showing 1–12 of 18 results</p>
-                                </div> -->
                                 <div class="shop__product__option__left">
-                                    <% 
-                                        const start = (page - 1) * limit + 1;
-                                        const end = Math.min(page * limit, totalProducts);
-                                    %>
-                                    <p>Showing <%= start %>–<%= end %> of <%= totalProducts %> results</p>
+                                    <% const start=(page - 1) * limit + 1; const end=Math.min(page * limit,
+                                        totalProducts); %>
+                                        <p>Showing <%= start %>–<%= end %> of <%= totalProducts %> results</p>
                                 </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
                                     <p>Sort by :</p>
-                                    <select id="sortItem"
+                                    <select id="sortItem" onchange="sortItem(this.value)">
+                                        <option value="">Sort By</option>
+                                        <option value="new-arrival" <%= sort === 'new-arrival' ? 'selected' : '' %>>New Arrivals</option>
+                                        <option value="low-to-high" <%= sort === 'low-to-high' ? 'selected' : '' %>>Low To High</option>
+                                        <option value="high-to-low" <%= sort === 'high-to-low' ? 'selected' : '' %>>High To Low</option>
+                                        <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>aA - zZ</option>
+                                        <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>zZ - aA</option>
+                                    </select>
+                                    <!-- <select id="sortItem"
                                         onchange="sortItem(this.value,`<%= JSON.stringify(products) %>`)">
                                         <option value="">Sort By</option>
                                         <option value="new-arrival">New Arrivals</option>
@@ -193,232 +120,151 @@
                                         <option value="high-to-low">High To Low</option>
                                         <option value="a-z">aA - zZ</option>
                                         <option value="z-a">zZ - aA</option>
-                                    </select>
+                                    </select> -->
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- <div class="row" id="productList">
-                        <%for(let i=0;i<products.length;i++){%>
-                            <% let totalStock = products[i].variant.reduce((acc,curr)=>acc+curr.stock,0) %>
-                            <%if(totalStock>0){%>
-                            <div class="col-lg-4 col-md-6 col-sm-6">
-                                <div class="product__item">
-                                    <div class="product__item__pic set-bg" data-setbg="<%=products[i].images[0]%>">
-                                        <%if(products[i].offerPrice!=0){%>
-                                            <span class="label text-light bg-dark"><%=((products[i].regularPrice - products[i].offerPrice) / products[i].regularPrice) * 100%>%</span>
-                                        <%}%>
-                                        <ul class="product__hover">
-                                            <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>',event)"><img
-                                                        src="img/icon/heart.png" alt=""></a></li>
-                                            <li><a href="#"><img src="img/icon/compare.png" alt="">
-                                                    <span>Compare</span></a>
-                                            </li>
-                                            <li><a href="/productInfo?id=<%=products[i]._id%>"><img
-                                                        src="img/icon/search.png" alt=""></a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="product__item__text">
-                                        <h6>
-                                            <%=products[i].productName%>
-                                        </h6>
-                                        <a href="#" class="add-cart">+ Add To Cart</a>
-                                        <div class="rating">
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                        </div>
-                                        <%if(products[i].offerPrice!==0){%>
-                                            <h5>Rs: <%=products[i].offerPrice%>/-</h5>
-                                            <h6 style="text-decoration: line-through;">Rs: <%=products[i].regularPrice%>.00/-</h6>
-                                            <%}else{%>
-                                                <h5>Rs: <%=products[i].regularPrice%>.00/-</h5>
-                                        <%}%>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <%}%>
-                            <%}%>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="product__pagination">
-                                <a class="active" href="#">1</a>
-                            </div>
-                        </div>
-                    </div> -->
                     <div class="row" id="productList">
-                        <% for (let i = 0; i < products.length; i++) { %>
-                            <% let totalStock = products[i].variant.reduce((acc, curr) => acc + curr.stock, 0); %>
-                            <% if (totalStock > 0) { %>
-                                <div class="col-lg-4 col-md-6 col-sm-6">
-                                    <div class="product__item">
-                                        <div class="product__item__pic set-bg" data-setbg="<%= products[i].images[0] %>">
-                                            <% if (products[i].offerPrice != 0) { %>
-                                                <span class="label text-light bg-dark">
-                                                    <%= Math.round(((products[i].regularPrice - products[i].offerPrice) / products[i].regularPrice) * 100) %> % Off
-                                                </span>
-                                            <% } %>
-                                            <ul class="product__hover">
-                                                <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>', event)"><img src="img/icon/heart.png" alt=""></a></li>
-                                                <li><a href="#"><img src="img/icon/compare.png" alt=""><span>Compare</span></a></li>
-                                                <li><a href="/productInfo?id=<%= products[i]._id %>"><img src="img/icon/search.png" alt=""></a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="product__item__text">
-                                            <h6><%= products[i].productName %></h6>
-                                            <a href="#" class="add-cart">+ Add To Cart</a>
-                                            <div class="rating">
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
-                                                <i class="fa fa-star-o"></i>
+                        <% for (let i=0; i < products.length; i++) { %>
+                            <% let totalStock=products[i].variant.reduce((acc, curr)=> acc + curr.stock, 0); %>
+                                <% if (totalStock> 0) { %>
+                                    <div class="col-lg-4 col-md-6 col-sm-6">
+                                        <div class="product__item">
+                                            <div class="product__item__pic set-bg"
+                                                data-setbg="<%= products[i].images[0] %>">
+                                                <% if (products[i].offerPrice !=0) { %>
+                                                    <span class="label text-light bg-dark">
+                                                        <%= Math.round(((products[i].regularPrice -
+                                                            products[i].offerPrice) / products[i].regularPrice) * 100)
+                                                            %> % Off
+                                                    </span>
+                                                    <% } %>
+                                                        <ul class="product__hover">
+                                                            <li><a href="#"
+                                                                    onclick="addToWishlist('<%= products[i]._id %>', event)"><img
+                                                                        src="img/icon/heart.png" alt=""></a></li>
+                                                        </ul>
                                             </div>
-                                            <% if (products[i].offerPrice !== 0) { %>
-                                                <h5>Rs: <%= products[i].offerPrice %>/-</h5>
-                                                <h6 style="text-decoration: line-through;">Rs: <%= products[i].regularPrice %>.00/-</h6>
-                                            <% } else { %>
-                                                <h5>Rs: <%= products[i].regularPrice %>.00/-</h5>
-                                            <% } %>
+                                            <div class="product__item__text">
+                                                <h6>
+                                                    <%= products[i].productName %>
+                                                </h6>
+                                                <a href="/productInfo?id=<%= products[i]._id %>" class="add-cart">View
+                                                    Product</a>
+                                                <% if (products[i].offerPrice !==0) { %>
+                                                    <h5>Rs: <%= products[i].offerPrice %>/-</h5>
+                                                    <h6 style="text-decoration: line-through;">Rs: <%=
+                                                            products[i].regularPrice %>.00/-</h6>
+                                                    <% } else { %>
+                                                        <h5>Rs: <%= products[i].regularPrice %>.00/-</h5>
+                                                        <% } %>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            <% } %>
-                        <% } %>
+                                    <% } %>
+                                        <% } %>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="product__pagination">
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                    <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>"><%= i %></a>
+                                <% for (let i=1; i <=totalPages; i++) { %>
+                                    <a href="#" 
+                                       onclick="updateURLParameters({page: '<%= i %>'}); return false;"
+                                       class="<%= i === currentPage ? 'active' : '' %>">
+                                        <%= i %>
+                                    </a>
                                 <% } %>
                             </div>
+                            <!-- <div class="product__pagination">
+                                <% for (let i=1; i <=totalPages; i++) { %>
+                                    <a href="?page=<%= i %>" class="<%= i === currentPage ? 'active' : '' %>">
+                                        <%= i %>
+                                    </a>
+                                    <% } %>
+                            </div> -->
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
         </div>
     </section>
+
+
     <script>
 
         const productList = document.getElementById('productList');
 
-        function sortItem(value, data) {
-            console.log(data)
-            let newData = JSON.parse(data)
+        // function sortItem(value, data) {
+        //     console.log(data)
+        //     let newData = JSON.parse(data)
 
-            switch (value) {
-                case 'new-arrival':
-                    newData.sort((a, b) => {
-                        const dateA = a.createdAt;
-                        const dateB = b.createdAt;
+        //     switch (value) {
+        //         case 'new-arrival':
+        //             newData.sort((a, b) => {
+        //                 const dateA = a.createdAt;
+        //                 const dateB = b.createdAt;
 
-                        if (dateA < dateB) return 1;
-                        if (dateA > dateB) return -1;
-                        return 0;
-                    })
-                    console.log('sort by new')
-                    break;
-                case 'low-to-high':
-                    newData.sort((a, b) => {
-                        const priceA = a.regularPrice;
-                        const priceB = b.regularPrice;
+        //                 if (dateA < dateB) return 1;
+        //                 if (dateA > dateB) return -1;
+        //                 return 0;
+        //             })
+        //             console.log('sort by new')
+        //             break;
+        //         case 'low-to-high':
+        //             newData.sort((a, b) => {
+        //                 const priceA = a.regularPrice;
+        //                 const priceB = b.regularPrice;
 
-                        if (priceA < priceB) return -1;
-                        if (priceA > priceB) return 1;
-                        return 0;
-                    })
-                    console.log('sort by price asc')
-                    break;
-                case 'high-to-low':
-                    newData.sort((a, b) => {
-                        const priceA = a.regularPrice;
-                        const priceB = b.regularPrice;
+        //                 if (priceA < priceB) return -1;
+        //                 if (priceA > priceB) return 1;
+        //                 return 0;
+        //             })
+        //             console.log('sort by price asc')
+        //             break;
+        //         case 'high-to-low':
+        //             newData.sort((a, b) => {
+        //                 const priceA = a.regularPrice;
+        //                 const priceB = b.regularPrice;
 
-                        if (priceA < priceB) return 1;
-                        if (priceA > priceB) return -1;
-                        return 0;
-                    })
-                    console.log('sort by price desc')
-                    break;
-                case 'a-z':
-                    newData.sort((a, b) => {
-                        const nameA = a.productName.toLowerCase();
-                        const nameB = b.productName.toLowerCase();
+        //                 if (priceA < priceB) return 1;
+        //                 if (priceA > priceB) return -1;
+        //                 return 0;
+        //             })
+        //             console.log('sort by price desc')
+        //             break;
+        //         case 'a-z':
+        //             newData.sort((a, b) => {
+        //                 const nameA = a.productName.toLowerCase();
+        //                 const nameB = b.productName.toLowerCase();
 
-                        if (nameA < nameB) return -1;
-                        if (nameA > nameB) return 1;
-                        return 0;
-                    })
-                    console.log('sort by name asc')
-                    break;
-                case 'z-a':
-                    newData.sort((a, b) => {
-                        const nameA = a.productName.toLowerCase();
-                        const nameB = b.productName.toLowerCase();
+        //                 if (nameA < nameB) return -1;
+        //                 if (nameA > nameB) return 1;
+        //                 return 0;
+        //             })
+        //             console.log('sort by name asc')
+        //             break;
+        //         case 'z-a':
+        //             newData.sort((a, b) => {
+        //                 const nameA = a.productName.toLowerCase();
+        //                 const nameB = b.productName.toLowerCase();
 
-                        if (nameA < nameB) return 1;
-                        if (nameA > nameB) return -1;
-                        return 0;
-                    })
-                    console.log('sort by name desc')
-                    break;
-                default:
-                    console.log("default case")
-                    break;
-            }
-            productList.innerHTML = ''
-            newData.map(products => {
-                let element = `
-                <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="product__item">
-                                <div class="product__item__pic set-bg" style="background-image: url(${products.images[0]})">
-                                    <ul class="product__hover">
-                                        <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                        <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a>
-                                        </li>
-                                        <li><a href="/productInfo?id= ${products._id} "><img src="img/icon/search.png" alt=""></a></li>
-                                    </ul>
-                                </div>
-                                <div class="product__item__text">
-                                    <h6>${products.productName}</h6>
-                                    <a href="#" class="add-cart">+ Add To Cart</a>
-                                    <div class="rating">
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                        <i class="fa fa-star-o"></i>
-                                    </div>
-                                    <h5>RS: ${products.regularPrice}.00/-</h5>
-                                    <div class="product__color__select">
-                                        <label for="pc-4">
-                                            <input type="radio" id="pc-4">
-                                        </label>
-                                        <label class="active black" for="pc-5">
-                                            <input type="radio" id="pc-5">
-                                        </label>
-                                        <label class="grey" for="pc-6">
-                                            <input type="radio" id="pc-6">
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-            `;
-                productList.innerHTML += element
-            })
-        }
-    </script>
-
-    <script>
+        //                 if (nameA < nameB) return 1;
+        //                 if (nameA > nameB) return -1;
+        //                 return 0;
+        //             })
+        //             console.log('sort by name desc')
+        //             break;
+        //         default:
+        //             console.log("default case")
+        //             break;
+        //     }
+        //     itemDisplay(newData)
+            
+        // }
+    
         function searchItem(value, data) {
             let products = JSON.parse(data);
             //avoid .* searching
@@ -431,61 +277,10 @@
             // let searchExp = new RegExp(`${value}`, "i");
             let searchOut = products.filter(value => searchExp.test(value.productName))
             console.log("Products are :", searchOut);
-
-            productList.innerHTML = ''
-            if (searchOut && searchOut.length > 0) {
-
-                searchOut.map(products => {
-                    let element = `
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                                <div class="product__item">
-                                    <div class="product__item__pic set-bg" style="background-image: url(${products.images[0]})">
-                                        <ul class="product__hover">
-                                            <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                            <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a>
-                                            </li>
-                                            <li><a href="/productInfo?id= ${products._id} "><img src="img/icon/search.png" alt=""></a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="product__item__text">
-                                        <h6>${products.productName}</h6>
-                                        <a href="#" class="add-cart">+ Add To Cart</a>
-                                        <div class="rating">
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                        </div>
-                                        <h5>RS: ${products.regularPrice}.00/-</h5>
-                                        <div class="product__color__select">
-                                            <label for="pc-4">
-                                                <input type="radio" id="pc-4">
-                                            </label>
-                                            <label class="active black" for="pc-5">
-                                                <input type="radio" id="pc-5">
-                                            </label>
-                                            <label class="grey" for="pc-6">
-                                                <input type="radio" id="pc-6">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                `;
-                    productList.innerHTML += element
-                })
-            } else {
-                productList.innerHTML = `
-                <div class="col text-center p-4 fs-4">
-                    No product Found
-                    </div>`
-            }
+            itemDisplay(searchOut);
 
         }
-    </script>
 
-    <script>
         function categorySort(catId, data) {
             console.log(catId)
             let products = JSON.parse(data);
@@ -493,59 +288,9 @@
             console.log(products)
             let catOut = products.filter(value => value.category && value.category._id === catId)
             console.log('cat out : ', catOut)
-            productList.innerHTML = ''
-            if (catOut && catOut.length > 0) {
-
-                catOut.map(products => {
-                    let element = `
-                    <div class="col-lg-4 col-md-6 col-sm-6">
-                                <div class="product__item">
-                                    <div class="product__item__pic set-bg" style="background-image: url(${products.images[0]})">
-                                        <ul class="product__hover">
-                                            <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                                            <li><a href="#"><img src="img/icon/compare.png" alt=""> <span>Compare</span></a>
-                                            </li>
-                                            <li><a href="/productInfo?id= ${products._id} "><img src="img/icon/search.png" alt=""></a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="product__item__text">
-                                        <h6>${products.productName}</h6>
-                                        <a href="#" class="add-cart">+ Add To Cart</a>
-                                        <div class="rating">
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                            <i class="fa fa-star-o"></i>
-                                        </div>
-                                        <h5>RS: ${products.regularPrice}.00/-</h5>
-                                        <div class="product__color__select">
-                                            <label for="pc-4">
-                                                <input type="radio" id="pc-4">
-                                            </label>
-                                            <label class="active black" for="pc-5">
-                                                <input type="radio" id="pc-5">
-                                            </label>
-                                            <label class="grey" for="pc-6">
-                                                <input type="radio" id="pc-6">
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                `;
-                    productList.innerHTML += element
-                })
-            } else {
-                productList.innerHTML = `
-                <div class="col text-center p-4 fs-4">
-                    No product Found
-                    </div>`
-            }
+            itemDisplay(catOut)  
         }
-    </script>
-
-    <script>
+        
         function addToWishlist(productId, event) {
             event.preventDefault();
             console.log('Product id is :', productId);
@@ -586,7 +331,111 @@
                 });
             })
         }
+
+
+        function itemDisplay(products) {
+            productList.innerHTML = '';
+            if (products && products.length > 0) {
+
+                products.map(product => {
+                    let element = `
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="product__item">
+                    <div class="product__item__pic set-bg" style="background-image: url(${product.images[0]})">
+                        <ul class="product__hover">
+                            <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
+                        </ul>
+                    </div>
+                    <div class="product__item__text">
+                        <h6>${product.productName}</h6>
+                        <a href="/productInfo?id= ${product._id} " class="add-cart">+ Add To Cart</a>
+                        
+                        <h5>RS: ${product.regularPrice}.00/-</h5>
+                       
+                    </div>
+                </div>
+            </div>
+            `;
+                    productList.innerHTML += element
+                })
+            } else {
+                productList.innerHTML = `
+            <div class="col text-center p-4 fs-4">
+                No product Found
+                </div>`
+            }
+        }
     </script>
 
+
+<script>
+    function updateURLParameters(params) {
+    const url = new URL(window.location.href);
+    Object.keys(params).forEach(key => {
+        if (params[key]) {
+            url.searchParams.set(key, params[key]);
+        } else {
+            url.searchParams.delete(key);
+        }
+    });
+    window.history.pushState({}, '', url);
+    location.reload(); // Reload to fetch new data
+}
+
+function sortItem(value) {
+    updateURLParameters({ sort: value, page: 1 }); // Reset to page 1 when sorting
+}
+
+function searchItem(value) {
+    // Debounce search to prevent too many requests
+    clearTimeout(window.searchTimeout);
+    window.searchTimeout = setTimeout(() => {
+        updateURLParameters({ search: value, page: 1 }); // Reset to page 1 when searching
+    }, 500);
+}
+
+function categorySort(catId) {
+    updateURLParameters({ category: catId, page: 1 }); // Reset to page 1 when filtering
+}
+
+function addToWishlist(productId, event) {
+    event.preventDefault();
+    axios.post('/wishlist', { productId })
+        .then((res) => {
+            const toastConfig = {
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            };
+
+            if (res.status === 200) {
+                Swal.fire({
+                    ...toastConfig,
+                    icon: 'success',
+                    title: 'Added to Wishlist!'
+                });
+            } else if (res.status === 201) {
+                Swal.fire({
+                    ...toastConfig,
+                    icon: 'warning',
+                    title: 'Already in Wishlist!'
+                });
+            }
+        })
+        .catch(() => {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: 'Add to Wishlist failed!',
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true
+            });
+        });
+}
+</script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <%- include('../partials/user/footer') %>

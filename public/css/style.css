@@ -1938,7 +1938,7 @@ ol {
 
 .footer {
 	background: #111111;
-	padding-top: 70px;
+	padding-top: 20px;
 }
 
 .footer__about {
@@ -3501,7 +3501,8 @@ ol {
 		background: #ffffff;
 		padding: 50px 20px 30px 30px;
 		display: block;
-		z-index: 99;
+		/* z-index: 99; */
+		z-index: 501;
 		overflow-y: auto;
 		-webkit-transition: all, 0.5s;
 		-o-transition: all, 0.5s;

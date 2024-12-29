@@ -13,38 +13,12 @@
                 <p>Product Mangement</p>
             </div>
             <div>
-                <a href="#" class="btn btn-light rounded font-md">Export</a>
-                <a href="#" class="btn btn-light rounded font-md">Import</a>
                 <a href="/admin/products" class="btn btn-primary btn-sm rounded">Create new</a>
             </div>
         </div>
         <div class="card mb-4">
             <header class="card-header">
                 <div class="row align-items-center">
-                    
-                    <!-- <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                        <select class="form-select">
-                            <option selected>All category</option>
-                            <%for(let i=0;i<category.length;i++){%>
-                                <option>
-                                    <%=category[i].name%>
-                                </option>
-                                <%}%>
-                        </select>
-                    </div> -->
-
-                    
-                    <!-- <div class="col-md-2 col-6">
-                        <input type="date" value="02.05.2021" class="form-control" />
-                    </div>
-                    <div class="col-md-2 col-6">
-                        <select class="form-select">
-                            <option selected>Status</option>
-                            <option>Active</option>
-                            <option>Disabled</option>
-                            <option>Show all</option>
-                        </select>
-                    </div> -->
                 </div>
             </header>
             <!-- card-header end// -->
@@ -106,13 +80,13 @@
                                                     <td>
                                                         <a href="/admin/unBlockProduct?id=<%=products[i]._id%>"
                                                             type="button" class="btn btn-warning"
-                                                            onclick="return confirmUnBlock()">Unblock</a>
+                                                            onclick="return confirmUnBlock(event,this)">Unblock</a>
                                                     </td>
                                                     <%}else{%>
                                                         <td>
                                                             <a href="/admin/blockProduct?id=<%=products[i]._id%>"
                                                                 type="button" class="btn btn-danger"
-                                                                onclick="return confirmBlock()">Block</a>
+                                                                onclick="return confirmBlock(event,this)">Block</a>
                                                         </td>
                                                         <%}%>
                                                             <!-- <td>
@@ -214,10 +188,10 @@
                         </div>
 
                         <div class="mb-3 row">
-                            <div class="col-sm-6">
+                            <!-- <div class="col-sm-6">
                                 <label for="totalStocks" class="form-label">Total Stocks</label>
                                 <input type="number" class="form-control w-100" id="totalStocks" value="0">
-                            </div>
+                            </div> -->
                             <div class="col-sm-6">
                                 <label for="color" class="form-label">Color</label>
                                 <input type="text" class="form-control w-100" id="color">
@@ -256,6 +230,8 @@
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
                                 <img id="imgDiv1" src="" alt="No image uploaded">
                             </div>
+                            <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image1')">Crop</button>
+                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                         <!-- Image 2 -->
                         <div class="col-md-6">
@@ -266,6 +242,8 @@
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
                                 <img id="imgDiv2" src="" alt="No image uploaded">
                             </div>
+                            <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image2')">Crop</button>
+                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -278,6 +256,8 @@
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
                                 <img id="imgDiv3" src="" alt="">
                             </div>
+                            <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image3')">Crop</button>
+                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                         <!-- Image 4 -->
                         <div class="col-md-6">
@@ -288,24 +268,10 @@
                                 style="border: 1px dashed #ccc; padding: 10px; text-align: center;">
                                 <img id="imgDiv4" src="" alt="">
                             </div>
+                            <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image4')">Crop</button>
+                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                     </div>
-
-                    <!-- Status Change Dropdown -->
-                    <!-- <div class="mb-3">
-                        <label for="status" class="form-label">Status</label>
-                        <select class="form-select" id="status">
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div> -->
-
-                    <!-- Variant Change Button -->
-                    <!-- <div class="mb-3 text-end">
-                        <button type="button" class="btn btn-warning" id="variantChangeButton">Change Variant</button>
-                    </div>
-                </div> -->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="button" class="btn btn-primary" id="updateImageId">Update Images</button>
@@ -313,6 +279,29 @@
             </div>
         </div>
     </div>
+
+    <!-- Crop Modal -->
+    <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <canvas id="cropCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="saveCrop" type="button" class="btn btn-primary">Save Crop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Crop Modal -->
+
+
+    <!-- ======================crop modal======================== -->
 
 
 
@@ -338,13 +327,12 @@
 
         //edit product
         function productEdit(id,name,regPrice,offPrice,col,desc) {
-        // regPrice,description,offerPrice,color
             const productName = document.getElementById('productName')
             const description = document.getElementById('description');
             const category = document.getElementById('category');
             const regularPrice = document.getElementById('regularPrice');
             const offerPrice = document.getElementById('offerPrice');
-            const totalStocks = document.getElementById('totalStocks');
+            // const totalStocks = document.getElementById('totalStocks');
             const color = document.getElementById('color');
             productName.value = name;
             regularPrice.value = regPrice;
@@ -363,7 +351,7 @@
                     category: category.value,
                     regularPrice: regularPrice.value,
                     offerPrice: offerPrice.value,
-                    totalStocks: totalStocks.value,
+                    // totalStocks: totalStocks.value,
                     color: color.value
                 }
                 fetch(`/admin/editProduct/${id}`, {
@@ -383,7 +371,7 @@
                             confirmButtonText: 'Okay'
                         }).then(() => {
                             console.log('reloading page....')
-                            window.location.reload(); // Reload the page after success
+                            window.location.reload();
                         });
                     })
                     .catch(err => {
@@ -398,17 +386,41 @@
             })
         }
 
-        //block product confirmation
-        function confirmBlock() {
-            var result = confirm("Are you sure you want to block this Product?");
-            return result;
-        }
+        function confirmBlock(event, element) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to undo this action!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, block it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = element.href;
+            }
+        });
+    }
         
-        //unblock product confirmation
-        function confirmUnBlock() {
-            var result = confirm("Are you sure you want to unblock this Product?");
-            return result;
-        }
+        function confirmUnBlock(event, element) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to unblock this product?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, unblock it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = element.href;
+            }
+        });
+    }
 
         //Update product images
         function imageEdit(id,images){
@@ -428,10 +440,12 @@
                             document.getElementById('image3'),
                             document.getElementById('image4'),
                         ];
+                        console.log("input Images:",imageInputs)
                         imageInputs.forEach((input, index) => {
                             const files = input.files;
                             for (let i = 0; i < files.length; i++) {
                                 formData.append(`images`, files[i]);
+                                console.log('i am:',files[i])
                             }
                         });
         
@@ -454,7 +468,7 @@
                             confirmButtonText: 'Okay'
                         }).then(() => {
                             console.log('reloading page....')
-                            window.location.reload(); // Reload the page after success
+                            window.location.reload(); 
                         });
                     })
                     .catch(err => {
@@ -471,11 +485,6 @@
     
             
         }
-
-
-    </script>
-
-    <script>
         function previewImage(input, previewId) {
             const previewDiv = document.getElementById(previewId);
 
@@ -483,17 +492,16 @@
                 const reader = new FileReader();
 
                 reader.onload = function (e) {
-                    // Replace the contents of the preview div with the image
                     previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; height: auto;">`;
                 };
 
-                reader.readAsDataURL(input.files[0]); // Read the file as a data URL
+                reader.readAsDataURL(input.files[0]);
             } else {
-                // Reset the preview div if no file is selected
                 previewDiv.innerHTML = "No image uploaded";
             }
         }
     </script>
+
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -504,6 +512,13 @@
     <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
     <script src="assets/js/main.js" type="text/javascript"></script>
+<!-- Cropper.js CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+
+
     </body>
 
-    </html>
+    </html> 

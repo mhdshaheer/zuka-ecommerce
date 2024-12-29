@@ -52,11 +52,11 @@
                                             <tr>
                                                 <td class="product__cart__item">
                                                     <div class="product__cart__item__pic">
-                                                        <img src="<%=item.productId.images[0]%>" alt="">
+                                                        <img src="<%=item?.productId?.images[0]%>" alt="">
                                                     </div>
                                                     <div class="product__cart__item__text">
                                                         <h6>
-                                                            <%=item.productId.productName%>
+                                                            <%=item?.productId?.productName%>
                                                         </h6>
                                                         <h5>₹ <%=item.price%>.00</h5>
                                                     </div>
@@ -81,7 +81,7 @@
                                                             <input id="itemQty-<%=index%>" type="number"
                                                                 value="<%=item.quantity%>" class="quantity-input"
                                                                 min="1" max="10" data-price="<%=item.price%>"
-                                                                oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>','<%=item.varientId%>')">
+                                                                oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>','<%=item.varientId%>','<%=isCouponApplied%>','<%=couponMin%>')">
                                                         </div>
                                                     </div>
                                                 </td>
@@ -104,51 +104,96 @@
                                 <a href="/shop">Continue Shopping</a>
                             </div>
                         </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#" id="updateCartBtn" onclick="window.location.reload()"><i
-                                        class="fa fa-spinner"></i> Update cart</a>
-                            </div>
-                        </div>
 
                     </div>
-                    <!-- <h3 class="my-2">Coupons</h3> -->
+                     <%if(coupons.length>0){%>
                     <div class="row mt-3">
-                        <%for(let i=0;i<3;i++){%>
-                            <div class="card col-3 mx-2">
+                        <%for(let i=0;i<coupons.length;i++){%>
+                            <!-- <div class="card col-3 mx-2">
                                 <p class="mt-2"><strong>CODE : </strong>
                                     <%=coupons[i].code%>
                                 </p>
                                 <p><strong>Min purchase : </strong>
                                     <%=coupons[i].minimumPrice%>
                                 </p>
+                            </div> -->
+                            <div class="card col-12 col-sm-6 col-md-4 col-lg-3 mx-2 mb-4 text-center">
+                                <p class="mt-2"><strong>CODE : </strong>
+                                    <%= coupons[i].code %>
+                                </p>
+                                <p><strong>Min purchase : </strong>
+                                    <%= coupons[i].minimumPrice %>
+                                </p>
                             </div>
                             <%}%>
                     </div>
-
+                    <%}else{%>
+                        <div class="row mt-3 ">
+                                <div class="card col-3 mx-2 text-center py-3">
+                                    No Coupon Found
+                                </div>
+                        </div>
+                    <%}%>
                 </div>
+                <%if(isCouponApplied && total>couponMin){%>
                 <div class="col-lg-4">
                     <div class="cart__discount">
                         <h6>Discount codes</h6>
                         <form action="#">
-                            <input type="text" placeholder="Coupon code" id="couponField" class="text-dark">
+                            <input type="text" placeholder="Coupon code" id="couponField" class="text-dark" value="<%=couponCode%>" disabled>
                             <button type="submit" id="couponAppyBtn"
-                                onclick="applyCoupon('<%=total%>',event)">Apply</button>
+                                onclick="applyCoupon('<%=total%>',event,'<%=isCouponApplied%>')" disabled>Applied</button>
                         </form>
-                        <div style="color: green;" id="couponApplied"></div>
+                        <div class="d-flex align-items-center mt-2">
+                            <div style="color: green;" id="couponApplied">Discount amount ₹<%=isCouponApplied.toFixed(2)%></div>
+                            <button id="removeCoupon" class="btn btn-outline-danger btn-sm ms-2" onclick="removeCoupon(event)" >Remove</button>
+                        </div>
+                        
+
                     </div>
                     <div class="cart__total">
                         <h6>Cart total</h6>
                         <ul>
                             <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span></li>
-                            <li>Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
-
-                            <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span></li>
+                            <li>Discount <span class="text-danger" id="discountId">- ₹ <%=isCouponApplied.toFixed(2)%></span></li>
+                            <li>Total <span id="totalAmount" class="text-dark">₹ <%=(total-isCouponApplied).toFixed(2)%></span></li>
+                            
                         </ul>
                         <a href="/checkout" class="primary-btn" id="checkOutBtn">Proceed to checkout</a>
                         <!-- <button class="primary-btn" id="checkOutBtn">Proceed to checkout</button> -->
                     </div>
                 </div>
+                <%}else{%>
+                <!-- ================================= -->
+                <div class="col-lg-4 ">
+                    <div class="cart__discount">
+                        <h6>Discount codes</h6>
+                        <form action="#">
+                            <input type="text" placeholder="Coupon code" id="couponField" class="text-dark">
+                            <button type="submit" id="couponAppyBtn"
+                                onclick="applyCoupon('<%=total%>',event,'<%=isCouponApplied%>')">Apply</button>
+                        </form>
+                            <div class="d-flex align-items-center mt-2">
+                                <div style="color: green;" id="couponApplied"></div>
+                                <button id="removeCoupon" class="btn btn-outline-danger btn-sm ms-2" onclick="removeCoupon(event)" hidden>Remove</button>
+                            </div>
+                        
+
+                    </div>
+                    <div class="cart__total">
+                        <h6>Cart total</h6>
+                        <ul>
+                                <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span></li>
+                                <li>Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
+                                <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span></li>
+                        </ul>
+                        <a href="/checkout" class="primary-btn" id="checkOutBtn">Proceed to checkout</a>
+                        <!-- <button class="primary-btn" id="checkOutBtn">Proceed to checkout</button> -->
+                    </div>
+                </div>
+                <%}%>
+                <!-- ================================= -->
+
             </div>
         </div>
     </section>
@@ -204,7 +249,9 @@
 
     <script>
         let totalAfterAll = null;
-        async function updatePrice(index, itemId, cartId, variantId) {
+        async function updatePrice(index, itemId, cartId, variantId,isCouponApplied,couponMin) {
+            discountAmount=discountAmount || isCouponApplied
+            minimumPrice=minimumPrice || couponMin
             // Get the quantity input and unit price
             const quantityInput = document.getElementById(`itemQty-${index}`);
             const price = parseFloat(quantityInput.dataset.price); // Get  price from data attribute
@@ -266,7 +313,9 @@
                             document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll - discountAmount).toFixed(2)}`
                         } else {
                             document.getElementById('discountId').innerHTML = `₹ 0.00`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
+                            // Remove coupon when total price below minimum price of coupon
+                            removeCoupon(event); 
                         }
                     }
                 })
@@ -282,6 +331,8 @@
         let minimumPrice = null;
         function applyCoupon(total, event) {
             event.preventDefault();
+            totalAfterAll = totalAfterAll || total
+            console.log('total:',total,totalAfterAll)
             const couponField = document.getElementById('couponField');
             console.log(couponField.value)
             axios.post('/couponApply', {
@@ -294,6 +345,7 @@
                         if (totalAfterAll >= minimumPrice) {
                             document.getElementById('couponApplied').style.color = "green"
                             document.getElementById('couponApplied').innerHTML = `Discount amount ₹${discountAmount.toFixed(2)}`
+                            document.getElementById('removeCoupon').hidden = false
                             console.log("apply total:", total, discountAmount)
 
                             document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(2)}`
@@ -308,9 +360,13 @@
                         }
                         Swal.fire({
                             title: 'Success!',
-                            text: 'Coupon added successfully!',
+                            text: 'Coupon Added successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                window.location.reload()
+                            }
                         })
                     }
                 })
@@ -347,6 +403,60 @@
             })
 
             return variantStock
+        }
+
+        // Remove coupon
+        // document.getElementById('removeCoupon').addEventListener('click',(e)=>{
+        //     e.preventDefault();
+        //     axios.post('/removeCoupon')
+        //     .then(res=>{
+        //         if(res.status==200){
+        //             Swal.fire({
+        //                     title: 'Success!',
+        //                     text: 'Coupon Removed successfully!',
+        //                     icon: 'success',
+        //                     confirmButtonText: 'Okay'
+        //                 }).then(result=>{
+        //                     if(result.isConfirmed){
+        //                         window.location.reload()
+        //                     }
+        //                 })
+        //         }
+        //     }).catch(error=>{
+        //         Swal.fire({
+        //                     title: 'Error!',
+        //                     text: 'Error : Coupon remove!',
+        //                     icon: 'error',
+        //                     confirmButtonText: 'Okay'
+        //                 })
+        //     })
+        // })
+
+        function removeCoupon(event){
+            event.preventDefault();
+            console.log("remove coupon")
+            axios.post('/removeCoupon')
+            .then(res=>{
+                if(res.status==200){
+                    Swal.fire({
+                            title: 'Success!',
+                            text: 'Coupon Removed successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(result=>{
+                            if(result.isConfirmed){
+                                window.location.reload()
+                            }
+                        })
+                }
+            }).catch(error=>{
+                Swal.fire({
+                            title: 'Error!',
+                            text: 'Error : Coupon remove!',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        })
+            })
         }
     </script>
 

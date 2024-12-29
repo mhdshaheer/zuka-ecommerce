@@ -59,7 +59,7 @@ router.patch('/returnOrder',userController.returnOrder);
 router.get('/download-invoice/:orderId', userController.invoiceDownload)
 
 // Wallet
-router.get('/wallet',userController.loadWallet)
+router.get('/wallet',userAuth,userController.loadWallet)
 
 
 
@@ -69,6 +69,7 @@ router.post('/addToCart',shopController.addToCart);
 router.delete('/deleteItem',shopController.deleteFromCart)
 router.patch('/cart',shopController.editCart);
 router.post('/couponApply',shopController.couponApply);
+router.post('/removeCoupon',shopController.removeCoupon)
 router.post('/getStock',shopController.getStock)
 
 // Checkout
