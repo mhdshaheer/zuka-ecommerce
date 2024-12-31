@@ -41,19 +41,12 @@
                         <h5>OrderId : <p>#<%=orders.orderId%>
                             </p>
                         </h5>
-                        <!-- <input type="text" placeholder="Search..." class="form-control" /> -->
                     </div>
-                    <!-- <div class="col-lg-2 col-6 col-md-3">
-                                <select class="form-select">
-                                    <option>Status</option>
-                                    <option>Cancel</option>
-                                    <option>Disabled</option>
-                                    <option>Show all</option>
-                                </select>
-                            </div> -->
                     <div class="col-lg-2 col-6 col-md-3">
                         <%if(orders.status=='Cancelled'){%>
-                        <button class="btn btn-danger" disabled>cancelled</button>
+                            <button class="btn btn-danger" disabled>cancelled</button>
+                            <%}else if(orders.status=='Delivered'){%>
+                                <span class="badge rounded-pill alert-primary"><%=orders.status%></span>
                         <%}else{%>
                             <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
                                 onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
@@ -207,8 +200,6 @@
                                     <option value="Shipped">Shipped</option>
                                     <option value="Delivered">Delivered</option>
                                     <option value="Cancelled">Cancelled</option>
-                                    <option value="Return Request">Return Request</option>
-                                    <option value="Returned">Returned</option>
                                 </select>
                             <%}else if(orders.status=='Processing'){%>
                                 <select class="form-select" id="orderStatus" name="status" required>
@@ -216,24 +207,14 @@
                                     <option value="Shipped">Shipped</option>
                                     <option value="Delivered">Delivered</option>
                                     <option value="Cancelled">Cancelled</option>
-                                    <option value="Return Request">Return Request</option>
-                                    <option value="Returned">Returned</option>
                                 </select>
                                 <%}else if(orders.status=='Shipped'){%>
                                     <select class="form-select" id="orderStatus" name="status" required>
                                         <option value="Shipped" selected>Shipped</option>
                                         <option value="Delivered">Delivered</option>
                                         <option value="Cancelled">Cancelled</option>
-                                        <option value="Return Request">Return Request</option>
-                                        <option value="Returned">Returned</option>
                                     </select>
-                                    <%}else if(orders.status=='Delivered'){%>
-                                        <select class="form-select" id="orderStatus" name="status" required>
-                                            <option value="Delivered" selected>Delivered</option>
-                                            <option value="Cancelled">Cancelled</option>
-                                            <option value="Return Request">Return Request</option>
-                                            <option value="Returned">Returned</option>
-                                        </select>
+                                    
                                         <%}else if(orders.status=='Return Request'){%>
                                             <select class="form-select" id="orderStatus" name="status" required>
                                                 <option value="Cancelled">Cancelled</option>
@@ -241,15 +222,6 @@
                                                 <option value="Returned">Returned</option>
                                             </select>
                             <%}%>
-                            <!-- <select class="form-select" id="orderStatus" name="status" required>
-                                <option value="Pending">Pending</option>
-                                <option value="Processing">Processing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Return Request">Return Request</option>
-                                <option value="Returned">Returned</option>
-                            </select> -->
                         </div>
                         <input type="hidden" id="orderId" name="order_id" value="">
                     </form>

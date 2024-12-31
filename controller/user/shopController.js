@@ -106,11 +106,12 @@ const loadShop = async (req, res) => {
                 .sort(sortOptions)
                 .skip(skip)
                 .limit(limit),
-            Product.countDocuments({isListed:true}),
+            Product.countDocuments({isBlocked:false}),
             Category.find()
         ]);
 
         const totalPages = Math.ceil(totalProducts / limit);
+        console.log('Total Pages:', totalPages, 'Current Page:', page);
 
         res.render('shop', {
             activePage: 'shop',
@@ -293,20 +294,7 @@ const addToCart = async (req, res) => {
         // manage duplicate adding to cart
         if (sizeFound) {
             return res.status(404).json({ itemFound: 1 })
-            // const itemIndex = sizeFound.items.findIndex(item =>
-            //     item.size === size && item.productId.toString() === productObj._id.toString()
-            // );
-            // console.log('item index is:', itemIndex)
-            // console.log('stocks : ', sizeFound.items[itemIndex].quantity)
-            // quantity = Number(quantity) + sizeFound.items[itemIndex].quantity;
-            // console.log(quantity)
-            // let totalPrice = Number(quantity) * Number(productObj.offerPrice!==0?productObj.offerPrice:productObj.regularPrice) //edit
-            // const result = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.quantity`]: quantity } })
-            // const resultPrice = await Cart.updateOne({ userId: user._id }, { $set: { [`items.${itemIndex}.totalPrice`]: totalPrice } })
-            // if (result && resultPrice) {
-            //     console.log('updated to db')
-            //     res.status(200).json({ message: true })
-            // }
+           
 
         } else {
             let lastPrice = productObj.offerPrice !== 0 ? productObj.offerPrice : productObj.regularPrice //edit

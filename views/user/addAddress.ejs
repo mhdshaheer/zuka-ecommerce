@@ -51,12 +51,6 @@
       <div class="row">
         <div class="col-lg-3">
           <div class="shop__sidebar">
-            <!-- <div class="shop__sidebar__search">
-              <form action="#">
-                <input type="text" placeholder="Search...">
-                <button type="submit"><span class="icon_search"></span></button>
-              </form>
-            </div> -->
             <div class="shop__sidebar__accordion">
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text active">
@@ -175,7 +169,7 @@
             <%if(addressDb){%>
 
               <%addressDb.address.map((item,index)=>{%>
-                <div class="card shadow-sm col-4 m-2">
+                <div class="card shadow-sm col-4 col-md-4 col-12 m-2">
                   <div class="card-body">
                     <h5 class="card-title"><strong>
                         <%=item.addressType%> Address

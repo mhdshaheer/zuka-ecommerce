@@ -112,15 +112,6 @@
                                         <option value="a-z" <%= sort === 'a-z' ? 'selected' : '' %>>aA - zZ</option>
                                         <option value="z-a" <%= sort === 'z-a' ? 'selected' : '' %>>zZ - aA</option>
                                     </select>
-                                    <!-- <select id="sortItem"
-                                        onchange="sortItem(this.value,`<%= JSON.stringify(products) %>`)">
-                                        <option value="">Sort By</option>
-                                        <option value="new-arrival">New Arrivals</option>
-                                        <option value="low-to-high">Low To High</option>
-                                        <option value="high-to-low">High To Low</option>
-                                        <option value="a-z">aA - zZ</option>
-                                        <option value="z-a">zZ - aA</option>
-                                    </select> -->
                                 </div>
                             </div>
                         </div>
@@ -196,74 +187,6 @@
     <script>
 
         const productList = document.getElementById('productList');
-
-        // function sortItem(value, data) {
-        //     console.log(data)
-        //     let newData = JSON.parse(data)
-
-        //     switch (value) {
-        //         case 'new-arrival':
-        //             newData.sort((a, b) => {
-        //                 const dateA = a.createdAt;
-        //                 const dateB = b.createdAt;
-
-        //                 if (dateA < dateB) return 1;
-        //                 if (dateA > dateB) return -1;
-        //                 return 0;
-        //             })
-        //             console.log('sort by new')
-        //             break;
-        //         case 'low-to-high':
-        //             newData.sort((a, b) => {
-        //                 const priceA = a.regularPrice;
-        //                 const priceB = b.regularPrice;
-
-        //                 if (priceA < priceB) return -1;
-        //                 if (priceA > priceB) return 1;
-        //                 return 0;
-        //             })
-        //             console.log('sort by price asc')
-        //             break;
-        //         case 'high-to-low':
-        //             newData.sort((a, b) => {
-        //                 const priceA = a.regularPrice;
-        //                 const priceB = b.regularPrice;
-
-        //                 if (priceA < priceB) return 1;
-        //                 if (priceA > priceB) return -1;
-        //                 return 0;
-        //             })
-        //             console.log('sort by price desc')
-        //             break;
-        //         case 'a-z':
-        //             newData.sort((a, b) => {
-        //                 const nameA = a.productName.toLowerCase();
-        //                 const nameB = b.productName.toLowerCase();
-
-        //                 if (nameA < nameB) return -1;
-        //                 if (nameA > nameB) return 1;
-        //                 return 0;
-        //             })
-        //             console.log('sort by name asc')
-        //             break;
-        //         case 'z-a':
-        //             newData.sort((a, b) => {
-        //                 const nameA = a.productName.toLowerCase();
-        //                 const nameB = b.productName.toLowerCase();
-
-        //                 if (nameA < nameB) return 1;
-        //                 if (nameA > nameB) return -1;
-        //                 return 0;
-        //             })
-        //             console.log('sort by name desc')
-        //             break;
-        //         default:
-        //             console.log("default case")
-        //             break;
-        //     }
-        //     itemDisplay(newData)
-            
-        // }
     
         function searchItem(value, data) {
             let products = JSON.parse(data);
@@ -274,10 +197,7 @@
             let sanitizedValue = escapeRegExp(value);
             //avoid .* searching
             let searchExp = new RegExp(sanitizedValue, "i");
-            // let searchExp = new RegExp(`${value}`, "i");
             let searchOut = products.filter(value => searchExp.test(value.productName))
-            console.log("Products are :", searchOut);
-            itemDisplay(searchOut);
 
         }
 
@@ -287,8 +207,6 @@
             console.log(products[0].category._id)
             console.log(products)
             let catOut = products.filter(value => value.category && value.category._id === catId)
-            console.log('cat out : ', catOut)
-            itemDisplay(catOut)  
         }
         
         function addToWishlist(productId, event) {
@@ -333,38 +251,6 @@
         }
 
 
-        function itemDisplay(products) {
-            productList.innerHTML = '';
-            if (products && products.length > 0) {
-
-                products.map(product => {
-                    let element = `
-            <div class="col-lg-4 col-md-6 col-sm-6">
-                <div class="product__item">
-                    <div class="product__item__pic set-bg" style="background-image: url(${product.images[0]})">
-                        <ul class="product__hover">
-                            <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
-                        </ul>
-                    </div>
-                    <div class="product__item__text">
-                        <h6>${product.productName}</h6>
-                        <a href="/productInfo?id= ${product._id} " class="add-cart">+ Add To Cart</a>
-                        
-                        <h5>RS: ${product.regularPrice}.00/-</h5>
-                       
-                    </div>
-                </div>
-            </div>
-            `;
-                    productList.innerHTML += element
-                })
-            } else {
-                productList.innerHTML = `
-            <div class="col text-center p-4 fs-4">
-                No product Found
-                </div>`
-            }
-        }
     </script>
 
 
@@ -379,23 +265,22 @@
         }
     });
     window.history.pushState({}, '', url);
-    location.reload(); // Reload to fetch new data
+    location.reload(); 
 }
 
 function sortItem(value) {
-    updateURLParameters({ sort: value, page: 1 }); // Reset to page 1 when sorting
+    updateURLParameters({ sort: value, page: 1 }); 
 }
 
 function searchItem(value) {
-    // Debounce search to prevent too many requests
     clearTimeout(window.searchTimeout);
     window.searchTimeout = setTimeout(() => {
-        updateURLParameters({ search: value, page: 1 }); // Reset to page 1 when searching
+        updateURLParameters({ search: value, page: 1 }); 
     }, 500);
 }
 
 function categorySort(catId) {
-    updateURLParameters({ category: catId, page: 1 }); // Reset to page 1 when filtering
+    updateURLParameters({ category: catId, page: 1 });
 }
 
 function addToWishlist(productId, event) {

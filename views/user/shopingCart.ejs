@@ -35,14 +35,13 @@
                                 <h4>Your cart is empty.</h4>
                             </div>
                             <%}else{%>
-                                <table>
+                                <table  class="table">
                                     <thead>
                                         <tr>
                                             <th>Product</th>
                                             <th>Size</th>
                                             <th>Quantity</th>
                                             <th>Total</th>
-                                            <!-- <th>Edit</th> -->
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -64,15 +63,6 @@
                                                 <td>
                                                     <%=item.size%>
                                                 </td>
-                                                <!-- <td class="quantity__item">
-                                            <div class="quantity">
-                                                <div class="pro-qty-2">
-                                                    <input id="itemQty" type="text" value="<%=item.quantity%>" class="quantity-input">
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="cart__price">Rs :<%=item.totalPrice%>.00</td>
-                                        -->
 
 
                                                 <td>
@@ -109,14 +99,6 @@
                      <%if(coupons.length>0){%>
                     <div class="row mt-3">
                         <%for(let i=0;i<coupons.length;i++){%>
-                            <!-- <div class="card col-3 mx-2">
-                                <p class="mt-2"><strong>CODE : </strong>
-                                    <%=coupons[i].code%>
-                                </p>
-                                <p><strong>Min purchase : </strong>
-                                    <%=coupons[i].minimumPrice%>
-                                </p>
-                            </div> -->
                             <div class="card col-12 col-sm-6 col-md-4 col-lg-3 mx-2 mb-4 text-center">
                                 <p class="mt-2"><strong>CODE : </strong>
                                     <%= coupons[i].code %>
