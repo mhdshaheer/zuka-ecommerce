@@ -56,7 +56,7 @@ router.get('/orders',userAuth,userController.loadOrders);
 router.patch('/cancelOrder',userController.cancelOrder);
 router.patch('/returnOrder',userController.returnOrder);
 // router.get('/download-invoice/:orderId',userController.invoiceDownload)
-router.get('/download-invoice/:orderId', userController.invoiceDownload)
+router.get('/download-invoice/:orderId', userAuth,userController.invoiceDownload)
 
 // Wallet
 router.get('/wallet',userAuth,userController.loadWallet)
@@ -80,8 +80,5 @@ router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess);
 router.get('/wishlist',userAuth,shopController.loadWishlist);
 router.post('/wishlist',shopController.addToWishlist);
 router.delete('/wishlist',shopController.deleteFromWishlist)
-
-//justcrop
-router.get('/crop',userController.cropImage)
 
 module.exports = router;

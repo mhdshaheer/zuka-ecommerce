@@ -581,19 +581,6 @@ const editAddressData = async (req, res) => {
                 }
             }
         )
-        // const result = await Address.updateOne({userId:user._id},
-        //     {$set:{
-        //         [`address.${index}.name`]:editedData.name,
-        //         [`address.${index}.phone`]:editedData.phone,
-        //         [`address.${index}.altPhone`]:editedData.altPhone,
-        //         [`address.${index}.addressType`]:editedData.addressType,
-        //         [`address.${index}.address`]:editedData.address,
-        //         [`address.${index}.country`]:editedData.country,
-        //         [`address.${index}.state`]:editedData.state,
-        //         [`address.${index}.pincode`]:editedData.pincode,
-        //         [`address.${index}.city`]:editedData.city,
-        //     }}
-        // )
         if (result) {
             console.log("Address edited successfully");
             res.status(200).json({ success: true })
@@ -703,199 +690,234 @@ const returnOrder = async (req, res) => {
 
 }
 
-// const invoiceDownload = async (req,res)=>{
+
+
+// const fs = require('fs');
+// const PDFDocument = require('pdfkit');
+
+// const invoiceDownload = async (req, res) => {
 //     try {
 //         const { orderId } = req.params;
-//         console.log(orderId,'hai');
+//         console.log(orderId, 'Generating invoice for Order ID');
+
+//         // Fetch the order from the database
 //         const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
+//         const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 })
+//         console.log("address is :", address)
+//         const myAddress = address.address[0]
+//         console.log("myAddress is :", myAddress)
+//         if (!order) {
+//             return res.status(404).send('Order not found');
+//         }
 
-//         const htmlContent = `
-//       <html>
-//         <head>
-//           <style>
-//             body { font-family: Arial, sans-serif; margin: 20px; }
-//             h1 { text-align: center; }
-//             table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-//             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-//             th { background-color: #f2f2f2; }
-//           </style>
-//         </head>
-//         <body>
-//           <h1>Invoice</h1>
-//           <p><strong>Order ID:</strong> ${order._id}</p>
-//           <table>
-//             <thead>
-//               <tr>
-//                 <th>Product Name</th>
-//                 <th>Quantity</th>
-//                 <th>Size</th>
-//                 <th>Price</th>
-//                 <th>Total</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               ${order.orderedItems.map(item => `
-//                 <tr>
-//                   <td>${item.productId.productName}</td>
-//                   <td>${item.quantity}</td>
-//                   <td>${item.size}</td>
-//                   <td>₹${item.price}</td>
-//                   <td>₹${item.totalPrice}</td>
-//                 </tr>
-//               `).join('')}
-//             </tbody>
-//           </table>
-//         </body>
-//       </html>
-//     `;
+//         // Create a new PDF document
+//         const doc = new PDFDocument();
 
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-//     await page.setContent(htmlContent);
-//     const pdfBuffer = await page.pdf({ format: 'A4' });
+//         // Set response headers to download the PDF
+//         res.setHeader('Content-Type', 'application/pdf');
+//         res.setHeader('Content-Disposition', `attachment; filename=Invoice-${order._id}.pdf`);
 
-//     await browser.close();
+//         // Pipe the PDF to the response
+//         doc.pipe(res);
 
-//     // Set headers and send the PDF to the client
-//     res.set({
-//       'Content-Type': 'application/pdf',
-//       'Content-Disposition': `attachment; filename=Invoice-${order._id}.pdf`,
-//     });
-//     res.send(pdfBuffer);
+//         // Add the invoice title
+//         doc.font('Helvetica-Bold').fontSize(20).text('Invoice', { align: 'center' });
+//         doc.moveDown();
 
+//         // Order details section
 
-//     } catch (error) {
-//         console.log(error)
-//     }
-// }
+//         doc.font('Helvetica-Bold').fontSize(12).text('Order ID: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(order._id.toString());
+//         doc.moveDown();
 
+//         // Customer details with bold labels
+//         doc.font('Helvetica-Bold').fontSize(12).text('Customer: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(order.userId.toString());
+//         doc.moveDown();
 
-const fs = require('fs');
-const PDFDocument = require('pdfkit');
+//         // Payment method
+//         doc.font('Helvetica-Bold').fontSize(12).text('Payment Method: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(order.paymentMethod);
+//         doc.moveDown();
 
-const invoiceDownload = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        console.log(orderId, 'Generating invoice for Order ID');
+//         // Payment status
+//         doc.font('Helvetica-Bold').fontSize(12).text('Payment Status: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(order.paymentStatus);
+//         doc.moveDown();
 
-        // Fetch the order from the database
-        const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
-        const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 })
-        console.log("address is :", address)
-        const myAddress = address.address[0]
-        console.log("myAddress is :", myAddress)
-        if (!order) {
-            return res.status(404).send('Order not found');
-        }
+//         // Order status
+//         doc.font('Helvetica-Bold').fontSize(12).text('Status: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(order.status);
+//         doc.moveDown();
 
-        // Create a new PDF document
-        const doc = new PDFDocument();
+//         // Total amount
+//         doc.font('Helvetica-Bold').fontSize(12).text('Total Amount: ', { continued: true });
+//         doc.font('Helvetica').fontSize(14).text(`₹${order.finalAmount}`);
+//         doc.moveDown()
 
-        // Set response headers to download the PDF
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=Invoice-${order._id}.pdf`);
-
-        // Pipe the PDF to the response
-        doc.pipe(res);
-
-        // Add the invoice title
-        doc.font('Helvetica-Bold').fontSize(20).text('Invoice', { align: 'center' });
-        doc.moveDown();
-
-        // Order details section
-
-        doc.font('Helvetica-Bold').fontSize(12).text('Order ID: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(order._id.toString());
-        doc.moveDown();
-
-        // Customer details with bold labels
-        doc.font('Helvetica-Bold').fontSize(12).text('Customer: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(order.userId.toString());
-        doc.moveDown();
-
-        // Payment method
-        doc.font('Helvetica-Bold').fontSize(12).text('Payment Method: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(order.paymentMethod);
-        doc.moveDown();
-
-        // Payment status
-        doc.font('Helvetica-Bold').fontSize(12).text('Payment Status: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(order.paymentStatus);
-        doc.moveDown();
-
-        // Order status
-        doc.font('Helvetica-Bold').fontSize(12).text('Status: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(order.status);
-        doc.moveDown();
-
-        // Total amount
-        doc.font('Helvetica-Bold').fontSize(12).text('Total Amount: ', { continued: true });
-        doc.font('Helvetica').fontSize(14).text(`₹${order.finalAmount}`);
-        doc.moveDown()
-
-        // For address
-        doc.font('Helvetica-Bold').fontSize(14).text('Shipping Address:', { underline: true });
-        doc.moveDown();
+//         // For address
+//         doc.font('Helvetica-Bold').fontSize(14).text('Shipping Address:', { underline: true });
+//         doc.moveDown();
 
 
        
-        doc.font('Helvetica').fontSize(10).text(`${myAddress.address.toString()}, ${myAddress.city.toString()}`);
-        doc.moveDown();
-        doc.font('Helvetica').fontSize(10).text(` ${myAddress.state.toString()}, ${myAddress.country.toString()}`);
-        doc.moveDown();
-        doc.font('Helvetica').fontSize(10).text(myAddress.pincode.toString());
-        doc.moveDown();
-        doc.font('Helvetica').fontSize(10).text(myAddress.phone);
-        doc.moveDown();
+//         doc.font('Helvetica').fontSize(10).text(`${myAddress.address.toString()}, ${myAddress.city.toString()}`);
+//         doc.moveDown();
+//         doc.font('Helvetica').fontSize(10).text(` ${myAddress.state.toString()}, ${myAddress.country.toString()}`);
+//         doc.moveDown();
+//         doc.font('Helvetica').fontSize(10).text(myAddress.pincode.toString());
+//         doc.moveDown();
+//         doc.font('Helvetica').fontSize(10).text(myAddress.phone);
+//         doc.moveDown();
 
-        // Add a small heading for product details
-        doc.font('Helvetica-Bold').fontSize(14).text('Product Details:', { underline: true });
-        doc.moveDown();
+//         // Add a small heading for product details
+//         doc.font('Helvetica-Bold').fontSize(14).text('Product Details:', { underline: true });
+//         doc.moveDown();
 
-        // Set up the table header (columns)
-        const columns = ['No', 'Product Name', 'Quantity', 'Size', 'Price', 'Total'];
-        const columnWidth = [50, 150, 50, 50, 50, 50]; // Adjusted column widths to ensure proper alignment
+//         // Set up the table header (columns)
+//         const columns = ['No', 'Product Name', 'Quantity', 'Size', 'Price', 'Total'];
+//         const columnWidth = [50, 150, 50, 50, 50, 50]; // Adjusted column widths to ensure proper alignment
 
-        // Draw table header
-        let yPos = doc.y;
-        doc.font('Helvetica-Bold').fontSize(10).text(columns[0], 50, yPos, { width: columnWidth[0], align: 'left' });
-        doc.text(columns[1], 200, yPos, { width: columnWidth[1], align: 'center' });
-        doc.text(columns[2], 350, yPos, { width: columnWidth[2], align: 'center' });
-        doc.text(columns[3], 400, yPos, { width: columnWidth[3], align: 'center' });
-        doc.text(columns[4], 450, yPos, { width: columnWidth[4], align: 'right' });
-        doc.text(columns[5], 500, yPos, { width: columnWidth[5], align: 'right' });
+//         // Draw table header
+//         let yPos = doc.y;
+//         doc.font('Helvetica-Bold').fontSize(10).text(columns[0], 50, yPos, { width: columnWidth[0], align: 'left' });
+//         doc.text(columns[1], 200, yPos, { width: columnWidth[1], align: 'center' });
+//         doc.text(columns[2], 350, yPos, { width: columnWidth[2], align: 'center' });
+//         doc.text(columns[3], 400, yPos, { width: columnWidth[3], align: 'center' });
+//         doc.text(columns[4], 450, yPos, { width: columnWidth[4], align: 'right' });
+//         doc.text(columns[5], 500, yPos, { width: columnWidth[5], align: 'right' });
 
-        // Draw a line after the header
-        doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+//         // Draw a line after the header
+//         doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
 
-        // Draw the table rows (items in the order)
-        order.orderedItems.forEach((item, index) => {
-            yPos = doc.y + 10;
+//         // Draw the table rows (items in the order)
+//         order.orderedItems.forEach((item, index) => {
+//             yPos = doc.y + 10;
 
-            doc.font('Helvetica').fontSize(10).text((index + 1).toString(), 50, yPos, { width: columnWidth[0], align: 'left' });
-            doc.text(item.productId.productName, 200, yPos, { width: columnWidth[1], align: 'center' });
-            doc.text(item.quantity.toString(), 350, yPos, { width: columnWidth[2], align: 'center' });
-            doc.text(item.size, 400, yPos, { width: columnWidth[3], align: 'center' });
-            doc.text(`${item.price.toFixed(2)}`, 450, yPos, { width: columnWidth[4], align: 'right' });
-            doc.text(`${item.totalPrice.toFixed(2)}`, 500, yPos, { width: columnWidth[5], align: 'right' });
+//             doc.font('Helvetica').fontSize(10).text((index + 1).toString(), 50, yPos, { width: columnWidth[0], align: 'left' });
+//             doc.text(item.productId.productName, 200, yPos, { width: columnWidth[1], align: 'center' });
+//             doc.text(item.quantity.toString(), 350, yPos, { width: columnWidth[2], align: 'center' });
+//             doc.text(item.size, 400, yPos, { width: columnWidth[3], align: 'center' });
+//             doc.text(`${item.price.toFixed(2)}`, 450, yPos, { width: columnWidth[4], align: 'right' });
+//             doc.text(`${item.totalPrice.toFixed(2)}`, 500, yPos, { width: columnWidth[5], align: 'right' });
 
-            // Draw a line after each row
-            doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        });
+//             // Draw a line after each row
+//             doc.moveDown().lineWidth(0.5).strokeColor('black').moveTo(50, doc.y).lineTo(550, doc.y).stroke();
+//         });
 
 
-        // Draw the total row at the end
-        doc.moveDown();
-        doc.text(`Total Amount: ${order.finalAmount.toFixed(2)}`, 300, doc.y, { width: 100, align: 'left' });
+//         // Draw the total row at the end
+//         doc.moveDown();
+//         doc.text(`Total Amount: ${order.finalAmount.toFixed(2)}`, 300, doc.y, { width: 100, align: 'left' });
 
-        // End the document
-        doc.end();
-    } catch (error) {
-        console.log(error);
-        res.status(500).send('An error occurred while generating the invoice.');
+//         // End the document
+//         doc.end();
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).send('An error occurred while generating the invoice.');
+//     }
+// };
+
+
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
+
+const invoiceDownload = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Fetch order and address
+    const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
+    const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 });
+    const myAddress = address.address[0];
+
+    if (!order) {
+      return res.status(404).send('Order not found');
     }
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+
+    // Set response headers
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=Invoice-${order._id}.pdf`);
+
+    doc.pipe(res);
+
+    // Header Section
+    const logoPath = path.join(__dirname, "logo.png");
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 45, { width: 50 });
+    }
+    doc.fontSize(20).text("Zuka Sports", 50, 57,{ align: "right" })
+      .fontSize(10).text("21 SM street", 50, 80,{ align: "right" })
+      .text("Calicut, Kerala, 673602", 50, 95,{ align: "right" })
+      .text("India", 50, 110,{ align: "right" });
+
+    doc.moveDown(2).fontSize(15).text("Invoice", { align: "left",underline:true }).moveDown();
+
+    // Customer and Order Details
+    doc.fontSize(12)
+      .text(`Order ID: ${order.orderId}`, 50, 160,{ align: "left" })
+      .text(`Payment Method: ${order.paymentMethod}`, 50, 180,{ align: "left" })
+      .text(`Payment Status: ${order.paymentStatus}`, 50, 200,{ align: "left" })
+      .text(`Order Status: ${order.status}`, 50, 220,{ align: "left" })
+      .text(`Total Amount: ₹${order.finalAmount}`, 50, 240,{ align: "left" });
+
+    // Shipping Address
+    doc.moveDown().fontSize(14).text("Shipping Address:", { underline: true });
+    doc.moveDown().fontSize(12).text(`${myAddress.address}, ${myAddress.city}`)
+      .text(`${myAddress.state}, ${myAddress.country}, ${myAddress.pincode}`)
+      .text(`Phone: ${myAddress.phone}`);
+
+    // Product Details Table
+    const tableTop = doc.y + 10;
+    const columnWidths = [50, 150, 50, 50, 50, 70];
+    const headers = ["No", "Product Name", "Quantity", "Size", "Price", "Total"];
+
+    headers.forEach((header, i) => {
+      doc.font("Helvetica-Bold").text(header, 50 + columnWidths.slice(0, i).reduce((a, b) => a + b, 0), tableTop, {
+        width: columnWidths[i],
+        align: i === 0 ? "left" : "center",
+      });
+    });
+
+    doc.moveDown(0.5).strokeColor("black").lineWidth(1)
+      .moveTo(50, tableTop + 15).lineTo(550, tableTop + 15).stroke();
+
+    let rowY = tableTop + 25;
+
+    order.orderedItems.forEach((item, index) => {
+      const values = [
+        index + 1,
+        item.productId.productName,
+        item.quantity,
+        item.size || "-",
+        item.price.toFixed(2),
+        item.totalPrice.toFixed(2),
+      ];
+
+      values.forEach((value, i) => {
+        doc.font("Helvetica").fontSize(10).text(value, 50 + columnWidths.slice(0, i).reduce((a, b) => a + b, 0), rowY, {
+          width: columnWidths[i],
+          align: i === 0 ? "left" : "center",
+        });
+      });
+
+      rowY += 20;
+    });
+
+    // Footer Section
+    doc.moveDown(2).fontSize(10).text("Thank you for your business!", 50, 780, { align: "center" });
+
+    doc.end();
+  } catch (error) {
+    console.error("Error generating invoice:", error);
+    res.status(500).send("An error occurred while generating the invoice.");
+  }
 };
 
+  
 //==============wallet================
 
 const loadWallet = async (req, res) => {
