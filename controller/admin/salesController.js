@@ -1,6 +1,6 @@
 const Order = require('../../models/orderSchema');
 const exceljs = require('exceljs'); 
-const puppeteer = require('puppeteer');
+const PDFDocument = require("pdfkit");
 
 
 
@@ -123,62 +123,6 @@ const exportExcel = async (req, res) => {
   await workbook.xlsx.write(res);
   res.end();
 };
-
-// const exportPDF = async (req, res) => {
-//   try {
-//     const { filter, startDate: customStart, endDate: customEnd } = req.query;
-
-//     let startDate, endDate;
-//     const now = new Date();
-
-//     if (filter === "daily") {
-//       startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-//       endDate = new Date(startDate);
-//       endDate.setDate(endDate.getDate() + 1);
-//     } else if (filter === "weekly") {
-//       startDate = new Date(now);
-//       startDate.setDate(now.getDate() - now.getDay());
-//       startDate.setHours(0, 0, 0, 0);
-//       endDate = new Date(startDate);
-//       endDate.setDate(startDate.getDate() + 7);
-//     } else if (filter === "monthly") {
-//       startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-//       endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-//     } else if (filter === "custom" && customStart && customEnd) {
-//       startDate = new Date(customStart);
-//       endDate = new Date(customEnd);
-//       endDate.setHours(23, 59, 59, 999);
-//     }
-
-//     const query = startDate && endDate ? { createdAt: { $gte: startDate, $lte: endDate } } : {};
-//     const orders = await Order.find(query).populate("userId");
-
-//     const htmlContent = await new Promise((resolve, reject) => {
-//       res.render("pdfTemplate", { orders, filter }, (err, html) => {
-//         if (err) reject(err);
-//         else resolve(html);
-//       });
-//     });
-
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-//     await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
-
-//     const pdfBuffer = await page.pdf({ format: "A4" });
-
-//     res.setHeader("Content-Disposition", "attachment; filename=sales_report.pdf");
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.end(pdfBuffer);
-
-//     await browser.close();
-//   } catch (error) {
-//     console.error("Error generating PDF:", error);
-//     res.status(500).send("Internal Server Error");
-//   }
-// };
-
-
-const PDFDocument = require("pdfkit");
 
 const exportPDF = async (req, res) => {
   try {
@@ -336,7 +280,6 @@ function generateHr(doc, y) {
     .stroke();
 }
 
-module.exports = exportPDF;
 
 
 

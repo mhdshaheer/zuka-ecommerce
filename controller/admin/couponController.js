@@ -4,6 +4,7 @@ const loadCouponPage = async (req,res)=>{
         const coupon = await Coupon.find()
         res.render('coupon',{coupon})
     } catch (error) {
+        res.redirect("/admin/login")
             console.log(error)
     }
 }
@@ -22,6 +23,7 @@ const addCoupon = async (req,res)=>{
         console.log("Coupon added successfully");
         res.status(200).json({success:true})
     } catch (error) {
+        
         console.log(error)
     }
 }

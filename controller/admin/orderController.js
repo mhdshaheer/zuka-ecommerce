@@ -21,6 +21,7 @@ const loadOrderList = async (req,res)=>{
             totalPages,
         })
     } catch (error) {
+        res.redirect("/admin/login")
         console.log(error)
     }
 }

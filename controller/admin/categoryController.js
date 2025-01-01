@@ -92,8 +92,6 @@ const addOffer = async (req, res) => {
                 { $set: { offerPrice: offerPrice } }
             );
         }
-        // let offerPrice = product.regularPrice*((100-newPrice)/100)
-        // await Product.updateOne({category:id},{$set:{offerPrice:offerPrice}})
         res.status(201).json({ success: true, message: 'Offer added successfully' });
     } catch (error) {
         console.log("Error in add category offer", error);

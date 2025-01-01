@@ -49,47 +49,6 @@ const login = async (req, res) => {
         res.redirect('/admin/adminError')
     }
 }
-
-// const loadDashboard = async (req, res) => {
-//     if (req.session.admin) {
-
-//         try {
-//             const orders = await Order.find()
-//             const noPendingOrder = await Order.find({ status: { $ne: 'Pending' } });
-
-//             const deliveredOrder = await Order.find({ status: 'Delivered' });
-//             console.log("deliverd orders:",deliveredOrder)
-//             const totalRevenue = deliveredOrder.reduce((acc, order) => acc + (order.finalAmount || 0), 0);
-//             console.log('total revenue:', totalRevenue);
-
-//             // Current month revenue
-//             const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-//             const startOfNextMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1);const monthOrders = await Order.find({
-//                 status: 'Delivered',
-//                 createdAt: { $gte: startOfMonth, $lt: startOfNextMonth }
-//             });
-//             const monthlyRevenue = monthOrders.reduce((acc, order) => acc + (order.finalAmount || 0), 0);
-//             console.log("monthly revenue:",monthlyRevenue)
-
-
-//             const categories = await Category.find();
-//             const products = await Product.find()
-//             res.render('dashboard', {
-//                 orders,
-//                 noPendingOrder,
-//                 categories,
-//                 products,
-//                 totalRevenue,
-//                 monthlyRevenue
-//             })
-//             console.log("into dashboard")
-//         } catch (error) {
-//             console.log("dashboard error...")
-//         }
-//     } else {
-//         res.redirect('/admin/login')
-//     }
-// }
 const loadDashboard = async (req, res) => {
     if (req.session.admin) {
         try {
@@ -271,6 +230,7 @@ const logout = async (req, res) => {
             res.redirect('/admin/login')
         });
     } catch (error) {
+        res.redirect("/admin/login")
         console.log("Error in logout admin...")
     }
 }

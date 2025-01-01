@@ -19,13 +19,11 @@ router.get('/adminError',adminController.adminErrorLoad);
 router.get("/login",adminController.loadLogin);
 router.get('/dashboard',adminAuth,adminController.loadDashboard)
 router.get('/logout',adminController.logout);
-
 router.post("/login",adminController.login);
 
 
 //Customer management
 router.get('/users',adminAuth,customerController.customerInfo)
-// router.get('/users',adminAuth,customerController.customerInfo)
 router.get('/blockUser',adminAuth,customerController.blockUser)
 router.get('/unBlockUser',adminAuth,customerController.unBlockUser);
 
@@ -48,28 +46,28 @@ router.get('/blockProduct',adminAuth,productController.blockProduct)
 router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
 router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productController.updateImages);
 
-router.get('/manageStock',productController.loadManageStock)
+router.get('/manageStock',adminAuth,productController.loadManageStock)
 router.patch('/updateStock',productController.updateStock)
 
 
 //Orders
-router.get('/orders',orderController.loadOrderList);
-router.get('/orderDetails',orderController.orderDetails);
+router.get('/orders',adminAuth,orderController.loadOrderList);
+router.get('/orderDetails',adminAuth,orderController.orderDetails);
 router.patch('/changeStatus',orderController.changeOrderStatus);
 
 
 //Coupon management
-router.get('/coupon',couponController.loadCouponPage);
+router.get('/coupon',adminAuth,couponController.loadCouponPage);
 router.post('/coupon',couponController.addCoupon);
 router.patch('/blockCoupon',couponController.blockCoupon)
 router.patch('/unBlockCoupon',couponController.unBlockCoupon)
 
 //Offer management 
-router.get('/offer',offerController.loadOfferPage)
+router.get('/offer',adminAuth,offerController.loadOfferPage)
 
 //Sales report
-router.get('/salesReport',salesController.loadSalesReportPage)
-router.get('/salesReport/export/excel', salesController.exportExcel);
-router.get('/salesReport/export/pdf', salesController.exportPDF);
+router.get('/salesReport',adminAuth,salesController.loadSalesReportPage)
+router.get('/salesReport/export/excel', adminAuth,salesController.exportExcel);
+router.get('/salesReport/export/pdf', adminAuth,salesController.exportPDF);
 
 module.exports = router;

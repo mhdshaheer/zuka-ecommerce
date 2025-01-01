@@ -10,6 +10,7 @@ const loadProduct = async (req, res) => {
             res.render('add product/productAdd', { categories })
 
         } catch (error) {
+            res.redirect("/admin/login")
             console.log('error in page load', error);
 
         }
@@ -169,9 +170,9 @@ const updateImages = async (req,res)=>{
     try {
         const { id } = req.params;
         console.log('id is:',id)
-    console.log(req.files); // Files uploaded to Cloudinary
+    console.log(req.files); 
 
-    const imageUrls = req.files.map(file => file.path); // Cloudinary URLs
+    const imageUrls = req.files.map(file => file.path);
     
     console.log(imageUrls)
     const updateImg = await Product.updateOne({_id:id},{
@@ -192,6 +193,7 @@ const loadManageStock = async (req,res)=>{
         const products = await Product.aggregate([{$unwind:"$variant"}])
         res.render('add product/manageStock',{products})
     } catch (error) {
+        res.redirect("/admin/login")
         console.log(error)
     }
 }
