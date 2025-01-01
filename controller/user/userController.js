@@ -257,10 +257,6 @@ const loadHomePage = async (req, res) => {
             console.log("hai home")
             res.render('home', { user: userData, activePage: 'home', products });
         }
-        // else if(googleUser){
-        //     console.log("google user:",googleUser)
-        //     res.render('home', { user: googleUser,activePage:'home'});
-        // }
         else {
             console.log("hai home iiii")
             console.log("userData is :", user)

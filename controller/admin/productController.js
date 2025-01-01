@@ -188,15 +188,32 @@ const updateImages = async (req,res)=>{
     }
 }
 
-const loadManageStock = async (req,res)=>{
+
+const loadManageStock = async (req, res) => {
     try {
-        const products = await Product.aggregate([{$unwind:"$variant"}])
-        res.render('add product/manageStock',{products})
+      const page = parseInt(req.query.page) || 1; 
+      const limit = 10;
+      const skip = (page - 1) * limit; 
+      const totalProducts = await Product.aggregate([{ $unwind: "$variant" }]).count("count");
+      const totalPages = Math.ceil(totalProducts[0]?.count / limit);
+  
+      const products = await Product.aggregate([
+        { $unwind: "$variant" },
+        { $skip: skip },
+        { $limit: limit }
+      ]);
+  
+      res.render('add product/manageStock', {
+        products,
+        totalPages,
+        currentPage: page
+      });
     } catch (error) {
-        res.redirect("/admin/login")
-        console.log(error)
+      console.error("Error in loadManageStock:", error);
+      res.redirect("/admin/login");
     }
-}
+  };
+  
 
 const updateStock = async (req,res)=>{
     try {

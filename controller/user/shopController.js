@@ -8,46 +8,6 @@ const Coupon = require('../../models/couponSchema')
 const mongoose = require('mongoose')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema');
-// const loadShop = async (req, res) => {
-
-//     try {
-
-//         const user = req.session.user || req.session.googleUser;
-//         console.log("home user:", user)
-//         if (user?.isBlocked == true) {
-//             return res.redirect('/login')
-//         }
-
-//         const page = parseInt(req.query.page) || 1;
-//         const limit = 12;
-//         const skip = (page - 1) * limit;
-
-//         const [products, totalProducts] = await Promise.all([
-//             Product.find({ isBlocked: false })
-//                 .populate('category')
-//                 .skip(skip)
-//                 .limit(limit),
-//             Product.countDocuments({ isBlocked: false }),
-//         ]);
-
-//         const totalPages = Math.ceil(totalProducts / limit);
-
-//         const category = await Category.find();
-//         res.render('shop', {
-//             activePage: 'shop',
-//             products,
-//             category,
-//             user,
-//             currentPage: page,
-//             totalPages,
-//             page,
-//             limit,
-//             totalProducts
-//         });
-//     } catch (error) {
-//         console.log("error in shop page", error)
-//     }
-// }
 
 const loadShop = async (req, res) => {
     try {
@@ -181,7 +141,7 @@ const loadCart = async (req, res) => {
         console.log("total : ", total);
 
         const currentDate = new Date(); 
-        const coupons = await Coupon.find({ expireOn: { $gte: currentDate } ,userId:{$nin:[user._id]} });
+        const coupons = await Coupon.find({ expireOn: { $gte: currentDate } ,userId:{$nin:[user._id]} ,isList:true});
         console.log("coupons:",coupons);
 
         

@@ -1,13 +1,24 @@
 const Coupon = require('../../models/couponSchema')
-const loadCouponPage = async (req,res)=>{
+const loadCouponPage = async (req, res) => {
     try {
-        const coupon = await Coupon.find()
-        res.render('coupon',{coupon})
+      const page = parseInt(req.query.page) || 1; 
+      const limit = 8; 
+      const skip = (page - 1) * limit;
+  
+      const totalCoupons = await Coupon.countDocuments();
+      const totalPages = Math.ceil(totalCoupons / limit); 
+  
+      const coupon = await Coupon.find()
+        .skip(skip)
+        .limit(limit);
+  
+      res.render('coupon', { coupon, totalPages, currentPage: page });
     } catch (error) {
-        res.redirect("/admin/login")
-            console.log(error)
+      console.error("Error loading coupon page:", error);
+      res.redirect("/admin/login");
     }
-}
+  };
+  
 const addCoupon = async (req,res)=>{
     try {
         const {couponCode,minAmount,discountValue,activationDate,expiryDate} = req.body;
