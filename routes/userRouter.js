@@ -55,7 +55,6 @@ router.post('/editAddress',userController.editAddressData)
 router.get('/orders',userAuth,userController.loadOrders);
 router.patch('/cancelOrder',userController.cancelOrder);
 router.patch('/returnOrder',userController.returnOrder);
-// router.get('/download-invoice/:orderId',userController.invoiceDownload)
 router.get('/download-invoice/:orderId', userAuth,userController.invoiceDownload)
 
 // Wallet

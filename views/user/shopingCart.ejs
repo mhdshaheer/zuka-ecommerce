@@ -206,7 +206,7 @@
                                     icon: 'success',
                                     confirmButtonText: 'Okay'
                                 }).then(() => {
-                                    window.location.reload()
+                                    location.reload()
                                 })
                             }
                         })
@@ -345,11 +345,10 @@
                             text: 'Coupon Added successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
-                        }).then(result=>{
-                            if(result.isConfirmed){
-                                window.location.reload()
-                            }
                         })
+                        
+                        document.getElementById('couponAppyBtn').disabled = true;
+                        document.getElementById('couponAppyBtn').innerHTML = 'Applied'
                     }
                 })
                 .catch(error => {
@@ -365,13 +364,6 @@
                 })
         }
 
-        // const checkOutBtn = document.getElementById('checkOutBtn');
-        // checkOutBtn.addEventListener('click',(e)=>{
-        //     e.preventDefault();
-        //     console.log('inside checklist');
-        //     window.location.href = `/checkout?${discountAmount}&${totalAfterAll}`;
-        //     console.log('hai')
-        // })
 
         async function getStock(variantId) {
             let variantStock = null
@@ -387,32 +379,7 @@
             return variantStock
         }
 
-        // Remove coupon
-        // document.getElementById('removeCoupon').addEventListener('click',(e)=>{
-        //     e.preventDefault();
-        //     axios.post('/removeCoupon')
-        //     .then(res=>{
-        //         if(res.status==200){
-        //             Swal.fire({
-        //                     title: 'Success!',
-        //                     text: 'Coupon Removed successfully!',
-        //                     icon: 'success',
-        //                     confirmButtonText: 'Okay'
-        //                 }).then(result=>{
-        //                     if(result.isConfirmed){
-        //                         window.location.reload()
-        //                     }
-        //                 })
-        //         }
-        //     }).catch(error=>{
-        //         Swal.fire({
-        //                     title: 'Error!',
-        //                     text: 'Error : Coupon remove!',
-        //                     icon: 'error',
-        //                     confirmButtonText: 'Okay'
-        //                 })
-        //     })
-        // })
+       
 
         function removeCoupon(event){
             event.preventDefault();
@@ -425,11 +392,11 @@
                             text: 'Coupon Removed successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
-                        }).then(result=>{
-                            if(result.isConfirmed){
-                                window.location.reload()
-                            }
                         })
+                        document.getElementById('couponAppyBtn').disabled = false;
+                        document.getElementById('couponAppyBtn').innerHTML = 'Apply';
+                        document.getElementById("couponApplied").innerHTML=''
+                        document.getElementById("removeCoupon") .hidden = true
                 }
             }).catch(error=>{
                 Swal.fire({

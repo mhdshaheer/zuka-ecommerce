@@ -58,44 +58,43 @@
 
     <style>
         .review-card-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-}
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
 
-.review-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-}
+        .review-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
 
-.review-header {
-    font-size: 1rem;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-}
+        .review-header {
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
 
-.review-rating {
-    color: #ffc107;
-}
+        .review-rating {
+            color: #ffc107;
+        }
 
-.review-text {
-    font-size: 0.9rem;
-    color: #555;
-}
+        .review-text {
+            font-size: 0.9rem;
+            color: #555;
+        }
 
-.review-date {
-    font-size: 0.8rem;
-    color: #999;
-    display: block;
-    margin-top: 0.5rem;
-}
-
+        .review-date {
+            font-size: 0.8rem;
+            color: #999;
+            display: block;
+            margin-top: 0.5rem;
+        }
     </style>
 
 
@@ -237,12 +236,13 @@
                                                     <input id="itemQuantity" type="text" value="1" readonly>
                                                 </div>
                                             </div>
-                                            <a onclick="selectSize()"  class="primary-btn text-light" id="addToCart">add to cart</a>
+                                            <a onclick="selectSize()" class="primary-btn text-light" id="addToCart">add
+                                                to cart</a>
                                         </div>
 
 
-                                       
-                                        
+
+
                         </div>
                     </div>
                 </div>\
@@ -263,21 +263,25 @@
                                                 <div class="review-header">
                                                     <strong>John Doe</strong> <span class="review-rating">★★★★★</span>
                                                 </div>
-                                                <p class="review-text">Excellent product! The quality exceeded my expectations.</p>
+                                                <p class="review-text">Excellent product! The quality exceeded my
+                                                    expectations.</p>
                                                 <small class="review-date">Reviewed on Dec 20, 2024</small>
                                             </div>
                                             <div class="review-card">
                                                 <div class="review-header">
                                                     <strong>Jane Smith</strong> <span class="review-rating">★★★★☆</span>
                                                 </div>
-                                                <p class="review-text">Good quality, but the delivery took longer than expected.</p>
+                                                <p class="review-text">Good quality, but the delivery took longer than
+                                                    expected.</p>
                                                 <small class="review-date">Reviewed on Dec 18, 2024</small>
                                             </div>
                                             <div class="review-card">
                                                 <div class="review-header">
-                                                    <strong>Mike Johnson</strong> <span class="review-rating">★★★☆☆</span>
+                                                    <strong>Mike Johnson</strong> <span
+                                                        class="review-rating">★★★☆☆</span>
                                                 </div>
-                                                <p class="review-text">The product is decent, but I found the size to be slightly off.</p>
+                                                <p class="review-text">The product is decent, but I found the size to be
+                                                    slightly off.</p>
                                                 <small class="review-date">Reviewed on Dec 15, 2024</small>
                                             </div>
                                         </div>
@@ -286,7 +290,8 @@
                                             <form>
                                                 <div class="form-group">
                                                     <label for="reviewer-name">Your Name</label>
-                                                    <input type="text" class="form-control" id="reviewer-name" placeholder="Enter your name">
+                                                    <input type="text" class="form-control" id="reviewer-name"
+                                                        placeholder="Enter your name">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="review-rating">Rating</label>
@@ -300,7 +305,8 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="review-text">Review</label>
-                                                    <textarea class="form-control" id="review-text" rows="3" placeholder="Write your review here"></textarea>
+                                                    <textarea class="form-control" id="review-text" rows="3"
+                                                        placeholder="Write your review here"></textarea>
                                                 </div>
                                                 <button type="submit" class="btn btn-primary">Submit Review</button>
                                             </form>
@@ -311,7 +317,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     </section>
@@ -425,8 +431,6 @@
                                         text: 'Product added to cart successfully!',
                                         icon: 'success',
                                         confirmButtonText: 'Okay'
-                                    }).then(() => {
-                                        window.location.reload();
                                     })
                                 }
                             }).catch((error) => {
@@ -494,13 +498,13 @@
                     });
                 });
 
-                function selectSize(){
+                function selectSize() {
                     Swal.fire({
-                                        title: 'Size empty!',
-                                        text: 'Please select a size!',
-                                        icon: 'warning',
-                                        confirmButtonText: 'Okay'
-                                    })
+                        title: 'Size empty!',
+                        text: 'Please select a size!',
+                        icon: 'warning',
+                        confirmButtonText: 'Okay'
+                    })
                 }
             </script>
 

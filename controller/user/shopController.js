@@ -208,7 +208,7 @@ const removeCoupon = async (req,res)=>{
     try {
         req.session.discountPrice = 0;
         req.session.minimumPrice = 0;
-        req.session.couponId = 0;
+        req.session.couponId = null;
         req.session.code = null
         res.status(httpStatusCode.OK).json({message:true})
     } catch (error) {
@@ -271,9 +271,10 @@ const deleteFromCart = async (req, res) => {
         cart.items.splice(Number(index), 1)
 
         const result = await Cart.updateOne({ userId: user._id }, { $set: { items: cart.items } })
+        const cartItems = await Cart.find({userId: user._id})
 
         if (result) {
-            res.status(httpStatusCode.OK).json({ message: true })
+            res.status(httpStatusCode.OK).json({ message: true,cartItems })
         }
 
     } catch (error) {
@@ -333,14 +334,16 @@ const addOrder = async (req, res) => {
         });
         if (addOrder) {
             const order = await Order.findOne({ cartId: cart._id })
+            if(req.session.couponId ){
 
-            const addToCoupon = await Coupon.updateOne(
-                { _id: req.session.couponId },
-                {
-                    $push: { userId: user._id },
-                    $inc: { usedCount: 1 }
-                }
-            )
+                const addToCoupon = await Coupon.updateOne(
+                    { _id: req.session.couponId },
+                    {
+                        $push: { userId: user._id },
+                        $inc: { usedCount: 1 }
+                    }
+                )
+            }
             req.session.order = order
 
             // Reduce stocks

@@ -68,14 +68,25 @@
                                         </td>
 
                                         <td class="quantity__item">
-                                            <span class="badge bg-success">In stock</span>
+                                            <%const totalStock = item.productId.variant.reduce((acc,curr)=>acc+curr.stock,0)%>
+                                            <%if(totalStock<=0){%>
+                                                <span class="badge bg-danger">Out of stock </span>
+                                            <%}else{%>
+                                                <span class="badge bg-success">In stock </span>
+                                            <%}%>
                                         </td>
 
 
                                         <td class="pe-5">
-                                            <a href="/productInfo?id=<%=item.productId._id%>">
-                                                <button class="btn btn-secondary">add to cart</button>
-                                            </a>
+                                            <%if(totalStock<=0){%>
+                                                <a href="#" aria-disabled="">
+                                                    <button class="btn btn-danger" disabled>Out of stock</button>
+                                                </a>
+                                                <%}else{%>
+                                                    <a href="/productInfo?id=<%=item.productId._id%>">
+                                                        <button class="btn btn-success">View Product</button>
+                                                    </a>
+                                                <%}%>
                                         </td>
                                         <td class="cart__close px-3" onclick="removeWishlist('<%=index%>')"><i class="fa fa-close"></i></td>
                                     </tr>
@@ -83,18 +94,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- <div class="row">
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn">
-                                <a href="#">Continue Shopping</a>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-6">
-                            <div class="continue__btn update__btn">
-                                <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
-                            </div>
-                        </div>
-                    </div> -->
+                   
                 </div>
 
             </div>
