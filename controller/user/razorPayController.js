@@ -15,11 +15,9 @@ const razorpay = new Razorpay({
 
 const createOrder = async (req, res) => {
     try {
-        console.log("hai")
         const { totalPrice, address, index } = req.body;
         const user = req.session.user || req.session.googleUser;
         const cart = await Cart.findOne({ userId: user._id });
-        console.log('total:', totalPrice)
 
         const order = await razorpay.orders.create({
             amount: totalPrice * 100, // Convert to paise
@@ -42,7 +40,6 @@ const createOrder = async (req, res) => {
             couponApplied: req.session.discountPrice ? true : false
         });
         if (addOrder) {
-            console.log("added to orders")
             const myOrder = await Order.findOne({ cartId: cart._id })
             const addToCoupon = await Coupon.updateOne(
                 { _id: req.session.couponId },
@@ -51,7 +48,6 @@ const createOrder = async (req, res) => {
                     $inc: { usedCount: 1 }
                 }
             )
-            console.log('order is :', order)
             req.session.order = myOrder
             cart.items.map(async (item) => {
                 let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } })
@@ -74,10 +70,7 @@ const createOrder = async (req, res) => {
 const verifyPayment = async (req, res) => {
     try {
 
-        console.log("verify payment")
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, totalPrice, address, index, order_id } = req.body;
-        console.log(req.body)
-        console.log("OrderId:", order_id)
         const user = req.session.user || req.session.googleUser;
 
 
@@ -107,7 +100,6 @@ const verifyPayment = async (req, res) => {
 const createOrder_OP = async (req, res) => {
     try {
         const { finalAmount } = req.body;
-        console.log('Final amount:', finalAmount)
 
         const order = await razorpay.orders.create({
             amount: finalAmount * 100,
@@ -129,8 +121,6 @@ const verifyRetryPayment = async (req, res) => {
 
         console.log("verify payment")
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature, order_id } = req.body;
-        console.log(req.body)
-        console.log("OrderId:", order_id)
 
 
         const hmac = crypto

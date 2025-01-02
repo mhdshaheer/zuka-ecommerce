@@ -71,7 +71,6 @@ const loadShop = async (req, res) => {
         ]);
 
         const totalPages = Math.ceil(totalProducts / limit);
-        console.log('Total Pages:', totalPages, 'Current Page:', page);
 
         res.render('shop', {
             activePage: 'shop',
@@ -97,12 +96,10 @@ const loadShop = async (req, res) => {
 const loadProductInfo = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
-        console.log("home user:", user)
         if (user?.isBlocked == true) {
             return res.redirect('/login')
         }
         const id = req.query.id.trim();
-        console.log("id is", id)
         const product = await Product.find({ _id: id })
         const category = await Category.find({ _id: product[0].category })
         const relatedProduct = await Product.find({
@@ -110,8 +107,6 @@ const loadProductInfo = async (req, res) => {
              _id: { $ne: id },
              isBlocked:false
             }).limit(4);
-        console.log("related product:",relatedProduct)
-        console.log(product, category)
         res.render('productDetail', {
             product,
             category,
@@ -128,21 +123,14 @@ const loadCart = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
         const cartItem = await Cart.findOne({ userId: user._id });
-        //===========================================================
-        console.log("user id is :", user)
-
-
         const newCart = await Cart.findOne({ userId: user._id }).populate('items.productId')
-        console.log("new Cart: ", cartItem)
         //=====================================================================        
         const total = cartItem?.items.reduce((acc, curr) => {
             return acc + curr.totalPrice;
         }, 0) ?? 0
-        console.log("total : ", total);
 
         const currentDate = new Date(); 
         const coupons = await Coupon.find({ expireOn: { $gte: currentDate } ,userId:{$nin:[user._id]} ,isList:true});
-        console.log("coupons:",coupons);
 
         
         res.render('shopingCart', {
@@ -167,9 +155,6 @@ const loadCheckout = async (req, res) => {
         const userAddress = await Address.findOne({ userId: user._id });
         const userCart = await Cart.findOne({ userId: user._id }).populate('items.productId');
         const wallet = await Wallet.findOne({ userId: user._id });
-        console.log(userCart);
-        // console.log(userAddress)
-        console.log(req.session.discountPrice)
 
         res.render('checkout', {
             activePage: "",
@@ -193,11 +178,9 @@ const couponApply = async (req, res) => {
         const currentDate = new Date();
         const coupon = await Coupon.findOne({ code: couponCode });
         const userCoupon = await Coupon.findOne({ code: couponCode, userId: { $elemMatch: { $eq: user._id } } })
-        console.log("coupon is :", coupon)
         if (!coupon) {
             req.session.coupon = 0;
             req.session.discountPrice = 0;
-            console.log("no coupon")
             return res.status(402).json({ message: "Coupon is invalid!" })
         }
         if (currentDate > coupon.expireOn) {
@@ -209,7 +192,6 @@ const couponApply = async (req, res) => {
             return res.status(402).json({ message: "Coupon is already used!" })
         }
 
-        console.log(couponCode);
         req.session.discountPrice = coupon.discountPrice;
         req.session.minimumPrice = coupon.minimumPrice;
         req.session.couponId = coupon._id;
@@ -237,18 +219,14 @@ const addToCart = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
         let { size, stock, productObj, quantity } = req.body
-        console.log(size, stock, typeof quantity, productObj._id)
         if (!user) {
             return res.status(404).json({ message: false })
         }
 
         const sizeFound = await Cart.findOne({ userId: user._id, 'items.size': size, 'items.productId': productObj._id });
-        console.log('Product obj: ', productObj)
-        console.log('size found : ', sizeFound)
 
         // For getting varienty id of the perticular varient
         const varientDetail = await Product.findOne({ _id: productObj._id, "variant.size": size }, { 'variant.$': 1 })
-        console.log("varient details id:", varientDetail)
 
 
         // manage duplicate adding to cart
@@ -263,7 +241,6 @@ const addToCart = async (req, res) => {
                 productId: productObj._id,
                 varientId: varientDetail.variant[0]._id,
                 quantity: Number(quantity),
-                // price: productObj.regularPrice,
                 price: lastPrice,
                 size,
                 totalPrice: Number(quantity) * Number(lastPrice),
@@ -275,7 +252,6 @@ const addToCart = async (req, res) => {
                 { upsert: true, new: true }
             );
             if (toCart) {
-                console.log('added to db')
                 res.status(200).json({ message: true })
             }
         }
@@ -289,17 +265,14 @@ const addToCart = async (req, res) => {
 const deleteFromCart = async (req, res) => {
     try {
         const { index } = req.query;
-        console.log('index is :', index)
         const user = req.session.user || req.session.googleUser;
         const cart = await Cart.findOne({ userId: user._id }, { items: 1 })
         cart.items.splice(Number(index), 1)
-        console.log("cart is :", cart.items)
 
         const result = await Cart.updateOne({ userId: user._id }, { $set: { items: cart.items } })
 
         if (result) {
             res.status(200).json({ message: true })
-            console.log("successfully deleted")
         }
 
     } catch (error) {
@@ -309,10 +282,7 @@ const deleteFromCart = async (req, res) => {
 
 const getStock = async (req, res) => {
     const { variantId } = req.body
-    console.log('variant id:', variantId);
     const product = await Product.findOne({ 'variant._id': variantId }, { 'variant.$': 1 })
-    console.log("product is :", product)
-    console.log("product is :", product?.variant[0]?.stock)
     const variantStock = product?.variant[0]?.stock;
     return res.status(200).json({ variantStock })
 }
@@ -325,19 +295,15 @@ const addOrder = async (req, res) => {
         const { totalPrice, address, paymentMethod, index } = req.body
         // const cart = await Cart.findOne({ userId: user._id });
         const userWallet = await Wallet.findOne({ userId: user._id })
-        console.log("discount amount is:", req.session.discountPrice);
-        console.log("total", totalPrice)
 
         // For blocked product handle:
         const cart = await Cart.findOne({ userId: user._id }).populate('items.productId'); 
 
         if (!cart) {
-            console.log("no cart")
             return res.status(400).json({ success: false, message: "Cart not found" });
         }
         const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
         if (isAnyProductBlocked) {
-            console.log("Cart have the blocked product")
             return res.status(401).json({
                 message: "Your cart contains blocked products. Please remove them to proceed."
             });
@@ -365,10 +331,7 @@ const addOrder = async (req, res) => {
 
         });
         if (addOrder) {
-            console.log("Successfully added to orders")
             const order = await Order.findOne({ cartId: cart._id })
-            console.log("coupon id:", req.session.couponId);
-            console.log("coupon id:", user._id);
 
             const addToCoupon = await Coupon.updateOne(
                 { _id: req.session.couponId },
@@ -377,7 +340,6 @@ const addOrder = async (req, res) => {
                     $inc: { usedCount: 1 }
                 }
             )
-            console.log('order is :', order)
             req.session.order = order
 
             // Reduce stocks
@@ -406,7 +368,6 @@ const addOrder = async (req, res) => {
             }
             //==================================
 
-            //Delete cart after order placed
             await Cart.deleteOne({ userId: user._id })
 
 
@@ -422,13 +383,10 @@ const loadOrderSuccess = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
         let orderId = req.query.id
-        console.log('order id:', orderId);
         const order = await Order.findOne({ _id: orderId })
         const findAddress = await Address.findOne({ userId: user._id, 'address._id': order.address }, { 'address.$': 1 })
-        console.log('address :', findAddress)
 
 
-        console.log('success: ', order)
         res.render('orderSuccess', {
             activePage: '',
             user,
@@ -458,7 +416,6 @@ const editCart = async (req, res) => {
         } else if (result.modifiedCount === 0) {
             console.warn("Quantity was not modified (maybe it was already the same)");
         } else {
-            console.log("Quantity updated successfully");
             return res.status(200).json({ success: true, totalSum })
         }
     } catch (error) {
@@ -471,7 +428,6 @@ const loadWishlist = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser;
         const wishlist = await Wishlist.findOne({ userId: user._id }).populate('products.productId');
-        console.log(wishlist)
         res.render('wishlist', {
             activePage: '',
             wishProducts: wishlist.products,
@@ -487,19 +443,14 @@ const addToWishlist = async (req, res) => {
         const user = req.session.user || req.session.googleUser;
         console.log(user)
         const { productId } = req.body;
-        console.log("product id :", productId);
         const wishlistExist = await Wishlist.findOne({ userId: user._id });
         console.log(wishlistExist)
         if (wishlistExist) {
-            console.log("inside exist")
             const isIncluded = wishlistExist.products.some(item =>
                 item.productId.equals(new mongoose.Types.ObjectId(productId))
             );
 
-            console.log('is included:', isIncluded)
             if (isIncluded) {
-                console.log('inside included');
-
                 return res.status(201).json({ message: "product already exist" })
             }
         }
@@ -516,8 +467,6 @@ const addToWishlist = async (req, res) => {
             { new: true, upsert: true }
         )
         if (addWishlist) {
-
-            console.log("Wishlist item push done")
             res.status(200).json({ success: true })
         }
     } catch (error) {
@@ -533,11 +482,8 @@ const deleteFromWishlist = async (req, res) => {
         const { index } = req.query;
         const wishlist = await Wishlist.findOne({ userId: user._id });
         wishlist.products.splice(index, 1)
-        console.log("index is :", index);
-        console.log("wishlist is :", wishlist)
         const removeItem = await Wishlist.updateOne({ userId: user._id }, { $set: { products: wishlist.products } })
         if (removeItem) {
-            console.log("removed item")
             return res.status(200).json({ success: true })
         }
 

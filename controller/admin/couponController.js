@@ -22,6 +22,10 @@ const loadCouponPage = async (req, res) => {
 const addCoupon = async (req,res)=>{
     try {
         const {couponCode,minAmount,discountValue,activationDate,expiryDate} = req.body;
+        const findCoupon = await Coupon.findOne({code:couponCode})
+        if(findCoupon){
+            res.status(400).json({success:false})
+        }
         const coupon = new Coupon({
             code:couponCode,
             createdOn:activationDate,
@@ -31,7 +35,6 @@ const addCoupon = async (req,res)=>{
         })
         await coupon.save();
 
-        console.log("Coupon added successfully");
         res.status(200).json({success:true})
     } catch (error) {
         
@@ -42,9 +45,7 @@ const addCoupon = async (req,res)=>{
 const blockCoupon = async (req,res)=>{
     try {  
         const {couponId} = req.body;
-        console.log(couponId);
         await Coupon.updateOne({_id:couponId},{$set:{isList:false}});
-        console.log("coupon is blocked");
         res.status(200).json({success:true})      
     } catch (error) {
         console.log(error)
@@ -53,9 +54,7 @@ const blockCoupon = async (req,res)=>{
 const unBlockCoupon = async (req,res)=>{
     try {  
         const {couponId} = req.body;
-        console.log(couponId);
         await Coupon.updateOne({_id:couponId},{$set:{isList:true}});
-        console.log("coupon is unblocked");
         res.status(200).json({success:true})      
     } catch (error) {
         console.log(error)

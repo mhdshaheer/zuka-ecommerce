@@ -21,15 +21,10 @@ const loadProduct = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
-        console.log("entered to this")
-        console.log('dffd',req.files); // Files uploaded to Cloudinary
-
         const imageUrls = req.files.map(file => file.path); // Cloudinary URLs
         const categoryId = await Category.findOne({ name: req.body.category }, { _id: 1 })
         let totalStocks = 0
 
-        console.log(imageUrls)
-        // console.log(categoryName)
         const variantArray = JSON.parse(JSON.stringify(req.body.variant))
         const variants = variantArray.map((size, index) => {
             totalStocks = totalStocks + Number(variantArray[index].stock)
@@ -39,25 +34,20 @@ const addProduct = async (req, res) => {
                 stock: Number(variantArray[index].stock)
             }
         })
-        console.log('stock:', totalStocks)
-        console.log(variants)
 
         const newProduct = new Product({
             productName: req.body.name,
             description: req.body.description,
             category: categoryId,
-            // subcategory: req.body.subcategory,
             totalStocks: totalStocks,
             regularPrice: req.body.price,
             offerPrice: req.body.offerPrice,
             color: req.body.colour,
-            // taxId: req.body.taxId,
             images: imageUrls,
             variant: variants
         });
 
         await newProduct.save();
-        console.log("product added successfully")
         res.status(200).json({ message: 'Product added successfully' });
     } catch (error) {
         console.error('Error adding product:', error);
@@ -98,16 +88,12 @@ const productList = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log(id)
-        const result = await Product.deleteOne({ _id: id });
-        console.log("deleted count = ", result.deletedCount)
+        const { productId } = req.params;
+        const result = await Product.deleteOne({ _id: productId });
 
         if (result.deletedCount === 1) {
-            console.log("inside success delete Product")
             res.status(200).send('Product deleted successfully');
         } else {
-            console.log("inside failed delete Product")
             res.status(404).send('Product not found');
         }
     } catch (error) {
@@ -120,7 +106,7 @@ const editProduct = async (req, res) => {
     try {
         console.log(req.body)
         const { productName, description, category, regularPrice, offerPrice, color } = req.body;
-        const { id } = req.params;
+        const { productId } = req.params;
 
         let updatedFields = {}
         const categoryId = await Category.find({ name: category }, { _id: 1 })
@@ -132,12 +118,11 @@ const editProduct = async (req, res) => {
         if (color !== undefined && color.trim() !== '') updatedFields.color = color;
 
 
-        const updateProduct = await Product.findOneAndUpdate({ _id: id }, updatedFields, { new: true })
+        const updateProduct = await Product.findOneAndUpdate({ _id: productId }, updatedFields, { new: true })
         if (!updateProduct) {
             return res.status(404).json({ message: 'Product not found' });
         }
         res.status(201).json({ message: 'Product Edit successfull' })
-        console.log('Product updated successfully', updateProduct)
 
     } catch (error) {
         console.error('Error updating product:', error);
@@ -147,8 +132,8 @@ const editProduct = async (req, res) => {
 
 const blockProduct = async (req, res) => {
     try {
-        let id = req.query.id;
-        await Product.updateOne({ _id: id }, { $set: { isBlocked: true } });
+        let productId = req.query.id;
+        await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
         res.redirect(`/admin/productList`);
     } catch (error) {
         res.redirect('/admin/admin-error');
@@ -157,8 +142,8 @@ const blockProduct = async (req, res) => {
 }
 const unBlockProduct = async (req, res) => {
     try {
-        let id = req.query.id;
-        await Product.updateOne({ _id: id }, { $set: { isBlocked: false } });
+        let productId = req.query.id;
+        await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
         res.redirect(`/admin/productList`);
     } catch (error) {
         res.redirect('/admin/admin-error');
@@ -168,14 +153,12 @@ const unBlockProduct = async (req, res) => {
 
 const updateImages = async (req,res)=>{
     try {
-        const { id } = req.params;
-        console.log('id is:',id)
-    console.log(req.files); 
+        const { productId } = req.params;
 
     const imageUrls = req.files.map(file => file.path);
     
     console.log(imageUrls)
-    const updateImg = await Product.updateOne({_id:id},{
+    const updateImg = await Product.updateOne({_id:productId},{
         images:imageUrls
     })
     if(!updateImg){
@@ -221,7 +204,6 @@ const updateStock = async (req,res)=>{
         console.log(variantId,stock);
         const result = await Product.updateOne({'variant._id':variantId},{$inc:{['variant.$.stock']:Number(stock)}})
         if(result){
-            console.log("update done");
             res.status(200).json({success:true});
         }
     } catch (error) {

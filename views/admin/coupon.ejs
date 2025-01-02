@@ -173,15 +173,20 @@
         currentDate.setDate(currentDate.getDate() - 1)
         const startDate = new Date(activationDate.value);
         const endDate = new Date(expiryDate.value)
+        console.log("min value",typeof minAmount.value)
         if(!couponCode.value.trim()){
             couponError.innerHTML = "coupon code should not be empty"
             return
         }else{
             couponError.innerHTML = ''
         }
+        
 
         if(!minAmount.value.trim()){
             minAmountError.innerHTML = "Enter amount"
+            return
+        }else if(Number(minAmount.value)<0){
+            minAmountError.innerHTML = "Enter a positive amount"
             return
         }else{
             minAmountError.innerHTML = ''
@@ -189,7 +194,14 @@
         if(!discountValue.value.trim()){
             discountValueError.innerHTML = "Enter discount amount"
             return
-        }else{
+        }else if(Number(discountValue.value)<0){
+            discountValueError.innerHTML = "Enter a positive amount"
+            return
+        }else if(Number(discountValue.value)>Number(minAmount.value)){
+            discountValueError.innerHTML = "Discount value must be lower than Minimum amount!"
+            return
+        }
+        else{
             discountValueError.innerHTML = ''
         }
 
@@ -223,11 +235,20 @@
             if(res.status==200){
                 Swal.fire({
               title: 'Success!',
-              text: 'Category added successfully!',
+              text: 'Coupon Created successfully!',
               icon: 'success',
               confirmButtonText: 'Okay'
             }).then((result)=>{
                 window.location.reload();
+            })
+            }e
+        }).catch(err=>{
+            if(err.response.status==400){
+                Swal.fire({
+              title: 'Already exist!',
+              text: 'Coupon already exist!',
+              icon: 'warning',
+              confirmButtonText: 'Okay'
             })
             }
         })

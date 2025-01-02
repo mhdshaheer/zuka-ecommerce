@@ -149,8 +149,6 @@ const loadDashboard = async (req, res) => {
                             _id: { $arrayElemAt: ["$categoryDetails._id", 0] },
                             categoryName: { $first: { $arrayElemAt: ["$categoryDetails.name", 0] } },
                             totalSales: { $sum: "$orderedItems.quantity" },
-                            // totalQuantity: { $sum: "$orderedItems.quantity" },
-                            // totalSales: { $sum: "$orderedItems.totalPrice" },
                         },
                     },
                     { $sort: { totalQuantity: -1 } },

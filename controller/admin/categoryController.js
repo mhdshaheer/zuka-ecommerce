@@ -1,6 +1,5 @@
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
-const { updateOne } = require("../../models/userSchema");
 
 
 const categoryInfo = async (req, res) => {
@@ -36,7 +35,6 @@ const categoryInfo = async (req, res) => {
 
 const addCategory = async (req, res) => {
     try {
-        console.log('data from frontend : ', req.body)
         const { name, description } = req.body;
         
         const existingCategory = await Category.findOne({ name });
@@ -48,7 +46,6 @@ const addCategory = async (req, res) => {
             description
         });
         await newCategory.save();
-        console.log("category added to database");
         return res.json({ message: "Category added successfully" })
 
     } catch (error) {
@@ -58,31 +55,12 @@ const addCategory = async (req, res) => {
 }
 
 
-const deleteCategory = async (req, res) => {
-    try {
-        const id = req.params.id;
-        const result = await Category.deleteOne({ _id: id });
-        const deleteProducts = await Products.updateMany({category:id,'varient.stock':{$lt:10}},{$set:{isBlocked:true}})
-        console.log("deleted count = ", result.deletedCount)
 
-        if (result.deletedCount === 1) {
-            console.log("inside success delete category")
-            res.status(200).send('Category deleted successfully');
-        } else {
-            console.log("inside failed delete category")
-            res.status(404).send('Category not found');
-        }
-    } catch (err) {
-        console.error('Error deleting category:', err);
-        res.status(500).send('Failed to delete category');
-    }
-};
 
 const addOffer = async (req, res) => {
     try {
         const { id } = req.params;
         const { newPrice } = req.body;
-        console.log("new price is :", newPrice);
         await Category.updateOne({ _id: id }, { $set: { categoryOffer: newPrice } })
         const products = await Product.find({category:id})
 
@@ -125,7 +103,6 @@ const editCategory = async (req, res) => {
     if (req.session.admin) {
         try {
 
-            console.log('category details:', req.body)
             const { name, description, isListed } = req.body
             const { id } = req.params;
             
@@ -139,7 +116,6 @@ const editCategory = async (req, res) => {
                 return res.status(404).json({ message: 'Category not found' });
             }
             res.status(201).json({ message: 'Edit successfull' })
-            console.log('category updated successfully', updateCategory)
         } catch (error) {
             console.error('Error updating category:', error);
             res.status(500).json({ message: 'Failed to update category', error });
@@ -152,7 +128,6 @@ const editCategory = async (req, res) => {
 module.exports = {
     categoryInfo,
     addCategory,
-    deleteCategory,
     addOffer,
     removeOffer,
     editCategory
