@@ -5,6 +5,7 @@ const Order = require('../../models/orderSchema');
 const Category = require('../../models/categorySchema')
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 
@@ -34,12 +35,10 @@ const login = async (req, res) => {
             console.log(passwordMatch)
             if (passwordMatch) {
                 req.session.admin = true;
-                // return res.redirect('/admin/dashboard')
-                return res.status(200).json({ message: "" })
+                return res.status(httpStatusCode.OK).json({ message: "" })
 
             } else {
-                // return res.redirect('/admin/login')
-                return res.status(200).json({ message: "Incorrect password" })
+                return res.status(httpStatusCode.OK).json({ message: "Incorrect password" })
             }
         } else {
             return res.redirect('/admin/login')

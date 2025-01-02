@@ -1,5 +1,6 @@
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 const categoryInfo = async (req, res) => {
@@ -50,7 +51,7 @@ const addCategory = async (req, res) => {
 
     } catch (error) {
         console.log("add category error", error);
-        return res.status(500).json({ error: "Internal server error....HAI" })
+        return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error....HAI" })
     }
 }
 
@@ -71,20 +72,20 @@ const addOffer = async (req, res) => {
                 { $set: { offerPrice: offerPrice } }
             );
         }
-        res.status(201).json({ success: true, message: 'Offer added successfully' });
+        res.status(httpStatusCode.CREATED).json({ success: true, message: 'Offer added successfully' });
     } catch (error) {
         console.log("Error in add category offer", error);
-        res.status(500).json({ success: false, message: 'Failed to add offer', error: err });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to add offer', error: err });
     }
 }
 
 const removeOffer = async (req, res) => {
     try {
-        const { id } = req.params;
-        await Category.updateOne({ _id: id }, { $set: { categoryOffer: 0 } });
+        const { categoryId } = req.params;
+        await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: 0 } });
 
         //up
-        const products = await Product.find({category:id})
+        const products = await Product.find({category:categoryId})
         for (const product of products) {
             const offerPrice = 0;
             await Product.updateOne(
@@ -92,10 +93,10 @@ const removeOffer = async (req, res) => {
                 { $set: { offerPrice: offerPrice } }
             );
         }
-        res.status(201).json({ success: true, message: 'Offer is removed Successfully' })
+        res.status(httpStatusCode.CREATED).json({ success: true, message: 'Offer is removed Successfully' })
     } catch (error) {
         console.log("Error in removing category offer", error);
-        res.status(500).json({ success: true, message: "Error in removing offer" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: true, message: "Error in removing offer" })
     }
 }
 
@@ -104,18 +105,18 @@ const editCategory = async (req, res) => {
         try {
 
             const { name, description, isListed } = req.body
-            const { id } = req.params;
+            const { categoryId } = req.params;
             
             let updatedFields = { isListed }
             if (name !== undefined && name.trim() !== '') updatedFields.name = name;
             if (description !== undefined && description.trim() !== '') updatedFields.description = description;
 
-            const updateCategory = await Category.findOneAndUpdate({ _id: id }, updatedFields, { new: true })
+            const updateCategory = await Category.findOneAndUpdate({ _id: categoryId }, updatedFields, { new: true })
 
             if (!updateCategory) {
-                return res.status(404).json({ message: 'Category not found' });
+                return res.status(httpStatusCode.NOT_FOUND).json({ message: 'Category not found' });
             }
-            res.status(201).json({ message: 'Edit successfull' })
+            res.status(httpStatusCode.CREATED).json({ message: 'Edit successfull' })
         } catch (error) {
             console.error('Error updating category:', error);
             res.status(500).json({ message: 'Failed to update category', error });
