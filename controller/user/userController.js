@@ -13,6 +13,7 @@ const env = require("dotenv").config()
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 //===================================================
 
@@ -22,7 +23,7 @@ const loadSignup = async (req, res) => {
     try {
         res.render('signup', { message: "" })
     } catch (error) {
-        res.status(500).send('Server error')
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('Server error')
     }
 }
 
@@ -129,7 +130,7 @@ const resentOtp = async (req, res) => {
         const { email } = req?.session?.userData;
 
         if (!email) {
-            return res.status(400).json({ success: false, message: "Email not found in session" })
+            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Email not found in session" })
         }
 
         let otp = generateOtp();
@@ -137,13 +138,13 @@ const resentOtp = async (req, res) => {
         const emailSent = await sendEmailVerify(email, otp);
 
         if (emailSent) {
-            res.status(200).json({ success: true, message: "otp resent successfully" })
+            res.status(httpStatusCode.OK).json({ success: true, message: "otp resent successfully" })
         } else {
-            res.status(500).json({ success: false, message: "Failed to resent otp,Please try again" })
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resent otp,Please try again" })
         }
 
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error,please try again" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error,please try again" })
     }
 }
 
@@ -214,11 +215,11 @@ const verifyOtp = async (req, res) => {
             res.json({ success: true, redirectUrl: "/" });
 
         } else {
-            res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Invalid OTP , Please try again" })
         }
     } catch (error) {
         console.error("Error verifying OTP ", error);
-        res.status(500).json({ success: false, message: "An error occured" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured" })
     }
 }
 
@@ -243,7 +244,7 @@ const loadHomePage = async (req, res) => {
 
     } catch (error) {
         console.log('Home page not found!', error);
-        res.status(500).send('Server error')
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('Server error')
     }
 
 }
@@ -282,10 +283,10 @@ const editName = async (req, res) => {
         const { userName } = req.body
         const result = await User.updateOne({ _id: user._id }, { $set: { name: userName } })
         req.session.user.name = userName
-        res.status(200).json({ success: "profile name successfully edited" })
+        res.status(httpStatusCode.OK).json({ success: "profile name successfully edited" })
         res.redirect('/profile')
     } catch (error) {
-
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
     }
 }
 //Load passChange page
@@ -305,11 +306,11 @@ const changePass = async (req, res) => {
         const userPass = req.session.user.password;
         const compPass = await bcrypt.compare(oldPassword, userPass)
         if (!compPass) {
-            return res.status(401).json({ message: "Password not match" })
+            return res.status(httpStatusCode.UNAUTHORIZED).json({ message: "Password not match" })
         }
         const changePass = await securePassword(newPassword);
         await User.updateOne({ _id: user._id }, { $set: { password: changePass } })
-        return res.status(200).json({ message: "success" })
+        return res.status(httpStatusCode.OK).json({ message: "success" })
     } catch (error) {
         console.log("server error", error);
         res.redirect('/pageNotFound')
@@ -340,16 +341,16 @@ const sentOtp = async (req, res) => {
             req.session.forgotOtp = otp;
             const sentOtp = await sendEmailVerify(email, otp);
             if (sentOtp) {
-                res.status(200).json({ message: "success" });
+                res.status(httpStatusCode.OK).json({ message: "success" });
 
             }
 
         } else {
-            res.status(401).json({ message: "Email not match" });
+            res.status(httpStatusCode.UNAUTHORIZED).json({ message: "Email not match" });
         }
         console.log(email)
     } catch (error) {
-
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
     }
 }
 const loadForgotOtpVerify = async (req, res) => {
@@ -364,13 +365,13 @@ const verifyForgot = async (req, res) => {
     try {
         const { otp } = req.body;
         if (otp == req.session.forgotOtp) {
-            return res.status(200).json({ success: true })
+            return res.status(httpStatusCode.OK).json({ success: true })
         } else {
-            res.status(400).json({ success: false, message: "Invalid OTP , Please try again" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Invalid OTP , Please try again" })
         }
     } catch (error) {
         console.error("Error verifying OTP ", error);
-        res.status(500).json({ success: false, message: "An error occured" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured" })
     }
 }
 
@@ -383,14 +384,14 @@ const resentForgotOtp = async (req, res) => {
         const emailSent = await sendEmailVerify(email, otp);
 
         if (emailSent) {
-            res.status(200).json({ success: true, message: "otp resent successfully" })
+            res.status(httpStatusCode.OK).json({ success: true, message: "otp resent successfully" })
         } else {
-            res.status(500).json({ success: false, message: "Failed to resent otp,Please try again" })
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resent otp,Please try again" })
         }
 
     } catch (error) {
         console.error("error resenting otp", error);
-        res.status(500).json({ success: false, message: "Internal server error,please try again" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error,please try again" })
     }
 }
 
@@ -411,14 +412,14 @@ const updatePass = async (req, res) => {
         if (result) {
             // req.session.user.password=bcryptPass;
             req.session.destroy()
-            res.status(200).json({ message: "Password changed successfully" });
+            res.status(httpStatusCode.OK).json({ message: "Password changed successfully" });
         } else {
-            res.status(400).json({ message: "Password change error" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ message: "Password change error" })
         }
 
     } catch (error) {
         console.log("server error in password changing", error)
-        res.status(500).json({ message: "Server while changing password" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Server while changing password" })
     }
 }
 // ================ Profile -> address ====================================
@@ -464,14 +465,14 @@ const addAddress = async (req, res) => {
             { upsert: true, new: true }
         );
         if (updateAddress) {
-            res.status(200).json({ success: true })
+            res.status(httpStatusCode.OK).json({ success: true })
         } else {
-            res.status(400).json({ success: false })
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false })
         }
         // await address.save()
     } catch (error) {
         console.log("error in adding address", error)
-        res.status(500).json({ success: false })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false })
     }
 }
 
@@ -485,7 +486,7 @@ const deleteAddress = async (req, res) => {
             { $pull: { address: { _id: addressId } } }
         );
 
-        res.status(200).json({ success: true })
+        res.status(httpStatusCode.OK).json({ success: true })
 
 
 
@@ -535,7 +536,7 @@ const editAddressData = async (req, res) => {
             }
         )
         if (result) {
-            res.status(200).json({ success: true })
+            res.status(httpStatusCode.OK).json({ success: true })
         }
     } catch (error) {
         console.log(error);
@@ -616,7 +617,7 @@ const cancelOrder = async (req, res) => {
         } else if (cancelOrder.modifiedCount === 0) {
             console.warn("Status was not modified (maybe it was already the same)");
         } else {
-            res.status(200).json({ success: true })
+            res.status(httpStatusCode.OK).json({ success: true })
         }
     } catch (error) {
         console.log(error)
@@ -628,7 +629,7 @@ const returnOrder = async (req, res) => {
         const { orderId } = req.body
         const updateStatus = await Order.updateOne({ orderId: orderId }, { $set: { status: 'Return Request' } });
         if (updateStatus) {
-            res.status(200).json({ success: true })
+            res.status(httpStatusCode.OK).json({ success: true })
         }
 
     } catch (error) {
@@ -651,7 +652,7 @@ const invoiceDownload = async (req, res) => {
     const myAddress = address.address[0];
 
     if (!order) {
-      return res.status(404).send('Order not found');
+      return res.status(httpStatusCode.NOT_FOUND).send('Order not found');
     }
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -731,7 +732,7 @@ const invoiceDownload = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error("Error generating invoice:", error);
-    res.status(500).send("An error occurred while generating the invoice.");
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("An error occurred while generating the invoice.");
   }
 };
 

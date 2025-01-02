@@ -8,6 +8,7 @@ const Coupon = require('../../models/couponSchema')
 const mongoose = require('mongoose')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema');
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 const loadShop = async (req, res) => {
     try {
@@ -89,7 +90,7 @@ const loadShop = async (req, res) => {
 
     } catch (error) {
         console.log("error in shop page", error);
-        res.status(500).render('error', { message: 'Internal server error' });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('error', { message: 'Internal server error' });
     }
 };
 
@@ -197,7 +198,7 @@ const couponApply = async (req, res) => {
         req.session.couponId = coupon._id;
         req.session.code = coupon.code
 
-        res.status(200).json({ success: true, coupon })
+        res.status(httpStatusCode.OK).json({ success: true, coupon })
     } catch (error) {
         console.log(error)
     }
@@ -209,7 +210,7 @@ const removeCoupon = async (req,res)=>{
         req.session.minimumPrice = 0;
         req.session.couponId = 0;
         req.session.code = null
-        res.status(200).json({message:true})
+        res.status(httpStatusCode.OK).json({message:true})
     } catch (error) {
         console.log("Error in coupon remove from the cart",error)
     }
@@ -220,7 +221,7 @@ const addToCart = async (req, res) => {
         const user = req.session.user || req.session.googleUser;
         let { size, stock, productObj, quantity } = req.body
         if (!user) {
-            return res.status(404).json({ message: false })
+            return res.status(httpStatusCode.NOT_FOUND).json({ message: false })
         }
 
         const sizeFound = await Cart.findOne({ userId: user._id, 'items.size': size, 'items.productId': productObj._id });
@@ -231,7 +232,7 @@ const addToCart = async (req, res) => {
 
         // manage duplicate adding to cart
         if (sizeFound) {
-            return res.status(404).json({ itemFound: 1 })
+            return res.status(httpStatusCode.NOT_FOUND).json({ itemFound: 1 })
            
 
         } else {
@@ -252,7 +253,7 @@ const addToCart = async (req, res) => {
                 { upsert: true, new: true }
             );
             if (toCart) {
-                res.status(200).json({ message: true })
+                res.status(httpStatusCode.OK).json({ message: true })
             }
         }
     } catch (error) {
@@ -272,7 +273,7 @@ const deleteFromCart = async (req, res) => {
         const result = await Cart.updateOne({ userId: user._id }, { $set: { items: cart.items } })
 
         if (result) {
-            res.status(200).json({ message: true })
+            res.status(httpStatusCode.OK).json({ message: true })
         }
 
     } catch (error) {
@@ -284,7 +285,7 @@ const getStock = async (req, res) => {
     const { variantId } = req.body
     const product = await Product.findOne({ 'variant._id': variantId }, { 'variant.$': 1 })
     const variantStock = product?.variant[0]?.stock;
-    return res.status(200).json({ variantStock })
+    return res.status(httpStatusCode.OK).json({ variantStock })
 }
 //Orders
 
@@ -300,11 +301,11 @@ const addOrder = async (req, res) => {
         const cart = await Cart.findOne({ userId: user._id }).populate('items.productId'); 
 
         if (!cart) {
-            return res.status(400).json({ success: false, message: "Cart not found" });
+            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cart not found" });
         }
         const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
         if (isAnyProductBlocked) {
-            return res.status(401).json({
+            return res.status(httpStatusCode.UNAUTHORIZED).json({
                 message: "Your cart contains blocked products. Please remove them to proceed."
             });
         }
@@ -371,11 +372,11 @@ const addOrder = async (req, res) => {
             await Cart.deleteOne({ userId: user._id })
 
 
-            res.status(200).json({ orderId: order._id })
+            res.status(httpStatusCode.OK).json({ orderId: order._id })
         }
     } catch (error) {
         console.log(error)
-        res.status(500).json({ success: false })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false })
     }
 }
 
@@ -416,7 +417,7 @@ const editCart = async (req, res) => {
         } else if (result.modifiedCount === 0) {
             console.warn("Quantity was not modified (maybe it was already the same)");
         } else {
-            return res.status(200).json({ success: true, totalSum })
+            return res.status(httpStatusCode.OK).json({ success: true, totalSum })
         }
     } catch (error) {
         console.log(error);
@@ -451,7 +452,7 @@ const addToWishlist = async (req, res) => {
             );
 
             if (isIncluded) {
-                return res.status(201).json({ message: "product already exist" })
+                return res.status(httpStatusCode.CREATED).json({ message: "product already exist" })
             }
         }
         const addWishlist = await Wishlist.findOneAndUpdate(
@@ -467,11 +468,11 @@ const addToWishlist = async (req, res) => {
             { new: true, upsert: true }
         )
         if (addWishlist) {
-            res.status(200).json({ success: true })
+            res.status(httpStatusCode.OK).json({ success: true })
         }
     } catch (error) {
         console.log(error)
-        res.status(500).json({ success: false })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false })
     }
 }
 
@@ -484,7 +485,7 @@ const deleteFromWishlist = async (req, res) => {
         wishlist.products.splice(index, 1)
         const removeItem = await Wishlist.updateOne({ userId: user._id }, { $set: { products: wishlist.products } })
         if (removeItem) {
-            return res.status(200).json({ success: true })
+            return res.status(httpStatusCode.OK).json({ success: true })
         }
 
     } catch (error) {

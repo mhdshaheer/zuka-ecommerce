@@ -4,7 +4,8 @@ const env = require("dotenv").config()
 const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema')
 const Product = require('../../models/productSchema')
-const Coupon = require('../../models/couponSchema')
+const Coupon = require('../../models/couponSchema');
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 // Initialize Razorpay instance
@@ -54,7 +55,7 @@ const createOrder = async (req, res) => {
             })
 
             await Cart.deleteOne({ userId: user._id })
-            res.status(200).json({
+            res.status(httpStatusCode.OK).json({
                 key: razorpay.key_id,
                 order,
                 order_id: myOrder._id
@@ -63,7 +64,7 @@ const createOrder = async (req, res) => {
         // ===========================
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
-        res.status(500).json({ error: "Failed to create Razorpay order." });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Failed to create Razorpay order." });
     }
 };
 
@@ -83,12 +84,12 @@ const verifyPayment = async (req, res) => {
 
             const updateOrder = await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } });
 
-            res.status(200).json({ success: true, orderId: order_id });
+            res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
 
 
 
         } else {
-            res.status(400).json({ success: false });
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
         }
     } catch (error) {
         console.log(error)
@@ -107,12 +108,12 @@ const createOrder_OP = async (req, res) => {
             receipt: "order_rcptid_11"
         });
 
-        res.status(200).json({ key: razorpay.key_id, order });
+        res.status(httpStatusCode.OK).json({ key: razorpay.key_id, order });
 
         // ===========================
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
-        res.status(500).json({ error: "Failed to create Razorpay order." });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Failed to create Razorpay order." });
     }
 };
 
@@ -131,10 +132,10 @@ const verifyRetryPayment = async (req, res) => {
         if (hmac === razorpay_signature) {
 
             await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } })
-            res.status(200).json({ success: true, orderId: order_id });
+            res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
 
         } else {
-            res.status(400).json({ success: false });
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
         }
     } catch (error) {
         console.log(error)
