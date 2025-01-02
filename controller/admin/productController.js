@@ -1,6 +1,7 @@
 const Category = require('../../models/categorySchema')
 const cloudinary = require('../../config/cloudinary');
 const Product = require('../../models/productSchema')
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 const loadProduct = async (req, res) => {
@@ -48,10 +49,10 @@ const addProduct = async (req, res) => {
         });
 
         await newProduct.save();
-        res.status(200).json({ message: 'Product added successfully' });
+        res.status(httpStatusCode.OK).json({ message: 'Product added successfully' });
     } catch (error) {
         console.error('Error adding product:', error);
-        res.status(500).json({ message: 'Error adding product', error });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Error adding product', error });
     }
 };
 
@@ -78,7 +79,7 @@ const productList = async (req, res) => {
             });
         } catch (error) {
             console.log("Error in product list", error);
-            res.status(500).send("Server error while fetching products");
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Server error while fetching products");
         }
     } else {
         res.redirect('/admin/login');
@@ -92,13 +93,13 @@ const deleteProduct = async (req, res) => {
         const result = await Product.deleteOne({ _id: productId });
 
         if (result.deletedCount === 1) {
-            res.status(200).send('Product deleted successfully');
+            res.status(httpStatusCode.OK).send('Product deleted successfully');
         } else {
-            res.status(404).send('Product not found');
+            res.status(httpStatusCode.NOT_FOUND).send('Product not found');
         }
     } catch (error) {
         console.log('error in product deleting', error)
-        res.status(500).send('error in product deleting');
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('error in product deleting');
     }
 }
 
@@ -120,13 +121,13 @@ const editProduct = async (req, res) => {
 
         const updateProduct = await Product.findOneAndUpdate({ _id: productId }, updatedFields, { new: true })
         if (!updateProduct) {
-            return res.status(404).json({ message: 'Product not found' });
+            return res.status(httpStatusCode.NOT_FOUND).json({ message: 'Product not found' });
         }
-        res.status(201).json({ message: 'Product Edit successfull' })
+        res.status(httpStatusCode.CREATED).json({ message: 'Product Edit successfull' })
 
     } catch (error) {
         console.error('Error updating product:', error);
-        res.status(500).json({ message: 'Failed to update product', error });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update product', error });
     }
 }
 
@@ -162,9 +163,9 @@ const updateImages = async (req,res)=>{
         images:imageUrls
     })
     if(!updateImg){
-        res.status(404).json({ message: 'Product not found' })
+        res.status(httpStatusCode.NOT_FOUND).json({ message: 'Product not found' })
     }
-    res.status(200).json({ message: 'Product updated' })
+    res.status(httpStatusCode.OK).json({ message: 'Product updated' })
 
     } catch (error) {
         console.log("error in update images",error)
@@ -201,10 +202,9 @@ const loadManageStock = async (req, res) => {
 const updateStock = async (req,res)=>{
     try {
         const {variantId,stock} = req.body;
-        console.log(variantId,stock);
         const result = await Product.updateOne({'variant._id':variantId},{$inc:{['variant.$.stock']:Number(stock)}})
         if(result){
-            res.status(200).json({success:true});
+            res.status(httpStatusCode.OK).json({success:true});
         }
     } catch (error) {
         console.log(error)

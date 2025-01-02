@@ -1,7 +1,7 @@
 const Order = require('../../models/orderSchema');
 const exceljs = require('exceljs'); 
 const PDFDocument = require("pdfkit");
-
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 const loadSalesReportPage = async (req, res) => {
@@ -57,7 +57,7 @@ const loadSalesReportPage = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal Server Error");
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
@@ -174,7 +174,7 @@ const exportPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     console.error("Error generating PDF:", error);
-    res.status(500).send("Internal Server Error");
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
   }
 };
 
