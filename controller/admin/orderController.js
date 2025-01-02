@@ -2,6 +2,7 @@ const Category = require('../../models/categorySchema')
 const Product = require('../../models/productSchema')
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
+const httpStatusCode = require('../../helpers/httpStatusCode')
 
 const loadOrderList = async (req,res)=>{
     try {
@@ -21,14 +22,12 @@ const loadOrderList = async (req,res)=>{
         })
     } catch (error) {
         res.redirect("/admin/login")
-        console.log(error)
     }
 }
 
 const orderDetails = async (req,res)=>{
     try {
         const order_id = req.query.order_id
-        console.log(order_id);
         const orders = await Order.findOne({_id:order_id}).populate('orderedItems.productId');
         const address = await Address.findOne({userId:orders.userId,'address._id':orders.address},{'address.$':1})
         
@@ -48,9 +47,9 @@ const changeOrderStatus = async (req,res)=>{
         const {status} =req.body
         const result = await Order.updateOne({_id:order_id},{$set:{status:status}})
         if(result){
-            res.status(200).json({success:true})
+            res.status(httpStatusCode.OK).json({success:true})
         }else{
-            res.status(400).json({success:false})
+            res.status(httpStatusCode.BAD_REQUEST).json({success:false})
         }
 
     } catch (error) {
