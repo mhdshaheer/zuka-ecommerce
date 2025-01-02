@@ -334,7 +334,7 @@
         <script>
           document.write(new Date().getFullYear());
         </script>
-        &copy; Nest - HTML Ecommerce Template .
+        &copy; Zuka sports - Ecommerce.
       </div>
       <div class="col-sm-6">
         <div class="text-sm-end">All rights reserved</div>
@@ -355,36 +355,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
-      // Get chart data from server
-      // const chartLabels = <%- JSON.stringify(chartLabels) %>;
-      // const chartData = <%- JSON.stringify(chartData) %>;
-
-      // console.log("Chart Labels:", chartLabels);
-      // console.log("Chart Data:", chartData);
-  
-      // // Chart configuration
-      // const ctx = document.getElementById("salesChart").getContext("2d");
-      // new Chart(ctx, {
-      //     type: "bar",
-      //     data: {
-      //         labels: chartLabels,
-      //         datasets: [{
-      //             label: "<%= dataType === 'products' ? 'Top Selling Products' : 'Top Selling Categories' %>",
-      //             data: chartData,
-      //             backgroundColor: "rgba(75, 192, 192, 0.6)",
-      //             borderColor: "rgba(75, 192, 192, 1)",
-      //             borderWidth: 1
-      //         }]
-      //     },
-      //     options: {
-      //         responsive: true,
-      //         scales: {
-      //             y: {
-      //                 beginAtZero: true
-      //             }
-      //         }
-      //     }
-      // });
+     
       const chartDataElement = document.getElementById('chartData');
     const chartLabels = JSON.parse(chartDataElement.getAttribute('data-labels'));
     const chartData = JSON.parse(chartDataElement.getAttribute('data-values'));

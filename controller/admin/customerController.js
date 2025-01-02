@@ -53,7 +53,8 @@ const blockUser = async (req, res) => {
     try {
         let id = req.query.id;
         await User.updateOne({ _id: id }, { $set: { isBlocked: true } });
-        res.redirect(`/admin/users`);
+        // res.redirect(`/admin/users`);
+        // res.status(200).json({success:true})
     } catch (error) {
         res.redirect('/admin/admin-error');
         console.log("error in block user", error)
@@ -64,7 +65,8 @@ const unBlockUser = async (req, res) => {
     try {
         let id = req.query.id;
         await User.updateOne({ _id: id }, { $set: { isBlocked: false } });
-        res.redirect('/admin/users');
+        // res.redirect('/admin/users');
+        // res.status(200).json({success:true})
     } catch (error) {
         res.redirect('/admin/admin-error');
         console.log("error in unBlock user", error)
