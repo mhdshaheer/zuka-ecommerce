@@ -62,6 +62,7 @@ const deleteCategory = async (req, res) => {
     try {
         const id = req.params.id;
         const result = await Category.deleteOne({ _id: id });
+        const deleteProducts = await Products.updateMany({category:id,'varient.stock':{$lt:10}},{$set:{isBlocked:true}})
         console.log("deleted count = ", result.deletedCount)
 
         if (result.deletedCount === 1) {
