@@ -1,4 +1,5 @@
 const Coupon = require('../../models/couponSchema')
+const httpStatusCode = require('../../helpers/httpStatusCode')
 const loadCouponPage = async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1; 
@@ -24,7 +25,7 @@ const addCoupon = async (req,res)=>{
         const {couponCode,minAmount,discountValue,activationDate,expiryDate} = req.body;
         const findCoupon = await Coupon.findOne({code:couponCode})
         if(findCoupon){
-            res.status(400).json({success:false})
+            res.status(httpStatusCode.BAD_REQUEST).json({success:false})
         }
         const coupon = new Coupon({
             code:couponCode,
@@ -35,7 +36,7 @@ const addCoupon = async (req,res)=>{
         })
         await coupon.save();
 
-        res.status(200).json({success:true})
+        res.status(httpStatusCode.OK).json({success:true})
     } catch (error) {
         
         console.log(error)
@@ -46,7 +47,7 @@ const blockCoupon = async (req,res)=>{
     try {  
         const {couponId} = req.body;
         await Coupon.updateOne({_id:couponId},{$set:{isList:false}});
-        res.status(200).json({success:true})      
+        res.status(httpStatusCode.OK).json({success:true})      
     } catch (error) {
         console.log(error)
     }
@@ -55,7 +56,7 @@ const unBlockCoupon = async (req,res)=>{
     try {  
         const {couponId} = req.body;
         await Coupon.updateOne({_id:couponId},{$set:{isList:true}});
-        res.status(200).json({success:true})      
+        res.status(httpStatusCode.OK).json({success:true})      
     } catch (error) {
         console.log(error)
     }
