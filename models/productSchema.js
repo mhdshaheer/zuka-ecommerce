@@ -65,6 +65,9 @@ const productSchema = new Schema({
         enum: ['available', 'out of stock', 'discontinued'],
         default: 'available',
       },
+      isBlocked:{
+        type:Boolean,
+      }
     },
   ],
   isBlocked: {

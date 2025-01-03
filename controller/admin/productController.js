@@ -1,7 +1,8 @@
 const Category = require('../../models/categorySchema')
 const cloudinary = require('../../config/cloudinary');
 const Product = require('../../models/productSchema')
-const httpStatusCode = require('../../helpers/httpStatusCode')
+const httpStatusCode = require('../../helpers/httpStatusCode');
+const HttpStatusCode = require('../../helpers/httpStatusCode');
 
 
 const loadProduct = async (req, res) => {
@@ -57,7 +58,6 @@ const addProduct = async (req, res) => {
 };
 
 const productList = async (req, res) => {
-    if (req.session.admin) {
         try {
             const page = parseInt(req.query.page) || 1; 
             const limit = parseInt(req.query.limit) || 10;
@@ -81,9 +81,7 @@ const productList = async (req, res) => {
             console.log("Error in product list", error);
             res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Server error while fetching products");
         }
-    } else {
-        res.redirect('/admin/login');
-    }
+   
 };
 
 
@@ -210,6 +208,69 @@ const updateStock = async (req,res)=>{
         console.log(error)
     }
 }
+
+const editVariantLoad = async (req,res)=>{
+    try {
+        const productId = req.query.productId
+        const product = await Product.findOne({_id:productId})
+        res.render('add product/editVariant',{
+            product
+        })
+    } catch (error) {
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
+    }
+}
+
+const variantUpdate = async (req,res)=>{
+    try {
+        const {variantId,variantPrice,variantStock} = req.body;
+        console.log(variantId,typeof variantPrice,typeof variantStock);
+        await Product.updateOne({'variant._id':variantId},{$set:{'variant.$.stock':variantStock,'variant.$.price':variantPrice}});
+        res.status(HttpStatusCode.OK).json({success:true})
+    } catch (error) {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
+    }
+}
+
+const blockVariant = async (req,res)=>{
+    try {
+        const variantId = req.params.variantId;
+        await Product.updateOne({'variant._id':variantId},{$set:{'variant.$.isBlocked':true}})
+        res.status(HttpStatusCode.OK).json({success:true})
+    } catch (error) {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
+    }
+}
+const unblockVariant = async (req,res)=>{
+    try {
+        const variantId = req.params.variantId;
+        await Product.updateOne({'variant._id':variantId},{$set:{'variant.$.isBlocked':false}})
+        res.status(HttpStatusCode.OK).json({success:true})
+    } catch (error) {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
+    }
+}
+
+const addVariant = async (req,res)=>{
+    try {
+        const {productId} = req.query;
+        const {variantSize,variantPrice,variantStock} = req.body;
+        const sizeFound = await Product.findOne({'variant.size':variantSize})
+        if(sizeFound){
+            return res.status(HttpStatusCode.FORBIDDEN).json({message:`Size : ${variantSize}   Already exist` })
+        }
+        const newVariant = {
+            stock:variantStock,
+            price:variantPrice,
+            size:variantSize
+        }
+        await Product.updateOne({_id:productId},{$push:{variant:newVariant}})
+        const product = await Product.findOne({_id:productId});
+        res.status(HttpStatusCode.OK).json({product})
+    } catch (error) {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
+    }
+}
 module.exports = {
     loadProduct,
     addProduct,
@@ -220,5 +281,11 @@ module.exports = {
     unBlockProduct,
     updateImages,
     loadManageStock,
-    updateStock
+    updateStock,
+
+    editVariantLoad,
+    variantUpdate,
+    blockVariant,
+    unblockVariant,
+    addVariant
 }

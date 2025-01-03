@@ -36,7 +36,7 @@
                                 <th scope="col">Actions</th>
                                 <th scope="col">Change Image</th>
                                 <th scope="col">Block/Unblock</th>
-                                <!-- <th scope="col">Delete</th> -->
+                                <th scope="col">Edit variant</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -89,10 +89,9 @@
                                                                 onclick="return confirmBlock(event,this)">Block</a>
                                                         </td>
                                                         <%}%>
-                                                            <!-- <td>
-                                                                <a href="#" class="btn btn-sm btn-danger" id="deleteBtn"
-                                                                    onclick="deleteProduct('<%=products[i]._id%>')">Delete</a>
-                                                            </td> -->
+                                                            <td>
+                                                                <a href="/admin/editVariant?productId=<%=products[i]._id%>" class="btn btn-sm btn-primary" id="variantBtn">Variant</a>
+                                                            </td>
                                 </tr>
                                 <%}%>
                         </tbody>
@@ -306,24 +305,8 @@
 
 
     <script>
-        // delete product
-        function deleteProduct(id) {
-            console.log("delete function")
-            if (confirm('Are you sure you want to delete this category?')) {
-                fetch(`/admin/deleteProduct/${id}`, {
-                    method: 'DELETE'
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            alert('Product deleted successfully');
-                            window.location.reload(); // Reload the page to show changes
-                        } else {
-                            alert('Failed to delete the product');
-                        }
-                    })
-                    .catch(err => console.error('Error:', err));
-            }
-        }
+      
+        
 
         //edit product
         function productEdit(id,name,regPrice,offPrice,col,desc) {
