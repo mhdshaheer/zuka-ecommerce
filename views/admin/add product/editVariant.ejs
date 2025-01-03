@@ -1,0 +1,249 @@
+<%-include('../../views/partials/admin/adminHeader')%>
+    <style>
+    </style>
+    <section class="content-main">
+        <div class="content-header">
+            <div>
+                <h2 class="content-title card-title">Edit variant</h2>
+                <p>Edit variant and stock management.</p>
+            </div>
+
+        </div>
+        <div class="card mb-4">
+            <header class="card-header">
+                <div class="row gx-3">
+                    <h4>
+                        <%=product.productName%>
+                    </h4>
+                </div>
+            </header>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th scope="col">Size</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% product.variant.forEach((item, index)=> { %>
+                                <tr>
+                                    <td>
+                                        <%= index + 1 %>
+                                    </td>
+                                    <td>
+                                        <%= item.size %>
+                                    </td>
+                                    <td>
+                                        <input type="number" value="<%= item.price %>"
+                                            class="form-control form-control-sm" style="width: 80px;"
+                                            id="variantPrice_<%= item._id %>">
+
+                                    </td>
+                                    <td class="d-flex stockBox">
+
+                                        <input type="number" value="<%= item.stock %>"
+                                            class="form-control form-control-sm" style="width: 80px;"
+                                            id="variantStock_<%= item._id %>">
+                                        <span><button class="btn btn-primary btn-sm ms-2"
+                                                onclick="updatePriceStock('<%=item._id%>')">Update</button></span>
+                                    </td>
+                                    <td>
+                                        <%if(item.isBlocked==true){%>
+                                            <button class="btn btn-danger"
+                                                onclick="blockVariant('<%=item._id%>')">block</button>
+                                            <%}else{%>
+                                                <button class="btn btn-primary px-2"
+                                                    onclick="unblockVariant('<%=item._id%>')">unblock</button>
+                                                <%}%>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#variantModal">ADD +</button>
+            </div>
+    </section>
+
+    <!-- modal -->
+    <div class="modal fade" id="variantModal" tabindex="-1" aria-labelledby="variantModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="variantModalLabel">Add/Edit Variant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="variantForm">
+                        <!-- Size Field -->
+                        <div class="mb-3">
+                            <label for="variantSizeInput" class="form-label">Variant Size</label>
+                            <input type="text" class="form-control" id="variantSizeInput" name="variant_size"
+                                placeholder="Enter size">
+                        </div>
+                        <!-- Price Field -->
+                        <div class="mb-3">
+                            <label for="variantPriceInput" class="form-label">Variant Price</label>
+                            <input type="number" class="form-control" id="variantPriceInput" name="variant_price"
+                                placeholder="Enter price">
+                        </div>
+                        <!-- Stock Field -->
+                        <div class="mb-3">
+                            <label for="variantStockInput" class="form-label">Variant Stock</label>
+                            <input type="number" class="form-control" id="variantStockInput" name="variant_stock"
+                                placeholder="Enter stock">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary"
+                        onclick="saveVariantData('<%=product._id%>')">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- modal -->
+    <%-include('../../views/partials/admin/adminFooter')%>
+
+        <script>
+
+            function updatePriceStock(variantId) {
+                const variantPrice = document.getElementById('variantPrice_' + variantId);
+                const variantStock = document.getElementById('variantStock_' + variantId);
+                console.log(variantPrice.value, variantId, variantStock.value);
+                axios.post('/admin/variantUpdate', {
+                    variantId,
+                    variantPrice: Number(variantPrice.value),
+                    variantStock: Number(variantStock.value)
+                })
+                    .then((res) => {
+                        if (res.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Stock & price updated successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            })
+                        }
+                    }).catch((error) => {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Error occured while updating!',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        })
+                    })
+            }
+
+            function blockVariant(variantId) {
+                axios.patch(`/admin/blockVariant/${variantId}`)
+                    .then(res => {
+                        if (res.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Variant blocked successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            })
+                        }
+                    })
+            }
+            function unblockVariant(variantId) {
+                axios.patch(`/admin/unblockVariant/${variantId}`)
+                    .then(res => {
+                        if (res.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Variant unblocked successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            })
+                        }
+                    })
+            }
+
+            function saveVariantData(productId) {
+                let productArr = []
+                const variantSize = document.getElementById('variantSizeInput').value;
+                const variantPrice = document.getElementById('variantPriceInput').value;
+                const variantStock = document.getElementById('variantStockInput').value;
+
+                console.log(variantPrice, variantSize, variantStock, productId);
+                axios.post(`/admin/addVariant?productId=${productId}`, {
+                    variantSize: variantSize.toUpperCase(),
+                    variantPrice,
+                    variantStock
+                })
+                    .then(res => {
+                        const tbody = document.querySelector('tbody')
+                        tbody.innerHTML =''
+                        if (res.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Variant Added successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            });
+                            const product = res.data.product;
+                            product.variant.forEach((item, index) => {
+                                let element = `
+                                            <tr>
+                                                <td>
+                                                    ${index + 1}
+                                                </td>
+                                                <td>
+                                                    ${item.size}
+                                                </td>
+                                                <td>
+                                                    <input type="number" value="${item.price}"
+                                                        class="form-control form-control-sm" style="width: 80px;"
+                                                        id="variantPrice_${item._id}">
+                                                </td>
+                                                <td class="d-flex stockBox">
+                                                    <input type="number" value="${item.stock}"
+                                                        class="form-control form-control-sm" style="width: 80px;"
+                                                        id="variantStock_${item._id}">
+                                                    <span><button class="btn btn-primary btn-sm ms-2"
+                                                            onclick="updatePriceStock('${item._id}')">Update</button></span>
+                                                </td>
+                                                <td>
+                                                    ${item.isBlocked
+                                                                            ? `<button class="btn btn-danger" onclick="blockVariant('${item._id}')">block</button>`
+                                                                            : `<button class="btn btn-primary px-2" onclick="unblockVariant('${item._id}')">unblock</button>`
+                                                                        }
+                                                </td>
+                                            </tr>
+                                        `;
+                                productArr += element;
+                            });
+                            tbody.innerHTML=productArr;
+
+                        }
+                    }).catch(error=>{
+                        if(error.response){
+                            Swal.fire({
+                                title: 'Error!',
+                                text: error.response.data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Okay'
+                            });
+                        }else{
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Having issues on variant adding!',
+                                icon: 'error',
+                                confirmButtonText: 'Okay'
+                            });
+
+                        }
+                    })
+            }
+        </script>
