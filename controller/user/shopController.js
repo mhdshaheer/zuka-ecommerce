@@ -100,12 +100,12 @@ const loadProductInfo = async (req, res) => {
         if (user?.isBlocked == true) {
             return res.redirect('/login')
         }
-        const id = req.query.id.trim();
-        const product = await Product.find({ _id: id })
+        const productId = req.query.id.trim();
+        const product = await Product.find({ _id: productId })
         const category = await Category.find({ _id: product[0].category })
         const relatedProduct = await Product.find({
             category:product[0].category,
-             _id: { $ne: id },
+             _id: { $ne: productId },
              isBlocked:false
             }).limit(4);
         res.render('productDetail', {

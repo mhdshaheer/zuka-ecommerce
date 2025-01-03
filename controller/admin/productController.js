@@ -6,7 +6,6 @@ const HttpStatusCode = require('../../helpers/httpStatusCode');
 
 
 const loadProduct = async (req, res) => {
-    if (req.session.admin) {
         try {
             const categories = await Category.find({ isListed: true }, { name: 1 })
             res.render('add product/productAdd', { categories })
@@ -16,9 +15,6 @@ const loadProduct = async (req, res) => {
             console.log('error in page load', error);
 
         }
-    } else {
-        res.redirect('/admin/login')
-    }
 }
 
 const addProduct = async (req, res) => {
@@ -85,27 +81,10 @@ const productList = async (req, res) => {
 };
 
 
-const deleteProduct = async (req, res) => {
-    try {
-        const { productId } = req.params;
-        const result = await Product.deleteOne({ _id: productId });
-
-        if (result.deletedCount === 1) {
-            res.status(httpStatusCode.OK).send('Product deleted successfully');
-        } else {
-            res.status(httpStatusCode.NOT_FOUND).send('Product not found');
-        }
-    } catch (error) {
-        console.log('error in product deleting', error)
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('error in product deleting');
-    }
-}
-
 const editProduct = async (req, res) => {
     try {
-        console.log(req.body)
         const { productName, description, category, regularPrice, offerPrice, color } = req.body;
-        const { productId } = req.params;
+        const productId  = req.params.id;
 
         let updatedFields = {}
         const categoryId = await Category.find({ name: category }, { _id: 1 })
@@ -152,7 +131,7 @@ const unBlockProduct = async (req, res) => {
 
 const updateImages = async (req,res)=>{
     try {
-        const { productId } = req.params;
+        const productId  = req.params.id;
 
     const imageUrls = req.files.map(file => file.path);
     
@@ -275,7 +254,6 @@ module.exports = {
     loadProduct,
     addProduct,
     productList,
-    deleteProduct,
     editProduct,
     blockProduct,
     unBlockProduct,

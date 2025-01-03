@@ -4,7 +4,6 @@ const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
 const categoryInfo = async (req, res) => {
-    if(req.session.admin){
     try {
 
         const page = parseInt(req.query.page) || 1;
@@ -29,9 +28,6 @@ const categoryInfo = async (req, res) => {
         console.log('error in admin category page...', error);
         res.redirect('/admin/admin-error');
     }
-}else{
-    res.redirect('/admin/login')
-}
 }
 
 const addCategory = async (req, res) => {
@@ -60,10 +56,10 @@ const addCategory = async (req, res) => {
 
 const addOffer = async (req, res) => {
     try {
-        const { id } = req.params;
+        const categoryId = req.params.id;
         const { newPrice } = req.body;
-        await Category.updateOne({ _id: id }, { $set: { categoryOffer: newPrice } })
-        const products = await Product.find({category:id})
+        await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: newPrice } })
+        const products = await Product.find({category:categoryId})
 
         for (const product of products) {
             const offerPrice = product.regularPrice * ((100 - newPrice) / 100);
@@ -81,7 +77,7 @@ const addOffer = async (req, res) => {
 
 const removeOffer = async (req, res) => {
     try {
-        const { categoryId } = req.params;
+        const categoryId  = req.params.id;
         await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: 0 } });
 
         //up
@@ -101,11 +97,10 @@ const removeOffer = async (req, res) => {
 }
 
 const editCategory = async (req, res) => {
-    if (req.session.admin) {
         try {
 
             const { name, description, isListed } = req.body
-            const { categoryId } = req.params;
+            const categoryId = req.params.id;
             
             let updatedFields = { isListed }
             if (name !== undefined && name.trim() !== '') updatedFields.name = name;
@@ -121,9 +116,6 @@ const editCategory = async (req, res) => {
             console.error('Error updating category:', error);
             res.status(500).json({ message: 'Failed to update category', error });
         }
-    } else {
-        res.redirect('/admin/login')
-    }
 }
 
 module.exports = {

@@ -39,7 +39,6 @@ router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
 router.get('/products',adminAuth,productController.loadProduct);
 router.post('/addProduct',adminAuth,upload.array('images', 4),productController.addProduct)
 router.get('/productList',productController.productList)
-router.delete('/deleteProduct/:id',adminAuth,productController.deleteProduct)
 router.put('/editProduct/:id',adminAuth,productController.editProduct);
 router.get('/blockProduct',adminAuth,productController.blockProduct)
 router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)

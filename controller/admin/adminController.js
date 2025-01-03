@@ -49,7 +49,6 @@ const login = async (req, res) => {
     }
 }
 const loadDashboard = async (req, res) => {
-    if (req.session.admin) {
         try {
             const filterBy = req.query.filterBy || "weekly";
             const dataType = req.query.dataType || "products";
@@ -204,9 +203,7 @@ const loadDashboard = async (req, res) => {
             console.error("Dashboard loading error:", error);
             res.redirect("/admin/login");
         }
-    } else {
-        res.redirect("/admin/login");
-    }
+
 };
 
 const adminErrorLoad = async (req, res) => {
