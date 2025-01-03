@@ -56,10 +56,10 @@
                                         <%if(item.isBlocked==true){%>
                                             <button class="btn btn-danger"
                                                 onclick="blockVariant('<%=item._id%>')">block</button>
-                                            <%}else{%>
-                                                <button class="btn btn-primary px-2"
-                                                    onclick="unblockVariant('<%=item._id%>')">unblock</button>
-                                                <%}%>
+                                                <%}else{%>
+                                                    <button class="btn btn-primary px-2"
+                                                        onclick="unblockVariant('<%=item._id%>')">unblock</button>
+                                                    <%}%>
                                     </td>
                                 </tr>
                                 <% }) %>
@@ -172,11 +172,42 @@
 
             function saveVariantData(productId) {
                 let productArr = []
-                const variantSize = document.getElementById('variantSizeInput').value;
-                const variantPrice = document.getElementById('variantPriceInput').value;
-                const variantStock = document.getElementById('variantStockInput').value;
+                const variantSize = document.getElementById('variantSizeInput').value.trim();
+                const variantPrice = document.getElementById('variantPriceInput').value.trim();
+                const variantStock = document.getElementById('variantStockInput').value.trim();
 
-                console.log(variantPrice, variantSize, variantStock, productId);
+                // validation
+
+                if (!variantSize) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Variant size is required.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                    return;
+                }
+
+                if (!variantPrice || isNaN(variantPrice) || variantPrice <= 0) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Variant price must be a positive number.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                    return;
+                }
+
+                if (!variantStock || isNaN(variantStock) || variantStock < 0) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Variant stock must be a non-negative number.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                    return;
+                }
+
                 axios.post(`/admin/addVariant?productId=${productId}`, {
                     variantSize: variantSize.toUpperCase(),
                     variantPrice,
@@ -184,7 +215,7 @@
                 })
                     .then(res => {
                         const tbody = document.querySelector('tbody')
-                        tbody.innerHTML =''
+                        tbody.innerHTML = ''
                         if (res.status == 200) {
                             Swal.fire({
                                 title: 'Success!',
@@ -216,26 +247,26 @@
                                                 </td>
                                                 <td>
                                                     ${item.isBlocked
-                                                                            ? `<button class="btn btn-danger" onclick="blockVariant('${item._id}')">block</button>`
-                                                                            : `<button class="btn btn-primary px-2" onclick="unblockVariant('${item._id}')">unblock</button>`
-                                                                        }
+                                        ? `<button class="btn btn-danger" onclick="blockVariant('${item._id}')">block</button>`
+                                        : `<button class="btn btn-primary px-2" onclick="unblockVariant('${item._id}')">unblock</button>`
+                                    }
                                                 </td>
                                             </tr>
                                         `;
                                 productArr += element;
                             });
-                            tbody.innerHTML=productArr;
+                            tbody.innerHTML = productArr;
 
                         }
-                    }).catch(error=>{
-                        if(error.response){
+                    }).catch(error => {
+                        if (error.response) {
                             Swal.fire({
                                 title: 'Error!',
                                 text: error.response.data.message,
                                 icon: 'error',
                                 confirmButtonText: 'Okay'
                             });
-                        }else{
+                        } else {
                             Swal.fire({
                                 title: 'Error!',
                                 text: 'Having issues on variant adding!',
