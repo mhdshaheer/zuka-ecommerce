@@ -47,7 +47,7 @@ router.patch('/updatePass',userController.updatePass)
 
 //address
 router.post('/addAddress',userController.addAddress);
-router.delete('/deleteAddress',userController.deleteAddress);
+router.patch('/softDeleteAddress',userController.softDeleteAddress);
 router.get('/editAddress',userAuth,userController.LoadEditAddress);
 router.post('/editAddress',userController.editAddressData)
 

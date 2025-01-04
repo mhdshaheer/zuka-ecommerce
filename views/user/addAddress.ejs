@@ -185,7 +185,7 @@
                       <a href="/editAddress?addressId=<%=item._id%>&index=<%=index%>"><button
                           class="btn btn-secondary">Edit</button></a>
                       <button class="btn btn-danger" id="deleteBtn"
-                        onclick="deleteAddress('<%=index%>','<%=item._id%>')">Delete</button>
+                        onclick="softDeleteAddress('<%=index%>','<%=item._id%>')">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -346,8 +346,7 @@
 
           </script>
           <script>
-            function deleteAddress(index,addressId) {
-              console.log(index,addressId)
+            function softDeleteAddress(index,addressId) {
               Swal.fire({
                 title: 'Are you sure!',
                 text: 'Do you want to delete address!',
@@ -358,12 +357,10 @@
               }).then((result) => {
                 if (result.isConfirmed) {
 
-                  axios.delete('/deleteAddress', {
-                    params: {
-                      index: index,
-                      addressId
-                    }
-                  }).then(res => {
+                  axios.patch('/softDeleteAddress', {
+    index: index,
+    addressId: addressId
+}).then(res => {
                     if (res.status == 200) {
                       Swal.fire({
                         title: 'Success!',

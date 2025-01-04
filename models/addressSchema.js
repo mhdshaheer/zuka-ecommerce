@@ -43,6 +43,10 @@ const addressSchema = new Schema({
         country:{
             type:String,
             required:true
+        },
+        isBlocked:{
+            type:Boolean,
+            default:false
         }
     }]
 },{timestamps:true})

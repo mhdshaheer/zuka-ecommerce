@@ -435,7 +435,7 @@ const updatePass = async (req, res) => {
 const loadAddress = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser
-        const addressDb = await Address.findOne({ userId: user?._id })
+        const addressDb = await Address.findOne({ userId: user?._id ,'address.isblocked':false})
 
         return res.render('addAddress', {
             user,
@@ -483,18 +483,12 @@ const addAddress = async (req, res) => {
 }
 
 //delete address
-const deleteAddress = async (req, res) => {
+const softDeleteAddress = async (req, res) => {
     try {
-        const { index, addressId } = req.query;
-        const user = req.session.user || req.session.googleUser;
-        await Address.updateOne(
-            { userId: user._id },
-            { $pull: { address: { _id: addressId } } }
-        );
+        const { addressId } = req.body;
+        await Address.updateOne({'address._id':addressId},{$set:{'address.$.isBlocked':true}})
 
         res.status(httpStatusCode.OK).json({ success: true })
-
-
 
     } catch (error) {
         console.log(error)
@@ -791,7 +785,7 @@ module.exports = {
 
     //address
     addAddress,
-    deleteAddress,
+    softDeleteAddress,
     LoadEditAddress, //load
     editAddressData,
 
