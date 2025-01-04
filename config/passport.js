@@ -20,6 +20,8 @@ async (accessToken,refreshToken,profile,done)=>{
                 googleId:profile.id,
             })
             await user.save();
+            console.log("google login stored successfully")
+            console.log(profile.displayName)
             return done(null,user)
         }
     } catch (error) {
@@ -29,6 +31,7 @@ async (accessToken,refreshToken,profile,done)=>{
 ));
 
 passport.serializeUser((user,done)=>{
+    console.log("serial:",user.id,"user:",user)
     done(null,user.id);
 });
 

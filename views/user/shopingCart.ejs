@@ -244,20 +244,16 @@
             // =============================
 
             // Validate and get the quantity
-            let quantity = parseInt(quantityInput.value, 5);
+            let quantity = parseInt(quantityInput.value, 10);
             if (isNaN(quantity) || quantity < 1) {
                 quantity = 1;
                 quantityInput.value = 1;
-            } else if (dbStock <= 5) {
-                console.log("less quantity")
-                // quantity = 10;
-                // quantityInput.value = 10;
-            } else if (quantity > 5 && dbStock > 10) {
+            }  else if (quantity >= 5 && dbStock > 5) {
                 quantity = 5;
                 quantityInput.value = 5;
             }
 
-
+           
             // Ensure price is a valid number
             if (isNaN(price)) {
                 console.error("Invalid unit price. Ensure the data-price attribute is set correctly.");
