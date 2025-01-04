@@ -3,7 +3,7 @@ const app = express();
 const session = require("express-session");
 const nodemailer = require("nodemailer");
 const path = require('path');
-const morgan = require('morgan')
+// const morgan = require('morgan')
 const passport = require("./config/passport")
 const env = require("dotenv").config();
 const userRouter = require('./routes/userRouter')
@@ -15,7 +15,7 @@ const nocache = require('nocache')
 
 db();
 app.use(nocache())
-app.use(morgan('tiny'))
+// app.use(morgan('tiny'))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 

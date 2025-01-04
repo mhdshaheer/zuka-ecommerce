@@ -53,12 +53,13 @@
                                                 onclick="updatePriceStock('<%=item._id%>')">Update</button></span>
                                     </td>
                                     <td>
-                                        <%if(item.isBlocked==true){%>
-                                            <button class="btn btn-danger"
-                                                onclick="blockVariant('<%=item._id%>')">block</button>
-                                                <%}else{%>
-                                                    <button class="btn btn-primary px-2"
+                                        <%if(item.isBlocked){%>
+                                            <button class="btn btn-danger px-2"
                                                         onclick="unblockVariant('<%=item._id%>')">unblock</button>
+                                                <%}else{%>
+                                                    <button class="btn btn-primary"
+                                                onclick="blockVariant('<%=item._id%>')">block</button>
+                                                    
                                                     <%}%>
                                     </td>
                                 </tr>
@@ -152,6 +153,8 @@
                                 text: 'Variant blocked successfully!',
                                 icon: 'success',
                                 confirmButtonText: 'Okay'
+                            }).then(()=>{
+                                location.reload()
                             })
                         }
                     })
@@ -165,6 +168,9 @@
                                 text: 'Variant unblocked successfully!',
                                 icon: 'success',
                                 confirmButtonText: 'Okay'
+                            })
+                            .then(()=>{
+                                location.reload()
                             })
                         }
                     })

@@ -40,6 +40,7 @@ const signup = async (req, res) => {
             return res.render("signup", { message: "User with this email already exist" })
         }
         const otp = generateOtp()
+        console.log("otp is:",otp)
 
         const emailSent = await sendEmailVerify(email, otp);
         if (!emailSent) {
@@ -135,6 +136,7 @@ const resentOtp = async (req, res) => {
 
         let otp = generateOtp();
         req.session.userOtp = otp;
+        console.log("otp is:",otp)
         const emailSent = await sendEmailVerify(email, otp);
 
         if (emailSent) {
@@ -339,6 +341,8 @@ const sentOtp = async (req, res) => {
         if (emailFound) {
             const otp = generateOtp();
             req.session.forgotOtp = otp;
+            
+            console.log("otp is:",otp)
             const sentOtp = await sendEmailVerify(email, otp);
             if (sentOtp) {
                 res.status(httpStatusCode.OK).json({ message: "success" });
@@ -380,6 +384,8 @@ const resentForgotOtp = async (req, res) => {
 
         let otp = generateOtp();
         req.session.forgotOtp = otp;
+        
+        console.log("otp is:",otp)
         const email = req.session.user.email
         const emailSent = await sendEmailVerify(email, otp);
 

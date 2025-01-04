@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controller/user/userController');
 const shopController = require('../controller/user/shopController');
-const {userAuth,adminAuth} = require("../middlewares/auth");
+const {userAuth,adminAuth,backToHome} = require("../middlewares/auth");
 const passport = require('passport');
 
 
 router.get('/pageNotFound',userController.pageNotFound)
 router.get('/',userController.loadHomePage);
-router.get('/signup',userController.loadSignup)
+router.get('/signup',backToHome,userController.loadSignup)
 router.get('/login',userController.loadLogin);
 router.get('/logout',userController.logout)
 
