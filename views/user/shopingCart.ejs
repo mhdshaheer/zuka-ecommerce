@@ -70,7 +70,7 @@
                                                         <div>
                                                             <input id="itemQty-<%=index%>" type="number"
                                                                 value="<%=item.quantity%>" class="quantity-input"
-                                                                min="1" max="10" data-price="<%=item.price%>"
+                                                                min="1" max="5" data-price="<%=item.price%>"
                                                                 oninput="updatePrice('<%=index%>','<%=item._id%>','<%=cart._id%>','<%=item.varientId%>','<%=isCouponApplied%>','<%=couponMin%>')">
                                                         </div>
                                                     </div>
@@ -142,7 +142,6 @@
                             
                         </ul>
                         <a href="/checkout" class="primary-btn" id="checkOutBtn">Proceed to checkout</a>
-                        <!-- <button class="primary-btn" id="checkOutBtn">Proceed to checkout</button> -->
                     </div>
                 </div>
                 <%}else{%>
@@ -170,7 +169,6 @@
                                 <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span></li>
                         </ul>
                         <a href="/checkout" class="primary-btn" id="checkOutBtn">Proceed to checkout</a>
-                        <!-- <button class="primary-btn" id="checkOutBtn">Proceed to checkout</button> -->
                     </div>
                 </div>
                 <%}%>
@@ -236,31 +234,27 @@
             minimumPrice=minimumPrice || couponMin
             // Get the quantity input and unit price
             const quantityInput = document.getElementById(`itemQty-${index}`);
-            const price = parseFloat(quantityInput.dataset.price); // Get  price from data attribute
-
-            console.log("Unit Price:", price);
-            console.log("Quantity Input Value:", quantityInput.value);
+            const price = parseFloat(quantityInput.dataset.price); 
 
             
             // =============================
 
             let dbStock = await getStock(variantId);
-            console.log("stock is :",dbStock)
             quantityInput.setAttribute('max', dbStock)
             // =============================
 
             // Validate and get the quantity
-            let quantity = parseInt(quantityInput.value, 10);
+            let quantity = parseInt(quantityInput.value, 5);
             if (isNaN(quantity) || quantity < 1) {
                 quantity = 1;
                 quantityInput.value = 1;
-            } else if (dbStock <= 10) {
+            } else if (dbStock <= 5) {
                 console.log("less quantity")
                 // quantity = 10;
                 // quantityInput.value = 10;
-            } else if (quantity > 10 && dbStock > 10) {
-                quantity = 10;
-                quantityInput.value = 10;
+            } else if (quantity > 5 && dbStock > 10) {
+                quantity = 5;
+                quantityInput.value = 5;
             }
 
 
@@ -274,7 +268,6 @@
             // Update the price element
             const priceElement = document.getElementById(`price-${index}`);
             priceElement.textContent = `₹ ${totalPrice.toFixed(2)}`;
-            // const totalAmount = document.getElementById('totalAmount');
             console.log('quantity:', quantityInput.value)
 
             axios.patch('/cart', {

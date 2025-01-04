@@ -207,7 +207,7 @@
                                             <div class="product__details__option__size">
                                                 <span>Size:</span>
                                                 <%for(let i=0;i<product[0].variant.length;i++){%>
-                                                    <%if(product[0].variant[i].stock>0){%>
+                                                    <%if(product[0].variant[i].stock>0 && !product[0].variant[i].isBlocked){%>
 
                                                         <label id="sizeLabel" for="xl"
                                                             onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
@@ -217,7 +217,11 @@
                                                                 <span> </span>
                                                                 <span class="badge rounded-pill bg-dark text-light"
                                                                     id="itemStock">
-                                                                    <%=product[0].variant[i].stock%>
+                                                                    <%if(product[0].variant[i].stock>=10){%>
+                                                                            10
+                                                                        <%}else{%>
+                                                                            <%=product[0].variant[i].stock%>
+                                                                    <%}%>
                                                                 </span>
                                                         </label>
                                                         <%}%>
@@ -239,8 +243,6 @@
                                             <a onclick="selectSize()" class="primary-btn text-light" id="addToCart">add
                                                 to cart</a>
                                         </div>
-
-
 
 
                         </div>
@@ -486,10 +488,10 @@
                             const input = container.querySelector('input');
                             let value = parseInt(input.value);
 
-                            if (event.target.classList.contains('inc')) {
-                                value = Math.min(value + 1, 10); // Increment up to 10
-                            } else if (event.target.classList.contains('dec')) {
-                                value = Math.max(value - 1, 1); // Decrement down to 1
+                            if (event.target.classList.contains('dec')) {
+                                value = Math.min(value + 1, 5); 
+                            } else if (event.target.classList.contains('inc')) {
+                                value = Math.max(value - 1, 1);
                             }
 
                             input.value = value;
