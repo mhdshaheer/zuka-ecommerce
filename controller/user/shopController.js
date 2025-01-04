@@ -161,7 +161,7 @@ const loadCheckout = async (req, res) => {
             activePage: "",
             user,
             userAddress,
-            userCart,
+            userCart:userCart||[],
             wallet,
             couponDiscount: req.session.discountPrice || 0,
             couponMin: req.session.minimumPrice || 0
@@ -295,7 +295,6 @@ const addOrder = async (req, res) => {
 
         const user = req.session.user || req.session.googleUser;
         const { totalPrice, address, paymentMethod, index } = req.body
-        // const cart = await Cart.findOne({ userId: user._id });
         const userWallet = await Wallet.findOne({ userId: user._id })
 
         // For blocked product handle:

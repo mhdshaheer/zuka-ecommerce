@@ -301,7 +301,6 @@
                         }
                     }
                 })
-            console.log("fetch done cart")
 
         }
 
@@ -328,7 +327,6 @@
                             document.getElementById('couponApplied').style.color = "green"
                             document.getElementById('couponApplied').innerHTML = `Discount amount ₹${discountAmount.toFixed(2)}`
                             document.getElementById('removeCoupon').hidden = false
-                            console.log("apply total:", total, discountAmount)
 
                             document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(2)}`
                             document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll) - Number(discountAmount)).toFixed(2)}`
@@ -383,7 +381,6 @@
 
         function removeCoupon(event){
             event.preventDefault();
-            console.log("remove coupon")
             axios.post('/removeCoupon')
             .then(res=>{
                 if(res.status==200){
@@ -397,6 +394,8 @@
                         document.getElementById('couponAppyBtn').innerHTML = 'Apply';
                         document.getElementById("couponApplied").innerHTML=''
                         document.getElementById("removeCoupon") .hidden = true
+                        document.getElementById('discountId').innerHTML = `₹ 0.00`
+                        document.getElementById('totalAmount').innerHTML = `₹ ${Number(totalAfterAll).toFixed(2)}`
                 }
             }).catch(error=>{
                 Swal.fire({
