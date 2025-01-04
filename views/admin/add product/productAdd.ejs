@@ -79,28 +79,7 @@
                                             </div>
                                             <!-- col.// -->
                                         </div>
-                                        <!-- <div class="row mb-4">
-                                            <label class="col-lg-3 col-form-label">Sub Categories</label>
-                                            <div class="col-lg-9">
-                                                <select id="subcategory" name="subcategory" class="form-control"
-                                                    aria-label="Product name">
-                                                    <option value="" disabled selected>Select a Sub Category</option>
-                                                    <option value="product1">kkkkkkkkk</option>
-                                                    <option value="product2">Category 2</option>
-                                                    <option value="product3">Category 3</option>
-                                                    <option value="product4">Category 4</option>
-                                                </select>
-                                                <div id="subCategoryError" class="text-danger"></div>
-                                            </div>
-                                        </div> -->
-                                        <!-- <div class="row mb-4">
-                                            <label class="col-lg-3 col-form-label">Total Stocks</label>
-                                            <div class="col-lg-4">
-                                                <input type="number" id="stock" name="stock" class="form-control"
-                                                    placeholder="Eg:123" />
-                                                <div id="stocksError" class="text-danger"></div>
-                                            </div>
-                                        </div> -->
+                                        
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Price</label>
                                             <div class="col-lg-4">
@@ -189,66 +168,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <!-- ====================================================================================== -->
-
-                                        <!-- <div class="row mb-4">
-                                            <label class="col-lg-3 col-form-label">Product Images*</label>
-                                            <div class="col-lg-9">
-                                                <div id="image-list"> -->
-                                        <!-- Image Upload 1 -->
-                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-1">
-                                                        <input id="images-1" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;">
-                                                        <div id="preview-1"
-                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
-                                                            No image uploaded
-                                                        </div>
-                                                        <button id="cropButton-1"
-                                                            class="btn btn-primary ms-3">Crop</button>
-                                                    </div> -->
-
-                                        <!-- Image Upload 2 -->
-                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-2">
-                                                        <input id="images-2" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;" required>
-                                                        <div id="preview-2"
-                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
-                                                            No image uploaded
-                                                        </div>
-                                                        <button id="cropButton-2"
-                                                            class="btn btn-primary ms-3">Crop</button>
-                                                    </div> -->
-
-                                        <!-- Image Upload 3 -->
-                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-3">
-                                                        <input id="images-3" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;" required>
-                                                        <div id="preview-3"
-                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
-                                                            No image uploaded
-                                                        </div>
-                                                        <button id="cropButton-3"
-                                                            class="btn btn-primary ms-3">Crop</button>
-                                                    </div> -->
-
-                                        <!-- Image Upload 4 -->
-                                        <!-- <div class="d-flex align-items-center mb-4" id="image-container-4">
-                                                        <input id="images-4" type="file" class="form-control me-3"
-                                                            name="images" accept="image/*" style="max-width: 70%;" required>
-                                                        <div id="preview-4"
-                                                            style="border: 1px dashed #ccc; padding: 10px; text-align: center; width: 200px;">
-                                                            No image uploaded
-                                                        </div>
-                                                        <button id="cropButton-4"
-                                                            class="btn btn-primary ms-3">Crop</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div> -->
-
-
-
-                                        <!-- row.// -->
 
 
                                         <br>
@@ -591,24 +510,39 @@
                 return true
             }
         }
+        function variantValidation(){
+            if(variantArray.length<=0){
+                 Swal.fire({
+                            title: 'Error!',
+                            text: 'Variant is Required!',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        })
+                    return false
+            }else{
+                return true
+            }
+        }
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
-            console.log("array is ", array)
+            console.log("array is ", variantArray)
             function validateAll() {
                 if (
                     !validateProductName(name.value) ||
                     !validateProductDescription(description.value) ||
                     !validateCategory(category.value) ||
-                    // !validateSubCategory(subcategory.value) ||
                     !validatePrice(price.value) ||
                     !validateOfferPrice(offerPrice.value) ||
-                    !validateColour(colour.value)
+                    !validateColour(colour.value)||
+                    !variantValidation()
                 ) {
                     return false
                 }
                 return true
             }
-            console.log('before form')
+            // variant validation
+            
+            // =============================
             if (validateAll()) {
                 let image1 = document.getElementById("images-1").files[0]
                 console.log(image1)
@@ -622,10 +556,10 @@
                 formData.append('price', price.value)
                 formData.append('offerPrice', offerPrice.value)
                 formData.append('colour', colour.value)
-                formData.append('varient', array)
-                console.log("varient array is:", array);
+                formData.append('varient', variantArray)
+                console.log("varient array is:", variantArray);
 
-                array.forEach((obj, index) => {
+                variantArray.forEach((obj, index) => {
                     formData.append(`variant[${index}][size]`, obj.size);
                     formData.append(`variant[${index}][price]`, obj.price);
                     formData.append(`variant[${index}][stock]`, obj.stock);
@@ -636,6 +570,7 @@
                     document.getElementById('images-3'),
                     document.getElementById('images-4'),
                 ];
+                
                 imageInputs.forEach((input, index) => {
                     const files = input.files;
                     for (let i = 0; i < files.length; i++) {
@@ -686,7 +621,7 @@
 
     </script>
     <script>
-        let array = [];
+        let variantArray = [];
 
         document.getElementById("saveProductChanges").addEventListener("click", () => {
 
@@ -698,7 +633,7 @@
             }
             console.log(obj);
 
-            array.push(obj)
+            variantArray.push(obj)
             saveChanges()
 
         })
@@ -710,7 +645,7 @@
 
             let tbody = document.getElementById("tbody")
             tbody.innerHTML = ''
-            array.map((item) => {
+            variantArray.map((item) => {
 
                 let element = `
                     <tr>
@@ -731,26 +666,7 @@
         }
 
     </script>
-    <!-- <script>
-        for (let i = 1; i <= 4; i++) {
-            const imageInput = document.getElementById(`images-${i}`);
-            const previewDiv = document.getElementById(`preview-${i}`);
-
-            // Display uploaded image
-            imageInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; max-height: 150px;">`;
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    previewDiv.innerHTML = "No image uploaded";
-                }
-            });
-        }
-    </script> -->
+    
     <script>
         let cropper;
         let activeInputId;
