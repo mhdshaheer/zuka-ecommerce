@@ -181,16 +181,12 @@
                                 <input type="number" class="form-control w-100" id="regularPrice" value="">
                             </div>
                             <div class="col-sm-6">
-                                <label for="offerPrice" class="form-label">Offer Price</label>
+                                <label for="offerPrice" class="form-label">Offer</label>
                                 <input type="number" class="form-control w-100" id="offerPrice" value="0">
                             </div>
                         </div>
 
                         <div class="mb-3 row">
-                            <!-- <div class="col-sm-6">
-                                <label for="totalStocks" class="form-label">Total Stocks</label>
-                                <input type="number" class="form-control w-100" id="totalStocks" value="0">
-                            </div> -->
                             <div class="col-sm-6">
                                 <label for="color" class="form-label">Color</label>
                                 <input type="text" class="form-control w-100" id="color">
@@ -319,7 +315,7 @@
             const color = document.getElementById('color');
             productName.value = name;
             regularPrice.value = regPrice;
-            offerPrice.value = offPrice;
+            offerPrice.value = Math.floor(((regPrice-offPrice)/regPrice)*100);
             description.value = desc;
             color.value=col
             var modal = new bootstrap.Modal(document.getElementById('productModal'));
@@ -327,7 +323,16 @@
 
             document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log(productName.value)
+                console.log("hhhhai")
+                if(offerPrice.value>100 || offerPrice.value<0){
+                    console.log("fdihjusfdujhjiuhofsdioj")
+                    return Swal.fire({
+                            title: 'Warning!',
+                            text: 'Offer between 0 and 100!',
+                            icon: 'warning',
+                            confirmButtonText: 'Okay'
+                        })
+                }
                 const options = {
                     productName: productName.value,
                     description: description.value,

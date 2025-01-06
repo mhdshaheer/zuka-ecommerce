@@ -38,19 +38,18 @@ router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
 //Product management
 router.get('/products',adminAuth,productController.loadProduct);
 router.post('/addProduct',adminAuth,upload.array('images', 4),productController.addProduct)
-router.get('/productList',productController.productList)
+router.get('/productList',adminAuth,productController.productList)
 router.put('/editProduct/:id',adminAuth,productController.editProduct);
 router.get('/blockProduct',adminAuth,productController.blockProduct)
 router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
 router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productController.updateImages);
-router.get('/editVariant',productController.editVariantLoad);
-router.post('/variantUpdate',productController.variantUpdate);
-router.patch('/blockVariant/:variantId',productController.blockVariant)
-router.patch('/unblockVariant/:variantId',productController.unblockVariant);
-router.post('/addVariant',productController.addVariant)
+router.get('/editVariant',adminAuth,productController.editVariantLoad);
+router.post('/variantUpdate',adminAuth,productController.variantUpdate);
+router.patch('/blockVariant/:variantId',adminAuth,productController.blockVariant)
+router.patch('/unblockVariant/:variantId',adminAuth,productController.unblockVariant);
+router.post('/addVariant',adminAuth,productController.addVariant)
 
-router.get('/manageStock',adminAuth,productController.loadManageStock)
-router.patch('/updateStock',productController.updateStock)
+
 
 
 //Orders

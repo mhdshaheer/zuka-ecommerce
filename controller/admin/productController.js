@@ -92,7 +92,7 @@ const editProduct = async (req, res) => {
         if (description !== undefined && description.trim() !== '') updatedFields.description = description;
         if (category !== undefined && category.trim() !== '') updatedFields.category = categoryId._id;
         if (regularPrice !== undefined && regularPrice.trim() !== '') updatedFields.regularPrice = Number(regularPrice);
-        if (offerPrice !== undefined && offerPrice.trim() !== '') updatedFields.offerPrice = Number(offerPrice);
+        if (offerPrice !== undefined && offerPrice.trim() !== '') updatedFields.offerPrice = Number(regularPrice)*((100-Number(offerPrice))/100);
         if (color !== undefined && color.trim() !== '') updatedFields.color = color;
 
 
@@ -149,44 +149,7 @@ const updateImages = async (req,res)=>{
     }
 }
 
-
-const loadManageStock = async (req, res) => {
-    try {
-      const page = parseInt(req.query.page) || 1; 
-      const limit = 10;
-      const skip = (page - 1) * limit; 
-      const totalProducts = await Product.aggregate([{ $unwind: "$variant" }]).count("count");
-      const totalPages = Math.ceil(totalProducts[0]?.count / limit);
   
-      const products = await Product.aggregate([
-        { $unwind: "$variant" },
-        { $skip: skip },
-        { $limit: limit }
-      ]);
-  
-      res.render('add product/manageStock', {
-        products,
-        totalPages,
-        currentPage: page
-      });
-    } catch (error) {
-      console.error("Error in loadManageStock:", error);
-      res.redirect("/admin/login");
-    }
-  };
-  
-
-const updateStock = async (req,res)=>{
-    try {
-        const {variantId,stock} = req.body;
-        const result = await Product.updateOne({'variant._id':variantId},{$inc:{['variant.$.stock']:Number(stock)}})
-        if(result){
-            res.status(httpStatusCode.OK).json({success:true});
-        }
-    } catch (error) {
-        console.log(error)
-    }
-}
 
 const editVariantLoad = async (req,res)=>{
     try {
@@ -258,8 +221,6 @@ module.exports = {
     blockProduct,
     unBlockProduct,
     updateImages,
-    loadManageStock,
-    updateStock,
 
     editVariantLoad,
     variantUpdate,
