@@ -9,6 +9,7 @@ const mongoose = require('mongoose')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema');
 const httpStatusCode = require('../../helpers/httpStatusCode')
+const HttpStatusCode = require('../../helpers/httpStatusCode')
 
 const loadShop = async (req, res) => {
     try {
@@ -495,6 +496,31 @@ const deleteFromWishlist = async (req, res) => {
     }
 }
 
+const manageCartStock = async (req,res) => {
+    try {
+        const {userId} = req.body;
+        console.log("user id:",userId)
+        const userCart = await Cart.findOne({userId:userId},{items:1}).populate('items.productId')
+        console.log("user cart:",userCart.items);
+        for (const item of userCart.items) {
+            console.log("size:", item.size, "quantity:", item.quantity);
+            const stockCheck = await Product.findOne({ _id:item.productId,'variant.size': item.size, 'variant.stock': { $lt: item.quantity } },{'variant.$':1});
+            console.log('stock check:', stockCheck);
+        
+            if (stockCheck) {
+                console.log('Stock issue found for size:', item.size);
+                let message=`Product ${item.productId.productName} with size '${item.size}' has only ${stockCheck.variant[0].stock} stocks left.`
+                return res.status(409).json({ message: message});
+            }
+        }
+        
+        
+        return res.status(200).json({message:'All done'})
+    } catch (error) {
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false});
+    }
+}
+
 module.exports = {
     loadShop,
     loadProductInfo,
@@ -510,5 +536,6 @@ module.exports = {
     addToWishlist,
     deleteFromWishlist,
     couponApply,
-    removeCoupon
+    removeCoupon,
+    manageCartStock
 }

@@ -70,7 +70,7 @@
               <% orders.forEach(item => { %>
               <tr>
                 <td>#<%= item.orderId %></td>
-                <td><%= item.userId.name %></td>
+                <td><%= item.userId?.name %></td>
                 <td><%= item.createdAt.toLocaleDateString() %></td>
                 <td>₹<%= item.finalAmount %></td>
                 <td>

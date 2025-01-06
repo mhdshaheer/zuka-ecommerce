@@ -69,7 +69,8 @@ router.delete('/deleteItem',shopController.deleteFromCart)
 router.patch('/cart',shopController.editCart);
 router.post('/couponApply',shopController.couponApply);
 router.post('/removeCoupon',shopController.removeCoupon)
-router.post('/getStock',shopController.getStock)
+router.post('/getStock',shopController.getStock);
+router.post('/manageCartStock',shopController.manageCartStock)
 
 // Checkout
 router.post('/placeOrder',shopController.addOrder)

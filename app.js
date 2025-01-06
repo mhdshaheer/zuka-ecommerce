@@ -43,6 +43,9 @@ app.use("/",userRouter);
 app.use("/admin",adminRouter);
 app.use("/payment",paymentRouter);
 
+app.use((req,res)=>{
+    res.render('page_404')
+})
 
 const PORT = 5000 || process.env.PORT
 app.listen(PORT, ()=>{

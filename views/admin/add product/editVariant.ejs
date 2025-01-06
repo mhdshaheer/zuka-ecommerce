@@ -41,14 +41,14 @@
                                     <td>
                                         <input type="number" value="<%= item.price %>"
                                             class="form-control form-control-sm" style="width: 80px;"
-                                            id="variantPrice_<%= item._id %>">
+                                            id="variantPrice_<%= item._id %>" min="0" >
 
                                     </td>
                                     <td class="d-flex stockBox">
 
                                         <input type="number" value="<%= item.stock %>"
                                             class="form-control form-control-sm" style="width: 80px;"
-                                            id="variantStock_<%= item._id %>">
+                                            id="variantStock_<%= item._id %>" min="0">
                                         <span><button class="btn btn-primary btn-sm ms-2"
                                                 onclick="updatePriceStock('<%=item._id%>')">Update</button></span>
                                     </td>
@@ -119,7 +119,22 @@
             function updatePriceStock(variantId) {
                 const variantPrice = document.getElementById('variantPrice_' + variantId);
                 const variantStock = document.getElementById('variantStock_' + variantId);
-                console.log(variantPrice.value, variantId, variantStock.value);
+                if(variantStock.value<0){
+                    return Swal.fire({
+                                title: 'Not valid!',
+                                text: 'Stock must be greater than 0',
+                                icon: 'warning',
+                                confirmButtonText: 'Okay'
+                            })
+                }
+                if(variantPrice.value<0){
+                    return Swal.fire({
+                                title: 'Not valid!',
+                                text: 'Price must be greater than 0',
+                                icon: 'warning',
+                                confirmButtonText: 'Okay'
+                            })
+                }
                 axios.post('/admin/variantUpdate', {
                     variantId,
                     variantPrice: Number(variantPrice.value),

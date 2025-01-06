@@ -40,6 +40,7 @@
             <div class="row">
                 <div class="col d-flex justify-content-center ">
                     <div class="shopping__cart__table">
+                        <%if(wishProducts.length>0){%>
                         <table class="mx-auto">
                             <thead>
                                 <tr>
@@ -90,9 +91,12 @@
                                         </td>
                                         <td class="cart__close px-3" onclick="removeWishlist('<%=index%>')"><i class="fa fa-close"></i></td>
                                     </tr>
-                                    <%})%>
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                            <%})%>
+                        <%}else{%>
+                            <div>No Prdoucts found</div>
+                        <%}%>
                     </div>
                    
                 </div>
