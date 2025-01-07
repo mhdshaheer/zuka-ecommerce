@@ -23,20 +23,20 @@ const loadShop = async (req, res) => {
         const sort = req.query.sort || '';
         const categoryId = req.query.category || '';
 
-        // Build query
-        let query = { isBlocked: false };
-        
-        // Search functionality
+
+        const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+        const categoryIds = unblockedCategoryIds.map(category => category._id);
+        let query = { isBlocked: false, category: { $nin: categoryIds } };
+
         if (search) {
             query.productName = { $regex: new RegExp(search, 'i') };
         }
 
-        // Category filter
+
         if (categoryId) {
             query.category = categoryId;
         }
 
-        // Build sort options
         let sortOptions = {};
         switch (sort) {
             case 'new-arrival':
@@ -55,7 +55,7 @@ const loadShop = async (req, res) => {
                 sortOptions = { productName: -1 };
                 break;
             default:
-                sortOptions = { createdAt: -1 }; // Default sort
+                sortOptions = { createdAt: -1 };
         }
 
         // Calculate pagination
@@ -68,7 +68,7 @@ const loadShop = async (req, res) => {
                 .sort(sortOptions)
                 .skip(skip)
                 .limit(limit),
-            Product.countDocuments({isBlocked:false}),
+            Product.countDocuments({ isBlocked: false }),
             Category.find()
         ]);
 
@@ -105,10 +105,10 @@ const loadProductInfo = async (req, res) => {
         const product = await Product.find({ _id: productId })
         const category = await Category.find({ _id: product[0].category })
         const relatedProduct = await Product.find({
-            category:product[0].category,
-             _id: { $ne: productId },
-             isBlocked:false
-            }).limit(4);
+            category: product[0].category,
+            _id: { $ne: productId },
+            isBlocked: false
+        }).limit(4);
         res.render('productDetail', {
             product,
             category,
@@ -131,10 +131,10 @@ const loadCart = async (req, res) => {
             return acc + curr.totalPrice;
         }, 0) ?? 0
 
-        const currentDate = new Date(); 
-        const coupons = await Coupon.find({ expireOn: { $gte: currentDate } ,userId:{$nin:[user._id]} ,isList:true});
+        const currentDate = new Date();
+        const coupons = await Coupon.find({ expireOn: { $gte: currentDate }, userId: { $nin: [user._id] }, isList: true });
 
-        
+
         res.render('shopingCart', {
             activePage: 'cart',
             user,
@@ -142,9 +142,9 @@ const loadCart = async (req, res) => {
             total,
             cart: newCart,
             coupons,
-            isCouponApplied : req.session.discountPrice || 0,
-            couponMin : req.session.minimumPrice || 0,
-            couponCode:req.session.code 
+            isCouponApplied: req.session.discountPrice || 0,
+            couponMin: req.session.minimumPrice || 0,
+            couponCode: req.session.code
         })
     } catch (error) {
         console.log(error)
@@ -162,7 +162,7 @@ const loadCheckout = async (req, res) => {
             activePage: "",
             user,
             userAddress,
-            userCart:userCart||[],
+            userCart: userCart || [],
             wallet,
             couponDiscount: req.session.discountPrice || 0,
             couponMin: req.session.minimumPrice || 0
@@ -205,15 +205,15 @@ const couponApply = async (req, res) => {
     }
 }
 
-const removeCoupon = async (req,res)=>{
+const removeCoupon = async (req, res) => {
     try {
         req.session.discountPrice = 0;
         req.session.minimumPrice = 0;
         req.session.couponId = null;
         req.session.code = null
-        res.status(httpStatusCode.OK).json({message:true})
+        res.status(httpStatusCode.OK).json({ message: true })
     } catch (error) {
-        console.log("Error in coupon remove from the cart",error)
+        console.log("Error in coupon remove from the cart", error)
     }
 }
 
@@ -234,7 +234,7 @@ const addToCart = async (req, res) => {
         // manage duplicate adding to cart
         if (sizeFound) {
             return res.status(httpStatusCode.NOT_FOUND).json({ itemFound: 1 })
-           
+
 
         } else {
             let lastPrice = productObj.offerPrice !== 0 ? productObj.offerPrice : productObj.regularPrice //edit
@@ -272,10 +272,10 @@ const deleteFromCart = async (req, res) => {
         cart.items.splice(Number(index), 1)
 
         const result = await Cart.updateOne({ userId: user._id }, { $set: { items: cart.items } })
-        const cartItems = await Cart.find({userId: user._id})
+        const cartItems = await Cart.find({ userId: user._id })
 
         if (result) {
-            res.status(httpStatusCode.OK).json({ message: true,cartItems })
+            res.status(httpStatusCode.OK).json({ message: true, cartItems })
         }
 
     } catch (error) {
@@ -299,15 +299,30 @@ const addOrder = async (req, res) => {
         const userWallet = await Wallet.findOne({ userId: user._id })
 
         // For blocked product handle:
-        const cart = await Cart.findOne({ userId: user._id }).populate('items.productId'); 
+        const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
 
         if (!cart) {
             return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cart not found" });
         }
+      
+
+        const cartWithProducts = await Cart.findById(cart._id).populate({
+            path: 'items.productId',
+            select: 'category',
+        });
+        const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+        const blockedCategoryIds = unblockedCategoryIds.map(category => category._id.toString());
+        const isAnyCategoryBlocked = cartWithProducts.items.some(item =>
+            blockedCategoryIds.includes(item.productId.category.toString())
+        );
+
+
+
         const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
-        if (isAnyProductBlocked) {
+
+        if (isAnyProductBlocked || isAnyCategoryBlocked) {
             return res.status(httpStatusCode.UNAUTHORIZED).json({
-                message: "Your cart contains blocked products. Please remove them to proceed."
+                message: "Your cart contains blocked products/category. Please remove them to proceed."
             });
         }
 
@@ -334,7 +349,7 @@ const addOrder = async (req, res) => {
         });
         if (addOrder) {
             const order = await Order.findOne({ cartId: cart._id })
-            if(req.session.couponId ){
+            if (req.session.couponId) {
 
                 const addToCoupon = await Coupon.updateOne(
                     { _id: req.session.couponId },
@@ -496,41 +511,36 @@ const deleteFromWishlist = async (req, res) => {
     }
 }
 
-const manageCartStock = async (req,res) => {
+const manageCartStock = async (req, res) => {
     try {
-        const {userId} = req.body;
-        console.log("user id:",userId)
-        const userCart = await Cart.findOne({userId:userId},{items:1}).populate('items.productId')
-        console.log("user cart:",userCart.items);
+        const { userId } = req.body;
+        console.log("user id:", userId)
+        const userCart = await Cart.findOne({ userId: userId }, { items: 1 }).populate('items.productId')
         for (const item of userCart.items) {
-            console.log("size:", item.size, "quantity:", item.quantity);
             const stockCheck = await Product.findOne(
-                { 
-                  _id: item.productId,
-                  variant: { 
-                    $elemMatch: { 
-                      size: item.size, 
-                      stock: { $lt: item.quantity } 
-                    } 
-                  }
+                {
+                    _id: item.productId,
+                    variant: {
+                        $elemMatch: {
+                            size: item.size,
+                            stock: { $lt: item.quantity }
+                        }
+                    }
                 },
                 { 'variant.$': 1 }
-              );
-            // const stockCheck = await Product.findOne({ _id:item.productId,'variant.size': item.size, 'variant.stock': { $lt: item.quantity } },{'variant.$':1});
-            
-            console.log("item quntity",item.quantity,'stock:',stockCheck?.variant)
-        
+            );
+
+
             if (stockCheck) {
-                console.log('Stock issue found for size:', item.size);
-                let message=`Product ${item.productId.productName} with size '${item.size}' has only ${stockCheck.variant[0].stock} stocks left.`
-                return res.status(409).json({ message: message});
+                let message = `Product ${item.productId.productName} with size '${item.size}' has only ${stockCheck.variant[0].stock} stocks left.`
+                return res.status(409).json({ message: message });
             }
         }
-        
-        
-        return res.status(200).json({message:'All done'})
+
+
+        return res.status(200).json({ message: 'All done' })
     } catch (error) {
-        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({success:false});
+        res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
     }
 }
 

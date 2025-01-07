@@ -46,15 +46,15 @@ router.get('/newPassSet',userAuth,userController.newPassSet)
 router.patch('/updatePass',userController.updatePass)
 
 //address
-router.post('/addAddress',userController.addAddress);
-router.patch('/softDeleteAddress',userController.softDeleteAddress);
+router.post('/addAddress',userAuth,userController.addAddress);
+router.patch('/softDeleteAddress',userAuth,userController.softDeleteAddress);
 router.get('/editAddress',userAuth,userController.LoadEditAddress);
-router.post('/editAddress',userController.editAddressData)
+router.post('/editAddress',userAuth,userController.editAddressData)
 
 //orders
 router.get('/orders',userAuth,userController.loadOrders);
-router.patch('/cancelOrder',userController.cancelOrder);
-router.patch('/returnOrder',userController.returnOrder);
+router.patch('/cancelOrder',userAuth,userController.cancelOrder);
+router.patch('/returnOrder',userAuth,userController.returnOrder);
 router.get('/download-invoice/:orderId', userAuth,userController.invoiceDownload)
 
 // Wallet
@@ -64,21 +64,21 @@ router.get('/wallet',userAuth,userController.loadWallet)
 
 
 //addtoCart
-router.post('/addToCart',shopController.addToCart);
-router.delete('/deleteItem',shopController.deleteFromCart)
-router.patch('/cart',shopController.editCart);
-router.post('/couponApply',shopController.couponApply);
-router.post('/removeCoupon',shopController.removeCoupon)
-router.post('/getStock',shopController.getStock);
-router.post('/manageCartStock',shopController.manageCartStock)
+router.post('/addToCart',userAuth,shopController.addToCart);
+router.delete('/deleteItem',userAuth,shopController.deleteFromCart)
+router.patch('/cart',userAuth,shopController.editCart);
+router.post('/couponApply',userAuth,shopController.couponApply);
+router.post('/removeCoupon',userAuth,shopController.removeCoupon)
+router.post('/getStock',userAuth,shopController.getStock);
+router.post('/manageCartStock',userAuth,shopController.manageCartStock)
 
 // Checkout
-router.post('/placeOrder',shopController.addOrder)
+router.post('/placeOrder',userAuth,shopController.addOrder)
 router.get('/orderSuccess',userAuth,shopController.loadOrderSuccess);
 
 // Wishlist
 router.get('/wishlist',userAuth,shopController.loadWishlist);
-router.post('/wishlist',shopController.addToWishlist);
-router.delete('/wishlist',shopController.deleteFromWishlist)
+router.post('/wishlist',userAuth,shopController.addToWishlist);
+router.delete('/wishlist',userAuth,shopController.deleteFromWishlist)
 
 module.exports = router;

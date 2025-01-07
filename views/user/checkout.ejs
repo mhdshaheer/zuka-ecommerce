@@ -370,9 +370,6 @@
         let selectAddress = (radioButton) => {
             const selectedIndex = radioButton.value;
             const selectedItem = JSON.parse(radioButton.getAttribute('data-item'));
-
-            console.log("Selected Address Index:", selectedIndex);
-            console.log("Selected Address Details:", selectedItem);
             addressObj = {
                 index: selectedIndex,
                 address: selectedItem
@@ -383,7 +380,6 @@
             e.preventDefault();
             const selectedOption = document.querySelector('input[name="paymentMethod"]:checked');
             let totalAmount = document.getElementById('totalAmount').textContent;
-            console.log("total amount is:", totalAmount, typeof totalAmount, Number(totalAmount))
 
             if (!addressObj) {
                 Swal.fire({
@@ -404,13 +400,9 @@
                 });
                 return;
             }
-
-            console.log("Selected Address:", addressObj);
-            console.log("Selected Payment Method:", selectedOption.value);
             try {
                 if (selectedOption.value === "Razorpay") {
                     // Create Razorpay order on the server
-                    console.log("it is razorPay")
                     const { data } = await axios.post('/payment/createRazorpayOrder', {
                         totalPrice: Number(totalAmount),
                         address: addressObj.address,
@@ -426,7 +418,6 @@
                         description: "Order Payment",
                         order_id: data.order.id,
                         handler: async function (response) {
-                            console.log("Payment Successful!", response);
 
                             // Verify payment on the server
                             const verification = await axios.post('/payment/verifyRazorpayPayment', {
@@ -438,7 +429,6 @@
                                 index: addressObj.index,
                                 order_id: data.order_id
                             });
-                            console.log("verification done");
 
                             if (verification.data.success) {
                                 Swal.fire({
@@ -557,10 +547,9 @@
                         text: error.response.data.message,
                     })
                 } else if (error.response.status == 401) {
-                    console.log("have blocked")
                     Swal.fire({
                         icon: 'error',
-                        title: 'Insufficient Balance',
+                        title: 'Blocked',
                         text: error.response.data.message,
                     })
                 } else {

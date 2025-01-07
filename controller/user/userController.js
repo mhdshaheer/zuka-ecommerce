@@ -2,6 +2,7 @@ const express = require('express')
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
 const Product = require('../../models/productSchema')
+const Category = require('../../models/categorySchema')
 const mongoose = require('mongoose')
 const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema')
@@ -235,7 +236,17 @@ const loadHomePage = async (req, res) => {
         if (user?.isBlocked == true) {
             return res.redirect('/login')
         }
-        const products = await Product.find().limit(8).sort({ createdAt: -1 })
+
+
+        const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+        const categoryIds = unblockedCategoryIds.map(category => category._id);
+        const products = await Product.find({
+            isBlocked: false,
+            category: { $nin: categoryIds },
+          })
+            .limit(8)
+            .sort({ createdAt: -1 });
+          
         if (user) {
             const userData = await User.findOne({ _id: user._id });
             res.render('home', { user: userData, activePage: 'home', products });
@@ -451,7 +462,6 @@ const loadAddress = async (req, res) => {
 const addAddress = async (req, res) => {
     try {
         const address = req.body;
-        console.log(address)
         const addressData = {
             addressType: address.addressType,
             name: address.name,
@@ -498,7 +508,7 @@ const LoadEditAddress = async (req, res) => {
         const { addressId, index } = req.query;
         const user = req.session.user || req.session.googleUser
         const userAddress = await Address.findOne({ userId: user._id })
-        const oneAddress = userAddress.address.splice(index, 1)
+        const oneAddress = userAddress?.address.splice(index, 1)
 
         res.render('editAddress', {
             activePage: '',

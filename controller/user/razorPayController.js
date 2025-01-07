@@ -5,6 +5,7 @@ const Order = require('../../models/orderSchema');
 const Cart = require('../../models/cartSchema')
 const Product = require('../../models/productSchema')
 const Coupon = require('../../models/couponSchema');
+const Category = require('../../models/categorySchema')
 const httpStatusCode = require('../../helpers/httpStatusCode')
 
 
@@ -18,7 +19,26 @@ const createOrder = async (req, res) => {
     try {
         const { totalPrice, address, index } = req.body;
         const user = req.session.user || req.session.googleUser;
-        const cart = await Cart.findOne({ userId: user._id });
+        const cart = await Cart.findOne({ userId: user._id }).populate('items.productId'); 
+
+
+        const cartWithProducts = await Cart.findById(cart._id).populate({
+            path: 'items.productId',
+            select: 'category',
+        });
+        const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+        const blockedCategoryIds = unblockedCategoryIds.map(category => category._id.toString());
+        const isAnyCategoryBlocked = cartWithProducts.items.some(item =>
+            blockedCategoryIds.includes(item.productId.category.toString())
+        );
+
+
+        const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
+        if (isAnyProductBlocked || isAnyCategoryBlocked) {
+            return res.status(httpStatusCode.UNAUTHORIZED).json({
+                message: "Your cart contains blocked products. Please remove them to proceed."
+            });
+        }
 
         const order = await razorpay.orders.create({
             amount: totalPrice * 100, // Convert to paise
