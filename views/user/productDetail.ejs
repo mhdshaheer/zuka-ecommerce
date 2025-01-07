@@ -407,7 +407,6 @@
 
                         e.preventDefault();
 
-                        console.log(size, stock, itemQuantity.value)
                         itemStock = stock;
                         if (Number(stock) < Number(itemQuantity.value)) {
                             return Swal.fire({
@@ -418,7 +417,6 @@
                             })
                         }
                         const productObj = JSON.parse(product)
-                        console.log("Products: ", productObj.color)
                         axios.post('addToCart', {
                             size,
                             stock,

@@ -37,13 +37,6 @@
                                 <button type="submit"><span class="icon_search"></span></button>
                             </form>
                         </div>
-                        <!-- <div class="shop__sidebar__search">
-                            <form action="#">
-                                <input type="text" placeholder="Search..." class="text-dark" id="search"
-                                    oninput="searchItem(this.value,`<%= JSON.stringify(products) %>`)">
-                                <button type="submit"><span class="icon_search"></span></button>
-                            </form>
-                        </div> -->
                         <div class="shop__sidebar__accordion">
                             <div class="accordion" id="accordionExample">
                                 <div class="card">
@@ -72,18 +65,7 @@
                                                 </ul>
                                             </div>
                                         </div>
-                                        <!-- <div class="card-body">
-                                            <div class="shop__sidebar__categories">
-                                                <ul class="nice-scroll">
-                                                    <%for(let i=0;i<category.length;i++){%>
-                                                        <li><a href="#"
-                                                                onclick="categorySort('<%=category[i]._id%>',`<%= JSON.stringify(products) %>`)">
-                                                                <%=category[i].name%>
-                                                            </a></li>
-                                                        <%}%>
-                                                </ul>
-                                            </div>
-                                        </div> -->
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -195,10 +177,7 @@
         }
 
         function categorySort(catId, data) {
-            console.log(catId)
             let products = JSON.parse(data);
-            console.log(products[0].category._id)
-            console.log(products)
             let catOut = products.filter(value => value.category && value.category._id === catId)
         }
         

@@ -10,9 +10,7 @@
       font-family: Arial, sans-serif;
     }
 
-    /* .categories-text:hover {
-      color: black;
-    } */
+    
 
     .form-container {
       background-color: #ffffff;
@@ -51,12 +49,6 @@
       <div class="row">
         <div class="col-lg-3">
           <div class="shop__sidebar">
-            <!-- <div class="shop__sidebar__search">
-              <form action="#">
-                <input type="text" placeholder="Search...">
-                <button type="submit"><span class="icon_search"></span></button>
-              </form>
-            </div> -->
             <div class="shop__sidebar__accordion">
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text active">
@@ -122,7 +114,6 @@
                   <hr>
                   <!-- Button -->
                   <div class="text-right">
-                    <!-- <button class="btn btn-warning ml-3">Edit</button> -->
                     <button type="button" class="btn btn-danger px-1 py-2 " >Delete Account</button>
                   </div>
 
@@ -146,7 +137,6 @@
                   <div class="col-sm-9 d-flex">
                     <input type="email" class="form-control" id="email" placeholder="E mail"
                       value="<%=user?.email%>" disabled>
-                    <!-- <button class="btn btn-warning ml-3">Change</button> -->
                   </div>
                 </div>
                 <!-- Password Field -->
@@ -160,13 +150,9 @@
                      <a href="/changePassword" class="btn btn-secondary ml-3" >Change</a>
                   </div>
                 </div>
-                <!-- <div class="row mb-4 align-items-center">
-                  <a class="text-primary" href="/forgotPassword">Forgot password?</a>
-                </div> -->
                 <hr>
                 <!-- Button -->
                 <div class="text-right">
-                  <!-- <button class="btn btn-warning ml-3">Edit</button> -->
                   <button type="button" class="btn btn-danger px-1 py-2 " >Delete Account</button>
                 </div>
                 <%}%>
@@ -212,7 +198,6 @@
       const userName = document.getElementById('name')
       changeName.addEventListener('click',(e)=>{
         e.preventDefault();
-        console.log(userName.value)
         
         Swal.fire({
         title: 'Name Field',
@@ -224,10 +209,8 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          console.log('Success');
           axios.patch('/nameEdit',{userName:userName.value})
           .then(res => {
-            console.log("inside swal")
             if(res.data){
               Swal.fire({
               title: 'Success!',
@@ -235,14 +218,12 @@
               icon: 'success',
               confirmButtonText: 'Okay'
             }).then(() => {
-              console.log('reloading page....')
               window.location.reload(); // Reload the page after success
             });
             }
            
           })
           .catch(err => {
-            console.error('Error:', err);
             Swal.fire({
               title: 'Error!',
               text: 'Failed to Edit Name.',
@@ -257,12 +238,6 @@
       })
       
 
-      // const changePass = document.getElementById('changePassBtn');
-      // const password = document.getElementById('password');
-      // changePass.addEventListener('click',(e)=>{
-      //   e.preventDefault();
-        
-      // })
    
 
     </script>

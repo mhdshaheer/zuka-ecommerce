@@ -157,7 +157,6 @@
                             <span id="timerValue">60</span>
                         </div>
                         <button type="button" class="btn btn-primary" id="resendOtpBtn" disabled>Resend OTP</button>
-                         <!-- <a href="/resentOtp" type="button" class="btn btn-secondary" id="resendOtpBtn" aria-disabled="">Resend OTP</a> -->
                     </div>
                     <% if (locals.message && message.length> 0) { %>
                         <div class="alert alert-danger">
@@ -216,7 +215,6 @@
                     method:'post'
                 })
                 let data = await res?.json();
-                console.log("response:",data?.success)
 
                 if (data.success) {
                     Swal.fire({
@@ -224,7 +222,6 @@
                         title: "OTP Resent",
                         text: "Please check your inbox for the new OTP."
                     });
-                    // window.location.href = '';
                 } else {
                     Swal.fire({
                         icon: "error",
@@ -236,8 +233,6 @@
             } catch (error) {
                 console.log(error);
                 
-                console.log('error fetch');
-                
             }
 
 
@@ -247,9 +242,6 @@
 
             // Start the timer again
             startTimer();
-
-            // Simulate resending the OTP (you can replace this with your actual OTP sending logic)
-            console.log("OTP Resent!");
             Swal.fire({
                 icon: "info",
                 title: "OTP Resent",
@@ -257,11 +249,7 @@
             });
         }
 
-
-        // Event listener for Resend OTP button
         resendOtpBtn.addEventListener("click", resendOtp);
-
-        // Start the timer when the page loads
         startTimer();
 
         // Form validation function
@@ -269,10 +257,8 @@
 
         async function validateOtpForm(e) {
             e.preventDefault();
-            console.log("Inside the validateOtpForm...");
 
             const otpval1 = document.getElementById('otp').value;
-            console.log("OTP value:", otpval1);
 
             let options = {
                 method: "POST",

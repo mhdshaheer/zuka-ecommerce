@@ -110,29 +110,23 @@
   const signForm = document.getElementById('a-form')
 
   function nameValidateCheck() {
-    console.log("inside name check")
     const nameval = name.value;
-    console.log("name is:",nameval,"this")
     const namepattern = /^[A-Za-z\s]+$/;
 
     if (nameval.trim() === "") {
-      console.log("condition 1")
       error_1.style.display = "block";
       error_1.innerHTML = "Please enter a valid name";
     } else if (!namepattern.test(nameval)) {
-      console.log("condition 2")
       error_1.style.display = "block";
       error_1.innerHTML = "Name can only contain alphabet and spaces";
     } else {
-      console.log("condition 3")
       error_1.style.display = "none";
       error_1.innerHTML = "";
     }
   }
 
   function emailValidateCheck() {
-    const emailval = email.value;
-    // const emailpattern = /^[a-zA-Z0-9._-]+)@[a-zA-Z0-9._-]+)\.([a-zA-Z]{2,4})$/;
+    const emailval = email.value;;
     const emailpattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
 
@@ -152,7 +146,6 @@
     const hasUpperCase = /[A-Z]/;
     const hasLowerCase = /[a-z]/;
     const hasDigit = /\d/;
-    // const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;\
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>[\]\\/`~_+;='"]/
 
 
@@ -160,37 +153,29 @@
 
 
     if (passval.length < minLength) {
-      console.log("condition 1 pass length")
       error_3.style.display = "block";
       error_3.innerHTML = "Password must be at least " + minLength + " characters long.";
     }else if (!hasUpperCase.test(passval)) {
-      console.log("condition upper")
       error_3.style.display = "block";
       error_3.innerHTML = "Password must contain at least one uppercase letter.";
     }else if (!hasLowerCase.test(passval)) {
-      console.log("condition lower")
       error_3.style.display = "block";
       error_3.innerHTML = "Password must contain at least one lowercase letter.";
     }else if (!hasDigit.test(passval)) {
-      console.log("condition digit")
       error_3.style.display = "block";
       error_3.innerHTML = "Password must contain at least one digit.";
     }else if (!hasSpecialChar.test(passval)) {
-      console.log("condition special char")
       error_3.style.display = "block";
       error_3.innerHTML = "Password must contain at least one special character.";
     }else{
-      console.log("condition true else")
       error_3.style.display = "none";
       error_3.innerHTML = ""
     }
 
     if (passval !== cPassval) {
-      console.log("condition not same pass")
       error_4.style.display = "block";
       error_4.innerHTML = "Passwords do not match.";
     }else {
-      console.log("condition pass same")
       error_4.style.display = "none";
       error_4.innerHTML = ""
     }

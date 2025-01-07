@@ -10,10 +10,6 @@
             font-family: Arial, sans-serif;
         }
 
-        /* .categories-text:hover {
-      color: black;
-    } */
-
         .form-container {
             background-color: #ffffff;
             padding: 30px;
@@ -40,18 +36,15 @@
 
         .small {
             font-size: 0.85rem;
-            /* Reduce font size */
         }
 
         .table th,
         .table td {
             padding: 0.5rem;
-            /* Reduce padding for compact look */
         }
 
         .h4 {
             font-size: 1.25rem;
-            /* Reduce header font size */
         }
         #ordersContainer {
   display: flex;
@@ -196,15 +189,6 @@
                                     </div>
                                 </div>
                             </div>
-                
-                            <!-- Add Money Button -->
-                            <!-- <div class="col-md-6 text-right">
-                                <div class="card bg-light mb-4">
-                                    <div class="card-body d-flex justify-content-center align-items-center">
-                                        <button class="btn btn-primary">Add Money</button>
-                                    </div>
-                                </div>
-                            </div> -->
                         </div>
                 
                         <!-- Transaction History -->
@@ -216,7 +200,6 @@
                                     <thead>
                                         <tr>
                                             <th>Date</th>
-                                            <!-- <th>Transaction ID</th> -->
                                             <th>Amount</th>
                                             <th>Status</th>
                                         </tr>
@@ -225,7 +208,6 @@
                                         <%wallet.transactions.map((item)=>{%>
                                             <tr>
                                                 <td><%=item.createdAt.toLocaleDateString()%></td>
-                                                <!-- <td>2024-12-01</td> -->
                                                 <td>₹<%=item.amount%></td>
                                                 <td><span class="badge <%= item.type == 'Debit' ? 'badge-danger' : 'badge-success' %>"><%=item.type%></span></td>
                                             </tr>
@@ -241,20 +223,7 @@
                         </div>
                     </div>
                 </div>
-                
-                
-                
-
-
-
-
-
-
-
-
-                <!-- Footer Section End -->
-
-                <!-- Js Plugins -->
+          
                 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

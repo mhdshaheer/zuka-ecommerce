@@ -276,7 +276,6 @@
             // Update the price element
             const priceElement = document.getElementById(`price-${index}`);
             priceElement.textContent = `₹ ${totalPrice.toFixed(2)}`;
-            console.log('quantity:', quantityInput.value)
 
             axios.patch('/cart', {
                 itemIndex: index,
@@ -288,7 +287,6 @@
                 .then(response => {
                     if (response.status == 200) {
                         totalAfterAll = response.data.totalSum
-                        console.log("total amount is :", totalAfterAll)
                         document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
                         if (discountAmount && response.data.totalSum >= minimumPrice) {
 
@@ -314,9 +312,7 @@
         function applyCoupon(total, event) {
             event.preventDefault();
             totalAfterAll = totalAfterAll || total
-            console.log('total:', total, totalAfterAll)
             const couponField = document.getElementById('couponField');
-            console.log(couponField.value)
             axios.post('/couponApply', {
                 couponCode: couponField.value.toUpperCase()
             })
@@ -371,7 +367,6 @@
             }).then((res) => {
                 if (res.data) {
                     variantStock = res.data.variantStock
-                    console.log('stock from the data base:', res.data.variantStock)
                 }
             })
 

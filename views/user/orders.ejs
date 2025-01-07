@@ -10,9 +10,6 @@
       font-family: Arial, sans-serif;
     }
 
-    /* .categories-text:hover {
-      color: black;
-    } */
 
     .form-container {
       background-color: #ffffff;
@@ -178,12 +175,7 @@
       <div class="row">
         <div class="col-lg-3">
           <div class="shop__sidebar">
-            <!-- <div class="shop__sidebar__search">
-              <form action="#">
-                <input type="text" placeholder="Search...">
-                <button type="submit"><span class="icon_search"></span></button>
-              </form>
-            </div> -->
+            
             <div class="shop__sidebar__accordion">
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text ">
@@ -397,8 +389,6 @@
         <script>
 
           function returnOrder(orderId) {
-            console.log("order id:", orderId);
-
 
             Swal.fire({
               title: "Return product?",
@@ -471,9 +461,6 @@
                 return;
               }
 
-              // Log the cancellation details (replace with actual server call)
-              console.log("Order ID:", orderId);
-              console.log("Reason for cancellation:", reason === "Other" ? customReasonText : reason);
 
               // ===========================================================
               Swal.fire({
@@ -505,8 +492,6 @@
               });
               // ===========================================================
 
-              // Close the modal after submission
-              // alert("Order cancellation submitted successfully.");
             });
           });
 
@@ -517,12 +502,10 @@
 
           async function razorPay(event, finalAmount, order_id) {
             event.preventDefault();
-            console.log('Data are:', finalAmount, order_id);
 
             const { data } = await axios.post('/payment/createRazorpayPageOrder', {
               finalAmount
             });
-            console.log("Razorpay Order Data:", data);
             const options = {
               key: data.key,
               amount: data.order.amount,
@@ -531,7 +514,6 @@
               description: "Order Payment",
               order_id: data.order.id,
               handler: async function (response) {
-                console.log("Payment Successful!", response);
 
                 // Verify payment on the server
                 const verification = await axios.post('/payment/verifyRazorpayRetryPayment', {
@@ -540,7 +522,6 @@
                   razorpay_signature: response.razorpay_signature,
                   order_id:order_id
                 });
-                console.log("verification done");
 
                 if (verification.data.success) {
                   Swal.fire({
