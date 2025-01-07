@@ -3,7 +3,6 @@
         .custom-badge {
             display: inline-block;
             background-color: #28a745;
-            /* Green */
             color: white;
             padding: 0.3em 0.6em;
             font-size: 0.7rem;
@@ -12,7 +11,6 @@
 
         .badge-cancel {
             background-color: #d62626;
-            /* Green */
         }
 
         .fixed-size {
@@ -28,7 +26,6 @@
         <div class="content-header">
             <div>
                 <h2 class="content-title card-title">Order Details</h2>
-                <!-- <p>Lorem ipsum dolor sit amet.</p> -->
             </div>
             <div>
                 <input type="text" placeholder="Search order ID" class="form-control bg-white" />
@@ -70,7 +67,6 @@
                             <h4 class="text-primary">
                                 <%=item.productId.productName%>
                             </h4>
-                            <!-- <p class="text-muted mb-2"><strong>Order ID:</strong> #12345</p> -->
                             <p class="text-dark mb-2"><strong>Price:</strong>
                                 ₹<%=item.productId.regularPrice%>
                             </p>
@@ -239,13 +235,11 @@
 
     <script>
         function updateStatus(order_id, orderStatus) {
-            console.log(order_id, orderStatus);
             const statusOption = document.getElementById('orderStatus')
             statusOption.value = orderStatus;
             const updateStatus = document.getElementById('updateStatusButton');
             updateStatus.addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log(statusOption.value)
                 Swal.fire({
                     title: 'Are you sure!',
                     text: 'Do you want to change status!',
@@ -256,7 +250,6 @@
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
-                            console.log("hai",statusOption.value)
                             axios.patch(`/admin/changeStatus?order_id=${order_id}`,{
                                 status : statusOption.value
                             })

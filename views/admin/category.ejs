@@ -66,9 +66,7 @@
                     <th>Offer Price</th>
                     <th>Add Offer</th>
                     <th>Status</th>
-                    <!-- <th>List/Unlist</th> -->
                     <th>Edit</th>
-                    <!-- <th>Delete</th> -->
 
                   </tr>
                 </thead>
@@ -125,11 +123,8 @@
               </table>
             </div>
           </div>
-          <!-- .col// -->
         </div>
-        <!-- .row // -->
       </div>
-      <!-- card body .// -->
     </div>
 
     <div class="pagination-area">
@@ -157,7 +152,6 @@
         </ul>
       </nav>
     </div>
-    <!-- card .// -->
 
     <!-- ============modal for add offer ==================== -->
 
@@ -171,7 +165,6 @@
           </div>
           <div class="modal-body">
             <form id="addOfferForm">
-              <!-- Hidden field to store category ID -->
               <input type="hidden" id="categoryIdInput">
 
               <div class="mb-3">
@@ -201,7 +194,6 @@
           </div>
           <div class="modal-body">
             <form id="editCategoryForm">
-              <!-- Hidden field to store category ID -->
               <input type="hidden" id="categoryIdInput">
 
               <div class="mb-3">
@@ -265,7 +257,6 @@
 
       //validation check for name of the category form data
       if (catName.value.trim() == "") {
-        console.log("inside null")
         nameError.style.display = 'block',
           nameError.innerHTML = "Name is required"
         a = 1;
@@ -296,7 +287,6 @@
       })
         .then(res => res.json())
         .then(data => {
-          console.log("Success:", data);
           if (a == 0 && data.error!="409") {
 
             Swal.fire({
@@ -306,9 +296,8 @@
               confirmButtonText: 'Okay'
             })
               .then((result) => {
-                console.log('Result:', result.isConfirmed)
                 if (result.isConfirmed) {
-                  window.location.reload(); // Reload the page after clicking "Okay"
+                  window.location.reload();
                 }
               });
           }
@@ -326,8 +315,6 @@
         .catch(err => {
           console.log("Error :", err);
         })
-
-      console.log("catName is :", catName.value, description.value)
     })
 
     //add offer 
@@ -342,7 +329,6 @@
       saveOfferButton.addEventListener('click', (e) => {
 
         e.preventDefault();
-        console.log("value is:", typeof price.value);
 
         if (price.value !== '0' && price.value !== '' && price.value) {
 
@@ -365,11 +351,10 @@
                 confirmButtonText: 'Okay'
               })
                 .then(() => {
-                  window.location.reload(); // Reload the page after success
+                  window.location.reload();
                 });
             })
             .catch(err => {
-              console.error('Error:', err);
               Swal.fire({
                 title: 'Error!',
                 text: 'Failed to add the offer.',
@@ -403,11 +388,10 @@
               confirmButtonText: 'Okay'
             })
               .then(() => {
-                window.location.reload(); // Reload the page after success
+                window.location.reload(); 
               });
           })
           .catch(err => {
-            console.error('Error:', err);
             Swal.fire({
               title: 'Error!',
               text: 'Failed to Remove the offer.',
@@ -435,7 +419,6 @@
       const saveCategoryButton = document.getElementById('saveCategoryButton');
       saveCategoryButton.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log("clicked....ok")
         fetch(`/admin/editCategory/${id}`, {
           method: 'PUT',
           headers: {
@@ -449,19 +432,16 @@
         })
           .then(res => res.json())
           .then(data => {
-            console.log("inside swal")
             Swal.fire({
               title: 'Success!',
               text: 'Category Edited successfully!',
               icon: 'success',
               confirmButtonText: 'Okay'
             }).then(() => {
-              console.log('reloading page....')
-              window.location.reload(); // Reload the page after success
+              window.location.reload();
             });
           })
           .catch(err => {
-            console.error('Error:', err);
             Swal.fire({
               title: 'Error!',
               text: 'Failed to Edit category.',
@@ -474,25 +454,6 @@
 
     }
 
-
-
-    //delete category
-    function deleteCategory(id) {
-      if (confirm('Are you sure you want to delete this category?')) {
-        fetch(`/admin/delete/${id}`, {
-          method: 'DELETE'
-        })
-          .then(response => {
-            if (response.ok) {
-              alert('Category deleted successfully');
-              window.location.reload(); // Reload the page to show changes
-            } else {
-              alert('Failed to delete the category');
-            }
-          })
-          .catch(err => console.error('Error:', err));
-      }
-    }
 
   </script>
 

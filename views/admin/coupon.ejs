@@ -8,7 +8,6 @@
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Coupon Mangement</h2>
-                        <!-- <p>Brand and vendor management</p> -->
                     </div>
                     <div>
                         <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCouponModal">
@@ -18,29 +17,7 @@
                     </div>
                 </div>
                 <div class="card mb-4">
-                    <!-- <header class="card-header">
-                        <div class="row gx-3">
-                            <div class="col-lg-4 mb-lg-0 mb-15 me-auto">
-                                <input type="text" placeholder="Search..." class="form-control" />
-                            </div>
-                            <div class="col-lg-2 col-6">
-                                <div class="custom_select">
-                                    <select class="form-select select-nice">
-                                        <option selected>Categories</option>
-                                        <option>Technology</option>
-                                        <option>Fashion</option>
-                                        <option>Home Decor</option>
-                                        <option>Healthy</option>
-                                        <option>Travel</option>
-                                        <option>Auto-car</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-2 col-6">
-                                <input type="date" class="form-control" name="" />
-                            </div>
-                        </div>
-                    </header> -->
+                   
                     <!-- card-header end// -->
                     <div class="card-body">
                         <div class="table-responsive">
@@ -173,7 +150,6 @@
         currentDate.setDate(currentDate.getDate() - 1)
         const startDate = new Date(activationDate.value);
         const endDate = new Date(expiryDate.value)
-        console.log("min value",typeof minAmount.value)
         if(!couponCode.value.trim()){
             couponError.innerHTML = "coupon code should not be empty"
             return
@@ -224,7 +200,6 @@
         }else{
             expiryDateError.innerHTML = ''
         }
-        console.log("date:",expiryDate.value)
         axios.post('/admin/coupon',{
             couponCode:couponCode.value.toUpperCase(),
             minAmount:minAmount.value,
@@ -256,7 +231,6 @@
   </script>
   <script>
     function blockCoupon(couponId){
-        console.log("id is:",couponId);
         axios.patch('/admin/blockCoupon',{couponId})
         .then((res)=>{
             if(res.status==200){
@@ -265,7 +239,6 @@
         })
     }
     function unBlockCoupon(couponId){
-        console.log("id is:",couponId);
         axios.patch('/admin/unBlockCoupon',{couponId})
         .then((res)=>{
             if(res.status==200){

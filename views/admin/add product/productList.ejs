@@ -99,9 +99,7 @@
                 </div>
 
             </div>
-            <!-- card-body end// -->
         </div>
-        <!-- card end// -->
         <div class="pagination-area mt-30 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
@@ -128,7 +126,6 @@
             </nav>
         </div>
     </section>
-    <!-- content-main end// -->
     <footer class="main-footer font-xs">
         <div class="row pb-30 pt-15">
             <div class="col-sm-6">
@@ -226,7 +223,6 @@
                                 <img id="imgDiv1" src="" alt="No image uploaded">
                             </div>
                             <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image1')">Crop</button>
-                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                         <!-- Image 2 -->
                         <div class="col-md-6">
@@ -238,7 +234,6 @@
                                 <img id="imgDiv2" src="" alt="No image uploaded">
                             </div>
                             <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image2')">Crop</button>
-                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                     </div>
                     <div class="row mb-3">
@@ -252,7 +247,6 @@
                                 <img id="imgDiv3" src="" alt="">
                             </div>
                             <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image3')">Crop</button>
-                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                         <!-- Image 4 -->
                         <div class="col-md-6">
@@ -264,7 +258,6 @@
                                 <img id="imgDiv4" src="" alt="">
                             </div>
                             <button type="button" class="btn btn-primary mt-2" onclick="openCropModal('image4')">Crop</button>
-                            <!-- <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#cropModal"> Crop </button> -->
                         </div>
                     </div>
                 <div class="modal-footer">
@@ -339,7 +332,6 @@
                     category: category.value,
                     regularPrice: regularPrice.value,
                     offerPrice: offerPrice.value,
-                    // totalStocks: totalStocks.value,
                     color: color.value
                 }
                 fetch(`/admin/editProduct/${id}`, {
@@ -351,19 +343,16 @@
                 })
                     .then(res => res.json())
                     .then(data => {
-                        console.log("inside swal")
                         Swal.fire({
                             title: 'Success!',
                             text: 'Product Edited successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
                         }).then(() => {
-                            console.log('reloading page....')
                             window.location.reload();
                         });
                     })
                     .catch(err => {
-                        console.error('Error:', err);
                         Swal.fire({
                             title: 'Error!',
                             text: 'Failed to Edit Product.',
@@ -433,34 +422,25 @@
                             const files = input.files;
                             for (let i = 0; i < files.length; i++) {
                                 formData.append(`images`, files[i]);
-                                console.log('i am:',files[i])
                             }
                         });
         
-                        //Console form data
-                        for (let [key, value] of formData.entries()) {
-                            console.log(key + ': ', value);
-                        }
-                        console.log("id is..",id)
                         fetch(`/admin/updateImages/${id}`,{
                             method:'POST',
                             body:formData
                         })
                         .then(res => res.json())
                     .then(data => {
-                        console.log("inside swal")
                         Swal.fire({
                             title: 'Success!',
                             text: 'Product Image Updated successfully!',
                             icon: 'success',
                             confirmButtonText: 'Okay'
                         }).then(() => {
-                            console.log('reloading page....')
                             window.location.reload(); 
                         });
                     })
                     .catch(err => {
-                        console.error('Error:', err);
                         Swal.fire({
                             title: 'Error!',
                             text: 'Failed to Update Images.',

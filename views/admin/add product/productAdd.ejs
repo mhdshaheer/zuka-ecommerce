@@ -2,9 +2,7 @@
     <style>
         .spinner {
             border: 5px solid #f3f3f3;
-            /* Light grey */
             border-top: 5px solid #3498db;
-            /* Blue */
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -51,9 +49,7 @@
 
                                                 <div id="productError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
-                                        <!-- row.// -->
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Description*</label>
                                             <div class="col-lg-9">
@@ -61,7 +57,6 @@
                                                     placeholder="Type here" rows="4"></textarea>
                                                 <div id="descriptionError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Categories</label>
@@ -77,7 +72,6 @@
                                                 </select>
                                                 <div id="categoryError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         
                                         <div class="row mb-4">
@@ -87,7 +81,6 @@
                                                     placeholder="Eg:123" />
                                                 <div id="priceError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Offer Price</label>
@@ -96,7 +89,6 @@
                                                     class="form-control" placeholder="Eg:123" value="0" />
                                                 <div id="offerPriceError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         <br />
                                         <hr>
@@ -108,7 +100,6 @@
                                                     placeholder="Type here" />
                                                 <div id="colourError" class="text-danger"></div>
                                             </div>
-                                            <!-- col.// -->
                                         </div>
                                         <!-- ====================================================================================== -->
                                         <div class="row mb-4">
@@ -163,8 +154,6 @@
                                                             data-bs-toggle="modal"
                                                             data-bs-target="#cropModal">Crop</button>
                                                     </div>
-
-                                                    <!-- Repeat for other image inputs (Image Upload 2, 3, 4) -->
                                                 </div>
                                             </div>
                                         </div>
@@ -224,17 +213,11 @@
                                     </form>
                                 </section>
                                 <hr>
-                                <!-- content-body .// -->
                             </div>
-                            <!-- col.// -->
                         </div>
-                        <!-- content-body .// -->
                     </div>
-                    <!-- col.// -->
                 </div>
-                <!-- row.// -->
             </div>
-            <!-- card body end// -->
         </div>
         </div>
         </div>
@@ -422,8 +405,8 @@
                 return false
             }
 
-            errorField.style.display = 'none'; // Hide the error if valid
-            return true; // Allow form submission
+            errorField.style.display = 'none';
+            return true;
         }
 
 
@@ -438,8 +421,8 @@
                 return false
             }
 
-            errorField.style.display = 'none'; // Hide the error if valid
-            return true; // Allow form submission
+            errorField.style.display = 'none';
+            return true;
         }
 
 
@@ -460,8 +443,8 @@
                 return false
             }
 
-            errorField.style.display = 'none'; // Hide the error if valid
-            return true; // Allow form submission
+            errorField.style.display = 'none';
+            return true;
         }
 
         //OfferPrice validation
@@ -475,18 +458,16 @@
                 return false
             }
 
-            errorField.style.display = 'none'; // Hide the error if valid
-            return true; // Allow form submission
+            errorField.style.display = 'none';
+            return true;
         }
 
         //Colour Validation
         function validateColour(colourVal) {
-            console.log('inside validate')
             const minLength = 3;
             const maxLength = 30;
             const colourError = document.getElementById('colourError')
 
-            console.log("name value is :", colourVal)
 
             if (colourVal.trim() === '') {
                 colourError.style.display = 'block';
@@ -525,7 +506,6 @@
         }
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
-            console.log("array is ", variantArray)
             function validateAll() {
                 if (
                     !validateProductName(name.value) ||
@@ -545,10 +525,8 @@
             // =============================
             if (validateAll()) {
                 let image1 = document.getElementById("images-1").files[0]
-                console.log(image1)
                 //form data
                 const formData = new FormData();
-                console.log('after form1')
                 formData.append('name', name.value);
                 formData.append('description', description.value)
                 formData.append('category', category.value)
@@ -557,7 +535,6 @@
                 formData.append('offerPrice', offerPrice.value)
                 formData.append('colour', colour.value)
                 formData.append('varient', variantArray)
-                console.log("varient array is:", variantArray);
 
                 variantArray.forEach((obj, index) => {
                     formData.append(`variant[${index}][size]`, obj.size);
@@ -583,8 +560,6 @@
                     console.log(key + ': ', value);
                 }
                 //form data end
-
-                console.log('to post')
                 showSpinner()
                 fetch('/admin/addProduct', {
                     method: "POST",
@@ -598,12 +573,10 @@
                             icon: 'success',
                             confirmButtonText: 'Okay'
                         }).then(() => {
-                            console.log('reloading page....')
                             window.location.reload(); // Reload the page after success
                         });
                     })
                     .catch(err => {
-                        console.error('Error:', err);
                         Swal.fire({
                             title: 'Error!',
                             text: 'Failed to add product.',
