@@ -435,8 +435,7 @@ const updatePass = async (req, res) => {
 const loadAddress = async (req, res) => {
     try {
         const user = req.session.user || req.session.googleUser
-        const addressDb = await Address.findOne({ userId: user?._id ,'address.isblocked':false})
-
+        const addressDb = await Address.findOne({ userId: user?._id });
         return res.render('addAddress', {
             user,
             addressDb,
@@ -475,7 +474,6 @@ const addAddress = async (req, res) => {
         } else {
             res.status(httpStatusCode.BAD_REQUEST).json({ success: false })
         }
-        // await address.save()
     } catch (error) {
         console.log("error in adding address", error)
         res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false })

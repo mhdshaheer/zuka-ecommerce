@@ -165,6 +165,7 @@
             <%if(addressDb){%>
 
               <%addressDb.address.map((item,index)=>{%>
+                <%if(item.isBlocked===false){%>
                 <div class="card shadow-sm col-4 col-md-4 col-12 m-2">
                   <div class="card-body">
                     <h5 class="card-title"><strong>
@@ -189,6 +190,7 @@
                     </div>
                   </div>
                 </div>
+                <%}%>
                 <%})%>
                   <%}else{%>
                     <div class="card shadow-sm col-4 m-2">
@@ -316,7 +318,6 @@
 
               console.log(addressType.value);
               if (validateAddressForm()) {
-                console.log("inside validate")
 
                 axios.post('/addAddress', {
                   name: name.value,
