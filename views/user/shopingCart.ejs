@@ -179,7 +179,7 @@
                                     <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span>
                                     </li>
                                 </ul>
-                                <a class="primary-btn" id="checkOutBtn" onclick="ToCheckOut('<%=user._id%>')">Proceed to
+                                <a class="primary-btn text-light" id="checkOutBtn" onclick="ToCheckOut('<%=user._id%>')">Proceed to
                                     checkout</a>
                             </div>
                         </div>
@@ -405,19 +405,14 @@
 
 
         function ToCheckOut(userId) {
-            console.log("hai");
             axios.post('/manageCartStock', { userId })
                 .then(res => {
-                    console.log("status code:",res.status)
                     if (res.status == 200) {
-                        
                         location.href = '/checkout'
                     }
                 })
                 .catch(error => {
-                    console.log('error occured', error.response.status || error.response)
                     if (error.response && error.response.status === 409) {
-                        console.log("inside outof stock")
                         Swal.fire({
                             title: 'Out of stock!',
                             text: error.response.data.message,

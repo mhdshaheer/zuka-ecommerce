@@ -504,8 +504,21 @@ const manageCartStock = async (req,res) => {
         console.log("user cart:",userCart.items);
         for (const item of userCart.items) {
             console.log("size:", item.size, "quantity:", item.quantity);
-            const stockCheck = await Product.findOne({ _id:item.productId,'variant.size': item.size, 'variant.stock': { $lt: item.quantity } },{'variant.$':1});
-            console.log('stock check:', stockCheck);
+            const stockCheck = await Product.findOne(
+                { 
+                  _id: item.productId,
+                  variant: { 
+                    $elemMatch: { 
+                      size: item.size, 
+                      stock: { $lt: item.quantity } 
+                    } 
+                  }
+                },
+                { 'variant.$': 1 }
+              );
+            // const stockCheck = await Product.findOne({ _id:item.productId,'variant.size': item.size, 'variant.stock': { $lt: item.quantity } },{'variant.$':1});
+            
+            console.log("item quntity",item.quantity,'stock:',stockCheck?.variant)
         
             if (stockCheck) {
                 console.log('Stock issue found for size:', item.size);
