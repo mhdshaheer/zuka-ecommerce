@@ -292,12 +292,13 @@ const loadProfile = async (req, res) => {
 //edit user name
 const editName = async (req, res) => {
     try {
-        const user = req.session.user;
+        const user = req.session.user || req.session.googleUser;
+        console.log("user is:",user)
         const { userName } = req.body
         const result = await User.updateOne({ _id: user._id }, { $set: { name: userName } })
         req.session.user.name = userName
         res.status(httpStatusCode.OK).json({ success: "profile name successfully edited" })
-        res.redirect('/profile')
+        // res.redirect('/profile')
     } catch (error) {
         res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
     }
