@@ -48,9 +48,9 @@ app.use((req,res)=>{
 })
 
 const PORT = 5000 || process.env.PORT
-app.listen(PORT, ()=>{
-    console.log(`server is running on ${PORT}`)
-})
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on http://0.0.0.0:${PORT}`);
+});
 
 
 module.exports = app;

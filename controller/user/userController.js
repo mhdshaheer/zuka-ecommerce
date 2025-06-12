@@ -583,7 +583,7 @@ const loadOrders = async (req, res) => {
     }
 }
 
-const cancelOrder = async (req, res) => {
+const cancelOrder = async (req, res) => {;p;
     try {
         const { orderId, reason } = req.body;
         const user = req.session.user || req.session.googleUser;
@@ -618,7 +618,12 @@ const cancelOrder = async (req, res) => {
         //Return the stock to dataBase
 
         orders.orderedItems.map(async (item) => {
+
             let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': item.quantity } })
+            let stock= await Product.findOne({'variant._id':item.varientId} ,{$lt:{'variant.stock':10}})
+            if(stock){
+                await Product.updateOne({_id:stock._id},{$set:{productName:"new name"}})
+            }
         })
         //=============================
         if (cancelOrder.matchedCount === 0) {
