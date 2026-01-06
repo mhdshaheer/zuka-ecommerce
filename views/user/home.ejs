@@ -1,85 +1,99 @@
 <%-include('../../views/partials/user/header')%>
-    <!-- Header Section End -->
+<!-- Header Section End -->
 
-    <!-- Hero Section Begin -->
-    <section class="hero">
-        <div class="hero__slider owl-carousel">
-            <div class="hero__items set-bg" data-setbg="img/hero/gym.jpg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
-                                <p class="d-none d-md-block">A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                commitment to exceptional quality.</p>
-                                <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Hero Section Begin -->
+<section class="hero">
+  <div class="hero__slider owl-carousel">
+    <div class="hero__items set-bg" data-setbg="img/hero/gym.jpg">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h6>Summer Collection</h6>
+              <h2>Fall - Winter Collections 2030</h2>
+              <p class="d-none d-md-block">
+                A specialist label creating luxury essentials. Ethically crafted
+                with an unwavering commitment to exceptional quality.
+              </p>
+              <a href="/shop" class="primary-btn"
+                >Shop now <span class="arrow_right"></span
+              ></a>
             </div>
-            <div class="hero__items set-bg" data-setbg="img/hero/running.jpeg">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-xl-5 col-lg-7 col-md-8">
-                            <div class="hero__text">
-                                <h6>Summer Collection</h6>
-                                <h2>Fall - Winter Collections 2030</h2>
-                                <p>A specialist label creating luxury essentials. Ethically crafted with an unwavering
-                                commitment to exceptional quality.</p>
-                                <a href="/shop" class="primary-btn">Shop now <span class="arrow_right"></span></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
-    </section>
-    <!-- Hero Section End -->
-
-   
-
-    <!-- Product Section Begin -->
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12 pt-3">
-                    <ul class="filter__controls">
-                        <li class="active" data-filter="*">New Arrivals</li>
-                    </ul>
-                </div>
+      </div>
+    </div>
+    <div class="hero__items set-bg" data-setbg="img/hero/running.jpeg">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-7 col-md-8">
+            <div class="hero__text">
+              <h6>Summer Collection</h6>
+              <h2>Fall - Winter Collections 2030</h2>
+              <p>
+                A specialist label creating luxury essentials. Ethically crafted
+                with an unwavering commitment to exceptional quality.
+              </p>
+              <a href="/shop" class="primary-btn"
+                >Shop now <span class="arrow_right"></span
+              ></a>
             </div>
-            <div class="row product__filter">
-                <%products.forEach((product,index)=>{%>
-                <div class="col-lg-3 col-md-6 col-sm-6 col-md-6 col-sm-6 mix new-arrivals">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="<%=product.images[0]%>">
-                            <%if(product.offerPrice!=0){%>
-                                <span class="label text-light bg-dark"><%=Math.floor(((product.regularPrice - product.offerPrice) / product.regularPrice) * 100)%>%</span>
-                            <%}%>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><%=product.productName%></h6>
-                            <a href="/productInfo?id=<%= product._id %>" class="add-cart">View Product</a>
-                            
-                            <%if(product.offerPrice!==0){%>
-                                <h5>Rs: <%=product.offerPrice%>/-</h5>
-                                <h6 style="text-decoration: line-through;">Rs: <%=product.regularPrice%>.00/-</h6>
-                                <%}else{%>
-                                    <h5>Rs: <%=product.regularPrice%>.00/-</h5>
-                            <%}%>
-                           
-                        </div>
-                    </div>
-                </div>
-                <%})%>
-                
-            </div>
+          </div>
         </div>
-    </section>
-    <!-- Product Section End -->
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Hero Section End -->
 
-   
+<!-- Product Section Begin -->
+<section class="product spad">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 pt-3">
+        <ul class="filter__controls">
+          <li class="active" data-filter="*">New Arrivals</li>
+        </ul>
+      </div>
+    </div>
+    <div class="row product__filter">
+      <%products.forEach((product,index)=>{%>
+      <div
+        class="col-lg-3 col-md-6 col-sm-6 col-md-6 col-sm-6 mix new-arrivals"
+      >
+        <div class="product__item">
+          <div
+            class="product__item__pic set-bg"
+            data-setbg="<%=product.images[0]%>"
+          >
+            <%if(product.offerPrice!=0){%>
+            <span class="label text-light bg-dark"
+              ><%=Math.floor(((product.regularPrice - product.offerPrice) /
+              product.regularPrice) * 100)%>%</span
+            >
+            <%}%>
+          </div>
+          <div class="product__item__text">
+            <h6><%=product.productName%></h6>
+            <a href="/productInfo?id=<%= product._id %>" class="add-cart"
+              >View Product</a
+            >
+
+            <%if(product.offerPrice!==0){%>
+            <h5>Rs: <%=product.offerPrice.toFixed(2)%>/-</h5>
+            <h6 style="text-decoration: line-through">
+              Rs: <%=product.regularPrice.toFixed(2)%>/-
+            </h6>
+            <%}else{%>
+            <h5>Rs: <%=product.regularPrice.toFixed(2)%>/-</h5>
+            <%}%>
+          </div>
+        </div>
+      </div>
+      <%})%>
+    </div>
+  </div>
+</section>
+<!-- Product Section End -->
 
 <%-include('../../views/partials/user/footer')%>
