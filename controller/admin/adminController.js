@@ -29,21 +29,11 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const admin = await User.findOne({ email, isAdmin: true });
-
-    if (admin) {
-
-      const passwordMatch = await bcrypt.compare(password, admin.password);
-
-      if (passwordMatch) {
-        req.session.admin = true;
-        return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
-
-      } else {
-        return res.status(httpStatusCode.OK).json({ message: constants.MSG_INCORRECT_PASSWORD });
-      }
+    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+      req.session.admin = true;
+      return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
     } else {
-      return res.redirect('/admin/login');
+      return res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_INCORRECT_USERNAME_OR_PASSWORD });
     }
   } catch (error) {
     logger.error("error in admin login");

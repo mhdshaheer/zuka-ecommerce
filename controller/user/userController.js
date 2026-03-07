@@ -169,12 +169,39 @@ async function sendEmailVerify(email, otp) {
 
     // Send the email
     const info = await transporter.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
+      from: `"Zuka Sports" <${process.env.NODEMAILER_EMAIL}>`,
       to: email,
-      subject: "otp test",
-      text: `Your OTP is ${otp}`,
-      html: `<b>Your OTP: ${otp}</b>`
-
+      subject: "Verify Your Email - Zuka Sports",
+      text: `Your OTP for Zuka Sports is ${otp}. Please enter this code to verify your email.`,
+      html: `
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eeeeee;">
+          <div style="background: linear-gradient(135deg, #000000 0%, #333333 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Zuka Sports</h1>
+          </div>
+          <div style="padding: 50px 40px; text-align: center;">
+            <div style="margin-bottom: 30px;">
+              <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">Verify Your Email</h2>
+              <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0;">Use the verification code below to complete your process.</p>
+            </div>
+            
+            <div style="background-color: #f4f7fa; border-radius: 12px; padding: 30px; margin: 30px 0; border: 1px dashed #ced4da;">
+              <span style="font-size: 42px; font-weight: 800; letter-spacing: 12px; color: #000000; display: block; margin-bottom: 10px; font-family: 'Courier New', Courier, monospace;">${otp}</span>
+              <span style="color: #888888; font-size: 14px; text-transform: uppercase; font-weight: 600;">Verification Code</span>
+            </div>
+            
+            <p style="color: #999999; font-size: 14px; line-height: 1.5;">
+              This code will expire in <b>10 minutes</b>. <br>
+              If you did not request this code, please ignore this email.
+            </p>
+          </div>
+          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;">
+            <p style="color: #999999; font-size: 13px; margin: 0 0 10px 0;">&copy; 2026 Zuka Sports. Premium Athletic Wear.</p>
+            <div style="color: #999999; font-size: 13px;">
+              Calicut, Kerala, India
+            </div>
+          </div>
+        </div>
+      `
     });
 
 
