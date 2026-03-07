@@ -2,8 +2,30 @@
 
     <style>
         .img-sm {
-            max-width: 50px;
-            max-height: 50px;
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .table > :not(caption) > * > * {
+            padding: 1rem 0.75rem;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #1a1a1a;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .action-btns .btn {
+            margin: 2px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .badge-status {
+            font-size: 0.7rem;
+            padding: 0.35em 0.65em;
         }
     </style>
     <section class="content-main">
@@ -18,7 +40,10 @@
         </div>
         <div class="card mb-4">
             <header class="card-header">
-                <div class="row align-items-center">
+                <div class="row gx-3">
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <input type="text" placeholder="Search products..." class="form-control" id="searchInput">
+                    </div>
                 </div>
             </header>
             <!-- card-header end// -->
@@ -27,73 +52,77 @@
                     <table class="table table-bordered align-middle">
                         <thead class="table-light">
                             <tr>
-                                <th scope="col">No</th>
-                                <th scope="col">Images/Item</th>
-                                <th scope="col">Name</th>
+                                <th scope="col" class="text-center">No</th>
+                                <th scope="col">Product</th>
                                 <th scope="col">Price</th>
                                 <th scope="col">Status</th>
-                                <th scope="col">Date</th>
-                                <th scope="col">Actions</th>
-                                <th scope="col">Change Image</th>
-                                <th scope="col">Block/Unblock</th>
-                                <th scope="col">Edit variant</th>
+                                <th scope="col">Added Date</th>
+                                <th scope="col" class="text-end">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <%for(let i=0;i<products.length;i++){%>
                                 <tr>
-                                    <td>
-                                        <%=i+1%>
+                                    <td class="text-center">
+                                        <span class="text-muted"><%= (currentPage - 1) * limit + i + 1 %></span>
                                     </td>
                                     <td>
-                                        <img src="<%=products[i].images[0]%>" alt="Item" class="img-thumbnail img-sm" />
+                                        <div class="d-flex align-items-center">
+                                            <img src="<%=products[i].images[0]%>" alt="<%=products[i].productName%>" class="img-sm me-3 border" />
+                                            <div>
+                                                <h6 class="mb-0 product-name"><%=products[i].productName%></h6>
+                                                <small class="text-muted"><%=products[i].color%></small>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>
-                                        <%=products[i].productName%>
+                                        <div class="fw-bold">₹<%=products[i].regularPrice.toFixed(0)%></div>
+                                        <% if(products[i].offerPrice < products[i].regularPrice) { %>
+                                            <small class="text-success">Now: ₹<%=products[i].offerPrice.toFixed(0)%></small>
+                                        <% } %>
                                     </td>
                                     <td>
-                                        ₹<%=products[i].regularPrice%>
-                                    </td>
-                                    <%if(products[i].isBlocked==false){%>
-                                        <td>
-                                            <span class="badge rounded-pill alert-success">Active</span>
-                                        </td>
+                                        <%if(products[i].isBlocked==false){%>
+                                            <span class="badge rounded-pill alert-success badge-status">Active</span>
                                         <%}else{%>
-                                            <td>
-                                                <span class="badge rounded-pill alert-danger">Blocked</span>
-                                            </td>
+                                            <span class="badge rounded-pill alert-danger badge-status">Blocked</span>
+                                        <%}%>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted small"><%=products[i].createdAt.toLocaleDateString()%></span>
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="action-btns">
+                                            <button class="btn btn-outline-primary btn-edit-product" 
+                                                data-id="<%=products[i]._id%>"
+                                                data-name="<%=products[i].productName%>"
+                                                data-price="<%=products[i].regularPrice%>"
+                                                data-offer="<%=products[i].offerPrice%>"
+                                                data-color="<%=products[i].color%>"
+                                                data-desc="<%=products[i].description%>">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-edit-images"
+                                                data-id="<%=products[i]._id%>"
+                                                data-images='<%= products[i].images.length > 0 ? JSON.stringify(products[i].images) : "[]" %>'>
+                                                <i class="fa-solid fa-image"></i>
+                                            </button>
+                                            <a href="/admin/products/<%=products[i]._id%>/variants/0/edit" class="btn btn-outline-secondary">
+                                                <i class="fa-solid fa-layer-group"></i>
+                                            </a>
+                                            <%if(products[i].isBlocked){%>
+                                                <button class="btn btn-soft-success btn-unblock-product" data-id="<%=products[i]._id%>">
+                                                    <i class="fa-solid fa-unlock"></i>
+                                                </button>
+                                            <%}else{%>
+                                                <button class="btn btn-soft-danger btn-block-product" data-id="<%=products[i]._id%>">
+                                                    <i class="fa-solid fa-lock"></i>
+                                                </button>
                                             <%}%>
-                                                <td>
-                                                    <%=products[i].createdAt.toLocaleDateString()%>
-                                                </td>
-
-
-                                                <td>
-                                                    <a href="#" class="btn btn-sm btn-primary" id="productEdit"
-                                                        onclick="productEdit('<%=products[i]._id%>','<%=products[i].productName%>','<%=products[i].regularPrice%>','<%=products[i].offerPrice%>','<%=products[i].color%>',`'<%=products[i].description%>'`)">Edit</a>
-                                                </td>
-                                                <td>
-                                                    <a href="#" type="button" class="btn btn-primary"
-                                                        onclick="imageEdit('<%=products[i]._id%>', '<%= JSON.stringify(products[i].images) %>')">Change</a>
-                                                </td>
-                                                <%if(products[i].isBlocked){%>
-                                                    <td>
-                                                        <a href="javascript:void(0)"
-                                                            type="button" class="btn btn-warning"
-                                                            onclick="return confirmUnBlock(event, '<%=products[i]._id%>')">Unblock</a>
-                                                    </td>
-                                                    <%}else{%>
-                                                        <td>
-                                                            <a href="javascript:void(0)"
-                                                                type="button" class="btn btn-danger"
-                                                                onclick="return confirmBlock(event, '<%=products[i]._id%>')">Block</a>
-                                                        </td>
-                                                        <%}%>
-                                                            <td>
-                                                                <a href="/admin/products/<%=products[i]._id%>/variants/0/edit" class="btn btn-sm btn-primary" id="variantBtn">Variant</a>
-                                                            </td>
+                                        </div>
+                                    </td>
                                 </tr>
-                                <%}%>
+                            <%}%>
                         </tbody>
                     </table>
                 </div>
@@ -294,192 +323,196 @@
 
 
     <script>
-      
-        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            let filter = this.value.toUpperCase();
+            let trs = document.querySelectorAll('tbody tr');
+            trs.forEach(tr => {
+                let name = tr.querySelector('.product-name').textContent.toUpperCase();
+                tr.style.display = name.includes(filter) ? "" : "none";
+            });
+        });
 
-        //edit product
-        function productEdit(id,name,regPrice,offPrice,col,desc) {
-            const productName = document.getElementById('productName')
-            const description = document.getElementById('description');
-            const category = document.getElementById('category');
-            const regularPrice = document.getElementById('regularPrice');
-            const offerPrice = document.getElementById('offerPrice');
-            // const totalStocks = document.getElementById('totalStocks');
-            const color = document.getElementById('color');
-            productName.value = name;
-            regularPrice.value = regPrice;
-            offerPrice.value = Math.floor(((regPrice-offPrice)/regPrice)*100);
-            description.value = desc;
-            color.value=col
-            var modal = new bootstrap.Modal(document.getElementById('productModal'));
-            modal.show();
+        let currentProductId = null;
 
-            document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
-                e.preventDefault();
+        // Edit product
+        document.querySelectorAll('.btn-edit-product').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const { id, name, price, offer, color, desc } = this.dataset;
+                currentProductId = id;
+                
+                document.getElementById('productName').value = name;
+                document.getElementById('regularPrice').value = price;
+                document.getElementById('description').value = desc;
+                document.getElementById('color').value = color;
+                
+                // Calculating discount percentage
+                const regPrice = parseFloat(price);
+                const offPrice = parseFloat(offer);
+                document.getElementById('offerPrice').value = Math.floor(((regPrice - offPrice) / regPrice) * 100);
+                
+                var modal = new bootstrap.Modal(document.getElementById('productModal'));
+                modal.show();
+            });
+        });
 
-                if(offerPrice.value>100 || offerPrice.value<0){
+        document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const offerPerc = document.getElementById('offerPrice').value;
 
-                    return Swal.fire({
-                            title: 'Warning!',
-                            text: 'Offer between 0 and 100!',
-                            icon: 'warning',
-                            confirmButtonText: 'Okay'
-                        })
-                }
-                const options = {
-                    productName: productName.value,
-                    description: description.value,
-                    category: category.value,
-                    regularPrice: regularPrice.value,
-                    offerPrice: offerPrice.value,
-                    color: color.value
-                }
-                fetch(`/admin/products/${id}`, {
-                    method: "PUT",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(options)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Product Edited successfully!',
-                            icon: 'success',
-                            confirmButtonText: 'Okay'
-                        }).then(() => {
-                            window.location.reload();
-                        });
-                    })
-                    .catch(err => {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Failed to Edit Product.',
-                            icon: 'error',
-                            confirmButtonText: 'Okay'
-                        });
-                    });
+            if(offerPerc > 100 || offerPerc < 0){
+                return Swal.fire({
+                    title: 'Warning!',
+                    text: 'Offer must be between 0 and 100!',
+                    icon: 'warning',
+                    confirmButtonText: 'Okay'
+                });
+            }
+
+            const options = {
+                productName: document.getElementById('productName').value,
+                description: document.getElementById('description').value,
+                category: document.getElementById('category').value,
+                regularPrice: document.getElementById('regularPrice').value,
+                offerPrice: offerPerc,
+                color: document.getElementById('color').value
+            };
+
+            fetch(`/admin/products/${currentProductId}`, {
+                method: "PUT",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(options)
             })
-        }
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Product Updated successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                }).then(() => window.location.reload());
+            })
+            .catch(err => {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Failed to update product.',
+                    icon: 'error',
+                    confirmButtonText: 'Okay'
+                });
+            });
+        });
+
+        // Block/Unblock
+        document.querySelectorAll('.btn-block-product').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                confirmBlock(e, this.dataset.id);
+            });
+        });
+
+        document.querySelectorAll('.btn-unblock-product').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                confirmUnBlock(e, this.dataset.id);
+            });
+        });
 
         async function confirmBlock(event, id) {
-            event.preventDefault();
             Swal.fire({
                 title: 'Are you sure?',
-                text: "You won't be able to undo this action!",
+                text: "Product will be hidden from customers!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, block it!',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: 'Yes, block it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    try {
-                        let response = await fetch('/admin/products/' + id + '/block', { method: 'PATCH' });
-                        if(response.ok) {
-                            window.location.reload();
-                        }
-                    } catch (e) {
-
-                    }
+                    let response = await fetch('/admin/products/' + id + '/block', { method: 'PATCH' });
+                    if(response.ok) window.location.reload();
                 }
             });
         }
         
         async function confirmUnBlock(event, id) {
-            event.preventDefault();
             Swal.fire({
                 title: 'Are you sure?',
-                text: "Do you want to unblock this product?",
+                text: "Product will be visible to customers!",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, unblock it!',
-                cancelButtonText: 'Cancel'
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, unblock it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    try {
-                        let response = await fetch('/admin/products/' + id + '/unblock', { method: 'PATCH' });
-                        if(response.ok) {
-                            window.location.reload();
-                        }
-                    } catch (e) {
-
-                    }
+                    let response = await fetch('/admin/products/' + id + '/unblock', { method: 'PATCH' });
+                    if(response.ok) window.location.reload();
                 }
             });
         }
 
-        //Update product images
-        function imageEdit(id,images){
-            const imgArr = JSON.parse(images)
-            for(let i=0;i<imgArr.length;i++){
-                document.getElementById(`imgDiv${i+1}`).src = imgArr[i]
-            }
-            var modal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
-            modal.show();
-            const updateBtn = document.getElementById('updateImageId')
-            updateBtn.addEventListener('click',(e)=>{
-                e.preventDefault()
-                const formData = new FormData();
-                const imageInputs = [
-                            document.getElementById('image1'),
-                            document.getElementById('image2'),
-                            document.getElementById('image3'),
-                            document.getElementById('image4'),
-                        ];
+        // Image managed
+        document.querySelectorAll('.btn-edit-images').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentProductId = this.dataset.id;
+                const images = JSON.parse(this.dataset.images);
+                
+                for(let i=0; i<4; i++){
+                    const imgEl = document.getElementById(`imgDiv${i+1}`);
+                    if(images[i]) {
+                        imgEl.src = images[i];
+                        imgEl.style.display = "block";
+                    } else {
+                        imgEl.src = "";
+                        imgEl.style.display = "none";
+                    }
+                }
+                
+                var modal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
+                modal.show();
+            });
+        });
 
-                        imageInputs.forEach((input, index) => {
-                            const files = input.files;
-                            for (let i = 0; i < files.length; i++) {
-                                formData.append(`images`, files[i]);
-                            }
-                        });
-        
-                        fetch(`/admin/products/${id}/images`,{
-                            method:'PATCH',
-                            body:formData
-                        })
-                        .then(res => res.json())
-                    .then(data => {
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Product Image Updated successfully!',
-                            icon: 'success',
-                            confirmButtonText: 'Okay'
-                        }).then(() => {
-                            window.location.reload(); 
-                        });
-                    })
-                    .catch(err => {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Failed to Update Images.',
-                            icon: 'error',
-                            confirmButtonText: 'Okay'
-                        });
-                    });
+        document.getElementById('updateImageId').addEventListener('click', (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            const imageInputs = [
+                document.getElementById('image1'),
+                document.getElementById('image2'),
+                document.getElementById('image3'),
+                document.getElementById('image4'),
+            ];
+
+            imageInputs.forEach(input => {
+                if(input.files.length > 0) {
+                    formData.append('images', input.files[0]);
+                }
+            });
+
+            fetch(`/admin/products/${currentProductId}/images`, {
+                method: 'PATCH',
+                body: formData
             })
-          
-    
-            
-        }
+            .then(res => res.json())
+            .then(data => {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Images updated successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay'
+                }).then(() => window.location.reload());
+            })
+            .catch(err => {
+                Swal.fire({ title: 'Error!', text: 'Failed to update images.', icon: 'error' });
+            });
+        });
+
         function previewImage(input, previewId) {
             const previewDiv = document.getElementById(previewId);
-
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-
-                reader.onload = function (e) {
+                reader.onload = (e) => {
                     previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; height: auto;">`;
                 };
-
                 reader.readAsDataURL(input.files[0]);
-            } else {
-                previewDiv.innerHTML = "No image uploaded";
             }
         }
     </script>
@@ -487,13 +520,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
-    <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/vendors/select2.min.js"></script>
-    <script src="assets/js/vendors/perfect-scrollbar.js"></script>
-    <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
+    <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
+    <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
+    <script src="/admin/assets/js/vendors/select2.min.js"></script>
+    <script src="/admin/assets/js/vendors/perfect-scrollbar.js"></script>
+    <script src="/admin/assets/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
-    <script src="assets/js/main.js" type="text/javascript"></script>
+    <script src="/admin/assets/js/main.js" type="text/javascript"></script>
 <!-- Cropper.js CSS -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
 <!-- Cropper.js JS -->

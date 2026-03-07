@@ -73,7 +73,8 @@ const productList = async (req, res) => {
       category,
       currentPage: page,
       totalPages: Math.ceil(totalProducts / limit),
-      totalProducts
+      totalProducts,
+      limit
     });
   } catch (error) {
     logger.error("Error in product list", error);
