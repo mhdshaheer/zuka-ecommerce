@@ -1,5 +1,7 @@
 const logger = require('../../helpers/logger');
 const User = require('../../models/userSchema');
+const httpStatusCode = require('../../helpers/httpStatusCode');
+const constants = require('../../helpers/constants');
 
 const customerInfo = async (req, res) => {
   try {
