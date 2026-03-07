@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const env = require("dotenv").config()
@@ -36,7 +37,7 @@ const createOrder = async (req, res) => {
         const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
         if (isAnyProductBlocked || isAnyCategoryBlocked) {
             return res.status(httpStatusCode.UNAUTHORIZED).json({
-                message: "Your cart contains blocked products. Please remove them to proceed."
+                message: constants.MSG_YOUR_CART_CONTAINS_BLOCKED_PRODUCTS_PLEASE_REMOVE_THEM_TO_PROCEED
             });
         }
 
@@ -84,7 +85,7 @@ const createOrder = async (req, res) => {
         // ===========================
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Failed to create Razorpay order." });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
     }
 };
 
@@ -133,7 +134,7 @@ const createOrder_OP = async (req, res) => {
         // ===========================
     } catch (error) {
         console.error("Error creating Razorpay order:", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Failed to create Razorpay order." });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
     }
 };
 

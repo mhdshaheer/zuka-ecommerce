@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const Category = require("../../models/categorySchema");
 const Product = require("../../models/productSchema");
 const httpStatusCode = require('../../helpers/httpStatusCode')
@@ -36,18 +37,18 @@ const addCategory = async (req, res) => {
         
         const existingCategory = await Category.findOne({ name });
         if (existingCategory) {
-            return res.status(409).json({ error: "409" });
+            return res.status(409).json({ error: constants.MSG_409 });
         }
         const newCategory = new Category({
             name,
             description
         });
         await newCategory.save();
-        return res.json({ message: "Category added successfully" })
+        return res.json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY })
 
     } catch (error) {
         console.log("add category error", error);
-        return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: "Internal server error....HAI" })
+        return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_INTERNAL_SERVER_ERROR_HAI })
     }
 }
 
@@ -68,10 +69,10 @@ const addOffer = async (req, res) => {
                 { $set: { offerPrice: offerPrice } }
             );
         }
-        res.status(httpStatusCode.CREATED).json({ success: true, message: 'Offer added successfully' });
+        res.status(httpStatusCode.CREATED).json({ success: true, message: constants.MSG_OFFER_ADDED_SUCCESSFULLY });
     } catch (error) {
         console.log("Error in add category offer", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Failed to add offer', error: err });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_FAILED_TO_ADD_OFFER, error: err });
     }
 }
 
@@ -89,10 +90,10 @@ const removeOffer = async (req, res) => {
                 { $set: { offerPrice: offerPrice } }
             );
         }
-        res.status(httpStatusCode.CREATED).json({ success: true, message: 'Offer is removed Successfully' })
+        res.status(httpStatusCode.CREATED).json({ success: true, message: constants.MSG_OFFER_IS_REMOVED_SUCCESSFULLY })
     } catch (error) {
         console.log("Error in removing category offer", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: true, message: "Error in removing offer" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: true, message: constants.MSG_ERROR_IN_REMOVING_OFFER })
     }
 }
 
@@ -109,12 +110,12 @@ const editCategory = async (req, res) => {
             const updateCategory = await Category.findOneAndUpdate({ _id: categoryId }, updatedFields, { new: true })
 
             if (!updateCategory) {
-                return res.status(httpStatusCode.NOT_FOUND).json({ message: 'Category not found' });
+                return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_CATEGORY_NOT_FOUND });
             }
-            res.status(httpStatusCode.CREATED).json({ message: 'Edit successfull' })
+            res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL })
         } catch (error) {
             console.error('Error updating category:', error);
-            res.status(500).json({ message: 'Failed to update category', error });
+            res.status(500).json({ message: constants.MSG_FAILED_TO_UPDATE_CATEGORY, error });
         }
 }
 

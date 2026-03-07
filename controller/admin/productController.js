@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const Category = require('../../models/categorySchema')
 const cloudinary = require('../../config/cloudinary');
 const Product = require('../../models/productSchema')
@@ -46,10 +47,10 @@ const addProduct = async (req, res) => {
         });
 
         await newProduct.save();
-        res.status(httpStatusCode.OK).json({ message: 'Product added successfully' });
+        res.status(httpStatusCode.OK).json({ message: constants.MSG_PRODUCT_ADDED_SUCCESSFULLY });
     } catch (error) {
         console.error('Error adding product:', error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Error adding product', error });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_ERROR_ADDING_PRODUCT, error });
     }
 };
 
@@ -98,13 +99,13 @@ const editProduct = async (req, res) => {
 
         const updateProduct = await Product.findOneAndUpdate({ _id: productId }, updatedFields, { new: true })
         if (!updateProduct) {
-            return res.status(httpStatusCode.NOT_FOUND).json({ message: 'Product not found' });
+            return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND });
         }
-        res.status(httpStatusCode.CREATED).json({ message: 'Product Edit successfull' })
+        res.status(httpStatusCode.CREATED).json({ message: constants.MSG_PRODUCT_EDIT_SUCCESSFULL })
 
     } catch (error) {
         console.error('Error updating product:', error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Failed to update product', error });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_FAILED_TO_UPDATE_PRODUCT, error });
     }
 }
 
@@ -140,9 +141,9 @@ const updateImages = async (req,res)=>{
         images:imageUrls
     })
     if(!updateImg){
-        res.status(httpStatusCode.NOT_FOUND).json({ message: 'Product not found' })
+        res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND })
     }
-    res.status(httpStatusCode.OK).json({ message: 'Product updated' })
+    res.status(httpStatusCode.OK).json({ message: constants.MSG_PRODUCT_UPDATED })
 
     } catch (error) {
         console.log("error in update images",error)

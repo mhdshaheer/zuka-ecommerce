@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const express = require('express')
 const User = require('../../models/userSchema');
 const Address = require('../../models/addressSchema');
@@ -32,13 +33,13 @@ const signup = async (req, res) => {
     try {
         const { name, email, password, confirmPassword } = req.body;
         if (password != confirmPassword) {
-            return res.render("signup", { message: "passwords do not match" });
+            return res.render("signup", { message: constants.MSG_PASSWORDS_DO_NOT_MATCH });
 
         }
 
         const finduser = await User.findOne({ email });
         if (finduser) {
-            return res.render("signup", { message: "User with this email already exist" })
+            return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST })
         }
         const otp = generateOtp()
         console.log("otp is:",otp)
@@ -81,14 +82,14 @@ const login = async (req, res) => {
         const findUser = await User.findOne({ isAdmin: 0, email: email });
 
         if (!findUser) {
-            return res.render('login', { message: "User not found" });
+            return res.render('login', { message: constants.MSG_USER_NOT_FOUND });
         } else if (findUser.isBlocked) {
-            return res.render('login', { message: "User is blocked by admin" })
+            return res.render('login', { message: constants.MSG_USER_IS_BLOCKED_BY_ADMIN })
         }
 
         const passwordMatch = await bcrypt.compare(password, findUser.password);
         if (!passwordMatch) {
-            return res.render('login', { message: "Incorrect password" });
+            return res.render('login', { message: constants.MSG_INCORRECT_PASSWORD });
         }
 
         req.session.user = findUser;
@@ -97,7 +98,7 @@ const login = async (req, res) => {
 
 
     } catch (error) {
-        res.render('login', { message: "Login failed , Please try again later" })
+        res.render('login', { message: constants.MSG_LOGIN_FAILED_PLEASE_TRY_AGAIN_LATER })
     }
 }
 //===================== logout ============================
@@ -132,7 +133,7 @@ const resentOtp = async (req, res) => {
         const { email } = req?.session?.userData;
 
         if (!email) {
-            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Email not found in session" })
+            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_EMAIL_NOT_FOUND_IN_SESSION })
         }
 
         let otp = generateOtp();
@@ -141,13 +142,13 @@ const resentOtp = async (req, res) => {
         const emailSent = await sendEmailVerify(email, otp);
 
         if (emailSent) {
-            res.status(httpStatusCode.OK).json({ success: true, message: "otp resent successfully" })
+            res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_OTP_RESENT_SUCCESSFULLY })
         } else {
-            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resent otp,Please try again" })
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_FAILED_TO_RESENT_OTP_PLEASE_TRY_AGAIN })
         }
 
     } catch (error) {
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error,please try again" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_INTERNAL_SERVER_ERROR_PLEASE_TRY_AGAIN })
     }
 }
 
@@ -218,11 +219,11 @@ const verifyOtp = async (req, res) => {
             res.json({ success: true, redirectUrl: "/" });
 
         } else {
-            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Invalid OTP , Please try again" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_INVALID_OTP_PLEASE_TRY_AGAIN })
         }
     } catch (error) {
         console.error("Error verifying OTP ", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED })
     }
 }
 
@@ -297,7 +298,7 @@ const editName = async (req, res) => {
         const { userName } = req.body
         const result = await User.updateOne({ _id: user._id }, { $set: { name: userName } })
         req.session.user.name = userName
-        res.status(httpStatusCode.OK).json({ success: "profile name successfully edited" })
+        res.status(httpStatusCode.OK).json({ success: constants.MSG_PROFILE_NAME_SUCCESSFULLY_EDITED })
         // res.redirect('/profile')
     } catch (error) {
         res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({success:false})
@@ -320,7 +321,7 @@ const changePass = async (req, res) => {
         const userPass = req.session.user.password;
         const compPass = await bcrypt.compare(oldPassword, userPass)
         if (!compPass) {
-            return res.status(httpStatusCode.UNAUTHORIZED).json({ message: "Password not match" })
+            return res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_PASSWORD_NOT_MATCH })
         }
         const changePass = await securePassword(newPassword);
         await User.updateOne({ _id: user._id }, { $set: { password: changePass } })
@@ -362,7 +363,7 @@ const sentOtp = async (req, res) => {
             }
 
         } else {
-            res.status(httpStatusCode.UNAUTHORIZED).json({ message: "Email not match" });
+            res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_EMAIL_NOT_MATCH });
         }
         console.log(email)
     } catch (error) {
@@ -383,11 +384,11 @@ const verifyForgot = async (req, res) => {
         if (otp == req.session.forgotOtp) {
             return res.status(httpStatusCode.OK).json({ success: true })
         } else {
-            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Invalid OTP , Please try again" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_INVALID_OTP_PLEASE_TRY_AGAIN })
         }
     } catch (error) {
         console.error("Error verifying OTP ", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "An error occured" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED })
     }
 }
 
@@ -402,14 +403,14 @@ const resentForgotOtp = async (req, res) => {
         const emailSent = await sendEmailVerify(email, otp);
 
         if (emailSent) {
-            res.status(httpStatusCode.OK).json({ success: true, message: "otp resent successfully" })
+            res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_OTP_RESENT_SUCCESSFULLY })
         } else {
-            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Failed to resent otp,Please try again" })
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_FAILED_TO_RESENT_OTP_PLEASE_TRY_AGAIN })
         }
 
     } catch (error) {
         console.error("error resenting otp", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error,please try again" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_INTERNAL_SERVER_ERROR_PLEASE_TRY_AGAIN })
     }
 }
 
@@ -430,14 +431,14 @@ const updatePass = async (req, res) => {
         if (result) {
             // req.session.user.password=bcryptPass;
             req.session.destroy()
-            res.status(httpStatusCode.OK).json({ message: "Password changed successfully" });
+            res.status(httpStatusCode.OK).json({ message: constants.MSG_PASSWORD_CHANGED_SUCCESSFULLY });
         } else {
-            res.status(httpStatusCode.BAD_REQUEST).json({ message: "Password change error" })
+            res.status(httpStatusCode.BAD_REQUEST).json({ message: constants.MSG_PASSWORD_CHANGE_ERROR })
         }
 
     } catch (error) {
         console.log("server error in password changing", error)
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Server while changing password" })
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_SERVER_WHILE_CHANGING_PASSWORD })
     }
 }
 // ================ Profile -> address ====================================

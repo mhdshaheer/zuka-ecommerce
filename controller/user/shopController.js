@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
 const User = require('../../models/userSchema')
@@ -91,7 +92,7 @@ const loadShop = async (req, res) => {
 
     } catch (error) {
         console.log("error in shop page", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('error', { message: 'Internal server error' });
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('error', { message: constants.MSG_INTERNAL_SERVER_ERROR });
     }
 };
 
@@ -183,15 +184,15 @@ const couponApply = async (req, res) => {
         if (!coupon) {
             req.session.coupon = 0;
             req.session.discountPrice = 0;
-            return res.status(402).json({ message: "Coupon is invalid!" })
+            return res.status(402).json({ message: constants.MSG_COUPON_IS_INVALID })
         }
         if (currentDate > coupon.expireOn) {
-            return res.status(402).json({ message: "Coupon is Expired!" })
+            return res.status(402).json({ message: constants.MSG_COUPON_IS_EXPIRED })
         }
         if (userCoupon) {
             req.session.coupon = 0;
             req.session.discountPrice = 0;
-            return res.status(402).json({ message: "Coupon is already used!" })
+            return res.status(402).json({ message: constants.MSG_COUPON_IS_ALREADY_USED })
         }
 
         req.session.discountPrice = coupon.discountPrice;
@@ -302,7 +303,7 @@ const addOrder = async (req, res) => {
         const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
 
         if (!cart) {
-            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cart not found" });
+            return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_CART_NOT_FOUND });
         }
       
 
@@ -322,14 +323,14 @@ const addOrder = async (req, res) => {
 
         if (isAnyProductBlocked || isAnyCategoryBlocked) {
             return res.status(httpStatusCode.UNAUTHORIZED).json({
-                message: "Your cart contains blocked products/category. Please remove them to proceed."
+                message: constants.MSG_YOUR_CART_CONTAINS_BLOCKED_PRODUCTS_CATEGORY_PLEASE_REMOVE_THEM_TO_PROCEED
             });
         }
 
         // Insufficient balance 
         if (paymentMethod == 'Wallet') {
             if (userWallet.balance < totalPrice) {
-                return res.status(402).json({ message: "Insufficient balance to process the transaction." })
+                return res.status(402).json({ message: constants.MSG_INSUFFICIENT_BALANCE_TO_PROCESS_THE_TRANSACTION })
             }
         }
 
@@ -470,7 +471,7 @@ const addToWishlist = async (req, res) => {
             );
 
             if (isIncluded) {
-                return res.status(httpStatusCode.CREATED).json({ message: "product already exist" })
+                return res.status(httpStatusCode.CREATED).json({ message: constants.MSG_PRODUCT_ALREADY_EXIST })
             }
         }
         const addWishlist = await Wishlist.findOneAndUpdate(
@@ -538,7 +539,7 @@ const manageCartStock = async (req, res) => {
         }
 
 
-        return res.status(200).json({ message: 'All done' })
+        return res.status(200).json({ message: constants.MSG_ALL_DONE })
     } catch (error) {
         res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
     }

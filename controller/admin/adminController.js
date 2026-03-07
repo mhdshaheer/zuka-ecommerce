@@ -1,3 +1,4 @@
+const constants = require('../../helpers/constants');
 const express = require('express')
 const User = require('../../models/userSchema');
 const Product = require('../../models/productSchema')
@@ -16,7 +17,7 @@ const loadLogin = async (req, res) => {
         }
         console.log("before render of admin login")
 
-        res.render('admin-login', { message: "Incorrect username or password" })
+        res.render('admin-login', { message: constants.MSG_INCORRECT_USERNAME_OR_PASSWORD })
         console.log("after render of admin login")
     } catch (error) {
         console.log("admin render error")
@@ -38,7 +39,7 @@ const login = async (req, res) => {
                 return res.status(httpStatusCode.OK).json({ message: "" })
 
             } else {
-                return res.status(httpStatusCode.OK).json({ message: "Incorrect password" })
+                return res.status(httpStatusCode.OK).json({ message: constants.MSG_INCORRECT_PASSWORD })
             }
         } else {
             return res.redirect('/admin/login')
@@ -200,8 +201,7 @@ const loadDashboard = async (req, res) => {
             });
 
         } catch (error) {
-            console.error("Dashboard loading error:", error);
-            res.redirect("/admin/login");
+            console.error("Dashboard loading error: constants.MSG_ERROR_RES_REDIRECT/admin/login");
         }
 
 };
