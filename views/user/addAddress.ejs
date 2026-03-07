@@ -60,7 +60,7 @@
               <hr>
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text">
-                  <a href="/address" class="text-dark">Address</a>
+                  <a href="/addresses" class="text-dark">Address</a>
                 </div>
               </div>
               <hr>
@@ -183,8 +183,8 @@
                                     <%=item.altPhone%><br>
                     </p>
                     <div class="col">
-                      <a href="/editAddress?addressId=<%=item._id%>&index=<%=index%>"><button
-                          class="btn btn-secondary">Edit</button></a>
+                      <a href="/addresses/<%=index%>"><button
+                           class="btn btn-secondary">Edit</button></a>
                       <button class="btn btn-danger" id="deleteBtn"
                         onclick="softDeleteAddress('<%=index%>','<%=item._id%>')">Delete</button>
                     </div>
@@ -319,7 +319,7 @@
               console.log(addressType.value);
               if (validateAddressForm()) {
 
-                axios.post('/addAddress', {
+                axios.post('/addresses', {
                   name: name.value,
                   // email:email.value,
                   phone: phone.value,
@@ -358,10 +358,7 @@
               }).then((result) => {
                 if (result.isConfirmed) {
 
-                  axios.patch('/softDeleteAddress', {
-    index: index,
-    addressId: addressId
-}).then(res => {
+                  axios.delete(`/addresses/${index}`).then(res => {
                     if (res.status == 200) {
                       Swal.fire({
                         title: 'Success!',

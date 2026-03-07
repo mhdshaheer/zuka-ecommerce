@@ -263,6 +263,32 @@ const loadHomePage = async (req, res) => {
   }
 
 };
+
+const loadProductInfo = async (req, res) => {
+  try {
+    const user = req.session.user || req.session.googleUser;
+    if (user?.isBlocked == true) {
+      return res.redirect('/login');
+    }
+    const productId = req.params.id.trim();
+    const product = await Product.find({ _id: productId });
+    const category = await Category.find({ _id: product[0].category });
+    const relatedProduct = await Product.find({
+      category: product[0].category,
+      _id: { $ne: productId },
+      isBlocked: false
+    }).limit(4);
+    res.render('productDetail', {
+      product,
+      category,
+      activePage: '',
+      user,
+      relatedProduct
+    });
+  } catch (error) {
+    logger.error("error in product info page load", error);
+  }
+};
 //=============== page not found ======================
 
 
@@ -496,40 +522,80 @@ const addAddress = async (req, res) => {
 //delete address
 const softDeleteAddress = async (req, res) => {
   try {
-    const { addressId } = req.body;
-    await Address.updateOne({ 'address._id': addressId }, { $set: { 'address.$.isBlocked': true } });
+    const { addressId } = req.params; // Changed from index to addressId
+    const user = req.session.user || req.session.googleUser;
+    
+    // Find the address document for the user
+    const userAddress = await Address.findOne({ userId: user._id });
 
+    if (!userAddress) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "User address document not found" });
+    }
+
+    // Find the specific address within the array by its _id
+    const addressToUpdate = userAddress.address.id(addressId);
+
+    if (!addressToUpdate) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Address not found" });
+    }
+
+    // Update the isBlocked status of the specific address
+    await Address.updateOne(
+      { "address._id": addressId },
+      { $set: { "address.$.isBlocked": true } }
+    );
+    
     res.status(httpStatusCode.OK).json({ success: true });
 
   } catch (error) {
     logger.error(error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
 const LoadEditAddress = async (req, res) => {
   try {
-    const { addressId, index } = req.query;
+    const { addressId } = req.params; // Changed from index to addressId
     const user = req.session.user || req.session.googleUser;
     const userAddress = await Address.findOne({ userId: user._id });
-    const oneAddress = userAddress?.address.splice(index, 1);
-
-    res.render('editAddress', {
-      activePage: '',
-      user,
-      address: oneAddress[0]
-    });
+    if(userAddress){
+       const oneAddress = userAddress.address.id(addressId); // Find by _id
+       if(oneAddress){
+         res.render('editAddress', {
+           activePage: '',
+           user,
+           address: oneAddress,
+           addressId // Pass addressId for update
+         });
+       } else {
+         res.status(httpStatusCode.NOT_FOUND).send("Address not found");
+       }
+    } else {
+       res.status(httpStatusCode.NOT_FOUND).send("User address document not found");
+    }
   } catch (error) {
     logger.error(error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Server Error");
   }
 };
 
 //edit Address
 const editAddressData = async (req, res) => {
   try {
-    const index = Number(req.body.index);
+    const { addressId } = req.params; // Changed from index to addressId
     const user = req.session.user || req.session.googleUser;
     const editedData = req.body.editedData;
-    const { addressId } = req.body;
+    
+    const userAddress = await Address.findOne({ userId: user._id });
+    if(!userAddress){
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "User address document not found" });
+    }
+
+    const addressToUpdate = userAddress.address.id(addressId);
+    if(!addressToUpdate){
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Address not found" });
+    }
+
     const result = await Address.updateOne(
       { "address._id": addressId },
       {
@@ -548,10 +614,12 @@ const editAddressData = async (req, res) => {
     );
     if (result) {
       res.status(httpStatusCode.OK).json({ success: true });
+    } else {
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Failed to update address" });
     }
   } catch (error) {
     logger.error(error);
-
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
@@ -660,15 +728,20 @@ const returnOrder = async (req, res) => {
 
 const invoiceDownload = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderId } = req.params; // Already using req.params
 
     // Fetch order and address
     const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
-    const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 });
-    const myAddress = address.address[0];
-
+    
     if (!order) {
       return res.status(httpStatusCode.NOT_FOUND).send('Order not found');
+    }
+
+    const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 });
+    const myAddress = address ? address.address[0] : null;
+
+    if (!myAddress) {
+      return res.status(httpStatusCode.NOT_FOUND).send('Shipping address not found for this order');
     }
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
@@ -776,6 +849,7 @@ module.exports = {
   loadSignup, //load
   loadLogin, //load
   loadHomePage, //load
+  loadProductInfo, // Added loadProductInfo
   pageNotFound,
   verifyOtp,
   resentOtp,

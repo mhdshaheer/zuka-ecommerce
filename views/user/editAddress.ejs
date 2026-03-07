@@ -40,7 +40,7 @@
       <div class="breadcrumb__text">
         <div class="breadcrumb__links">
           <a href="/">Home</a>
-          <a href="/address">Address</a>
+          <a href="/addresses">Address</a>
           <span>Edit-Address</span>
         </div>
       </div>
@@ -57,7 +57,7 @@
               <hr>
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text">
-                  <a href="/address" class="text-dark">Address</a>
+                  <a href="/addresses" class="text-dark">Address</a>
                 </div>
               </div>
               <hr>
@@ -179,10 +179,8 @@
             const pincode = document.getElementById('pincode');
 
             //access value from the query ===================
-            const queryString = window.location.search;
-            const params = new URLSearchParams(queryString);
-            const index = params.get("index");
-            const addressId = params.get("addressId")
+            const addressId = "<%=address._id%>";
+             const index = "<%=index%>";
             console.log(index);
             console.log('address id :',addressId)
             //===============================================
@@ -295,10 +293,8 @@
               }
               if(validateAddressForm()){
 
-                axios.post('/editAddress', {
-                  index,
-                  addressId,
-                  editedData
+                axios.put(`/addresses/${index}`, {
+                   editedData
                  
                 }).then(res => {
                   if (res.status == 200) {
@@ -308,7 +304,7 @@
                       icon: 'success',
                       confirmButtonText: 'Okay'
                     }).then(() => {
-                      window.location.href = '/address'
+                      window.location.href = '/addresses'
                     })
                   }
                 })

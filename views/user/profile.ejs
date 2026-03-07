@@ -58,7 +58,7 @@
               <hr>
               <div class="accordion" id="accordionExample">
                 <div class="card categories-text">
-                  <a href="/address" class="text-secondary text-decoration-none hover:text-danger">Address</a>
+                  <a href="/addresses" class="text-secondary text-decoration-none hover:text-danger">Address</a>
                 </div>
               </div>
               <hr>
@@ -147,7 +147,7 @@
                   <div class="col-sm-9 d-flex">
                     <input type="password" class="form-control" id="password" placeholder="Enter your password"
                       value="shaheer@123" disabled>
-                     <a href="/changePassword" class="btn btn-secondary ml-3" >Change</a>
+                     <a href="/profile/password" class="btn btn-secondary ml-3" >Change</a>
                   </div>
                 </div>
                 <hr>
@@ -197,7 +197,7 @@
         reverseButtons: true
       }).then((result) => {
         if (result.isConfirmed) {
-          axios.patch('/nameEdit',{userName:userName.value})
+          axios.patch('/profile',{userName:userName.value})
           .then(res => {
             if(res.data){
               Swal.fire({

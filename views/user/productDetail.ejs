@@ -417,7 +417,7 @@
                             })
                         }
                         const productObj = JSON.parse(product)
-                        axios.post('addToCart', {
+                        axios.post('/cart/items', {
                             size,
                             stock,
                             productObj,

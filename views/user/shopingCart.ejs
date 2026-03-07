@@ -207,7 +207,7 @@
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete('/deleteItem', { params: { index: index } })
+                    axios.delete(`/cart/items/${index}`)
                         .then((res) => {
                             if (res.data.message) {
                                 Swal.fire({
@@ -313,7 +313,7 @@
             event.preventDefault();
             totalAfterAll = totalAfterAll || total
             const couponField = document.getElementById('couponField');
-            axios.post('/couponApply', {
+            axios.post('/cart/coupon', {
                 couponCode: couponField.value.toUpperCase()
             })
                 .then(response => {
@@ -362,9 +362,7 @@
 
         async function getStock(variantId) {
             let variantStock = null
-            await axios.post('/getStock', {
-                variantId
-            }).then((res) => {
+            await axios.get(`/products/${variantId}/stock`).then((res) => {
                 if (res.data) {
                     variantStock = res.data.variantStock
                 }
@@ -377,7 +375,7 @@
 
         function removeCoupon(event) {
             event.preventDefault();
-            axios.post('/removeCoupon')
+            axios.delete('/cart/coupon')
                 .then(res => {
                     if (res.status == 200) {
                         Swal.fire({
@@ -405,7 +403,7 @@
 
 
         function ToCheckOut(userId) {
-            axios.post('/manageCartStock', { userId })
+            axios.post('/cart/stock-check', { userId })
                 .then(res => {
                     if (res.status == 200) {
                         location.href = '/checkout'

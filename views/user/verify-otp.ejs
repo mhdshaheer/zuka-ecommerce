@@ -211,7 +211,7 @@
 
             try {
                 console.log("before fetch")
-                let res = await fetch('/resentOtp', {
+                let res = await fetch('/resend-otp', {
                     method:'post'
                 })
                 let data = await res?.json();

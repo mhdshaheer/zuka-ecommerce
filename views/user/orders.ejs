@@ -290,10 +290,10 @@
                                 Return
                               </button>
                               <button class="btn btn-success btn-sm">
-                                <a href="/download-invoice/<%= order._id %>" class="text-white"
-                                  style="text-decoration: none;" target="_blank">
-                                  Download Invoice
-                                </a>
+                                  <a href="/orders/<%= order._id %>/invoice" class="text-white"
+                                    style="text-decoration: none;" target="_blank">
+                                    Download Invoice
+                                  </a>
                               </button>
                               <%}%>
                     </div>
@@ -400,7 +400,7 @@
               confirmButtonText: "Yes, Cancel it!"
             }).then((result) => {
               if (result.isConfirmed) {
-                axios.patch('/returnOrder', {
+                axios.patch(`/orders/${orderId}/return`, {
                   orderId
                 }).then(res => {
                   if (res.status === 200) {
@@ -473,7 +473,7 @@
                 confirmButtonText: "Yes, Cancel it!"
               }).then((result) => {
                 if (result.isConfirmed) {
-                  axios.patch('/cancelOrder', {
+                  axios.patch(`/orders/${orderId}`, {
                     orderId: orderId,
                     reason: reason === "Other" ? customReasonText : reason
                   }).then(res => {
@@ -503,7 +503,7 @@
           async function razorPay(event, finalAmount, order_id) {
             event.preventDefault();
 
-            const { data } = await axios.post('/payment/createRazorpayPageOrder', {
+            const { data } = await axios.post('/payment/razorpay/page-order', {
               finalAmount
             });
             const options = {
@@ -516,7 +516,7 @@
               handler: async function (response) {
 
                 // Verify payment on the server
-                const verification = await axios.post('/payment/verifyRazorpayRetryPayment', {
+                const verification = await axios.post('/payment/razorpay/retry-verify', {
                   razorpay_order_id: response.razorpay_order_id,
                   razorpay_payment_id: response.razorpay_payment_id,
                   razorpay_signature: response.razorpay_signature,

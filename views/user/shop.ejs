@@ -123,7 +123,7 @@
                                                 <h6>
                                                     <%= products[i].productName %>
                                                 </h6>
-                                                <a href="/productInfo?id=<%= products[i]._id %>" class="add-cart">View
+                                                <a href="/products/<%= products[i]._id %>" class="add-cart">View
                                                     Product</a>
                                                 <% if (products[i].offerPrice !==0) { %>
                                                     <h5>Rs: <%= products[i].offerPrice.toFixed(2) %>/-</h5>

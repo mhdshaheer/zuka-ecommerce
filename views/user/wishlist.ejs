@@ -81,7 +81,7 @@
                                                     <button class="btn btn-danger" disabled>Out of stock</button>
                                                 </a>
                                                 <%}else{%>
-                                                    <a href="/productInfo?id=<%=item.productId._id%>">
+                                                    <a href="/products/<%=item.productId._id%>">
                                                         <button class="btn btn-success">View Product</button>
                                                     </a>
                                                 <%}%>
@@ -115,9 +115,7 @@
         reverseButtons: true
       }).then((result)=>{
         if(result.isConfirmed){
-            axios.delete('/wishlist',{
-                params:{index}
-            })
+            axios.delete(`/wishlist/${index}`)
             .then(res=>{
                 if(res.status==200){
                     Swal.fire({

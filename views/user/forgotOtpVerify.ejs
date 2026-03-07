@@ -202,8 +202,8 @@
 
                 try {
                     console.log("before fetch")
-                    let res = await fetch('/resentForgotOtp', {
-                        method: 'post'
+                    let res = await fetch('/forgot-password/resend', {
+                        method:'post'
                     })
                     let data = await res?.json();
                     console.log("response:", data?.success)
@@ -272,7 +272,7 @@
                     body: JSON.stringify({ otp: otpval1 })
                 };
 
-                let res = await fetch("/verifyForgot", options);
+                let res = await fetch("/forgot-password/verify", options);
                 let data = await res.json();
 
                 if (data.success) {

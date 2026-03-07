@@ -1,15 +1,18 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const paymentController = require("../controller/user/razorPayController");
+const razorPayController = require('../controller/user/razorPayController');
+const { userAuth } = require('../middleware/auth');
 
-// Create Razorpay order
-router.post("/createRazorpayOrder", paymentController.createOrder);
+router.route('/razorpay/orders')
+  .post(userAuth, razorPayController.createRazorpayOrder);
 
-// Verify Razorpay payment
-router.post("/verifyRazorpayPayment", paymentController.verifyPayment);
+router.route('/razorpay/verify')
+  .post(userAuth, razorPayController.verifyRazorpayPayment);
 
-// order Page RazorPay
-router.post('/createRazorpayPageOrder',paymentController.createOrder_OP)
-router.post('/verifyRazorpayRetryPayment',paymentController.verifyRetryPayment)
+router.route('/razorpay/page-order')
+  .post(userAuth, razorPayController.createRazorpayPageOrder);
+
+router.route('/razorpay/retry-verify')
+  .post(userAuth, razorPayController.verifyRazorpayRetryPayment);
 
 module.exports = router;
