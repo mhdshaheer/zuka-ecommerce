@@ -46,7 +46,7 @@ const addCoupon = async (req, res) => {
 
 const blockCoupon = async (req, res) => {
   try {
-    const { couponId } = req.body;
+    const couponId = req.params.id;
     await Coupon.updateOne({ _id: couponId }, { $set: { isList: false } });
     res.status(httpStatusCode.OK).json({ success: true });
   } catch (error) {
@@ -55,7 +55,7 @@ const blockCoupon = async (req, res) => {
 };
 const unBlockCoupon = async (req, res) => {
   try {
-    const { couponId } = req.body;
+    const couponId = req.params.id;
     await Coupon.updateOne({ _id: couponId }, { $set: { isList: true } });
     res.status(httpStatusCode.OK).json({ success: true });
   } catch (error) {

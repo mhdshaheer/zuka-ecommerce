@@ -112,22 +112,22 @@ const editProduct = async (req, res) => {
 
 const blockProduct = async (req, res) => {
   try {
-    let productId = req.query.id;
+    let productId = req.params.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
-    res.redirect(`/admin/productList`);
+    res.status(httpStatusCode.OK).json({ success: true, message: 'Product blocked' });
   } catch (error) {
-    res.redirect('/admin/admin-error');
     logger.error("error in block product", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' });
   }
 };
 const unBlockProduct = async (req, res) => {
   try {
-    let productId = req.query.id;
+    let productId = req.params.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
-    res.redirect(`/admin/productList`);
+    res.status(httpStatusCode.OK).json({ success: true, message: 'Product unblocked' });
   } catch (error) {
-    res.redirect('/admin/admin-error');
     logger.error("error in unblock product", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' });
   }
 };
 
@@ -155,7 +155,7 @@ const updateImages = async (req, res) => {
 
 const editVariantLoad = async (req, res) => {
   try {
-    const productId = req.query.productId;
+    const productId = req.params.productId;
     const product = await Product.findOne({ _id: productId });
     res.render('add product/editVariant', {
       product
@@ -167,7 +167,8 @@ const editVariantLoad = async (req, res) => {
 
 const variantUpdate = async (req, res) => {
   try {
-    const { variantId, variantPrice, variantStock } = req.body;
+    const variantId = req.params.variantId;
+    const { variantPrice, variantStock } = req.body;
 
     await Product.updateOne({ 'variant._id': variantId }, { $set: { 'variant.$.stock': variantStock, 'variant.$.price': variantPrice } });
     res.status(HttpStatusCode.OK).json({ success: true });
@@ -197,7 +198,7 @@ const unblockVariant = async (req, res) => {
 
 const addVariant = async (req, res) => {
   try {
-    const { productId } = req.query;
+    const productId = req.params.productId;
     const { variantSize, variantPrice, variantStock } = req.body;
     const sizeFound = await Product.findOne({ 'variant.size': variantSize });
     if (sizeFound) {

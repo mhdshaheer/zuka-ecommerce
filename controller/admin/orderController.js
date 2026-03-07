@@ -28,7 +28,7 @@ const loadOrderList = async (req, res) => {
 
 const orderDetails = async (req, res) => {
   try {
-    const order_id = req.query.order_id;
+    const order_id = req.params.id;
     const orders = await Order.findOne({ _id: order_id }).populate('orderedItems.productId');
     const address = await Address.findOne({ userId: orders.userId, 'address._id': orders.address }, { 'address.$': 1 });
 
@@ -44,7 +44,7 @@ const orderDetails = async (req, res) => {
 
 const changeOrderStatus = async (req, res) => {
   try {
-    const order_id = req.query.order_id;
+    const order_id = req.params.id;
     const { status } = req.body;
     const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
     if (result) {

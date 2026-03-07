@@ -6,12 +6,12 @@
     </div>
     <div>
       <!-- Export Buttons -->
-      <a href="/admin/salesReport/export/excel?filter=<%= filter %><% if (filter === 'custom') { %>&startDate=<%= customStart %>&endDate=<%= customEnd %><% } %>" 
+      <a href="/admin/reports/sales/export/excel?filter=<%= filter %><% if (filter === 'custom') { %>&startDate=<%= customStart %>&endDate=<%= customEnd %><% } %>" 
          class="btn btn-primary">
         <i class="text-muted material-icons md-post_add"></i> Export Excel
       </a>
       
-      <a href="/admin/salesReport/export/pdf?filter=<%= filter %><% if (filter === 'custom') { %>&startDate=<%= customStart %>&endDate=<%= customEnd %><% } %>" 
+      <a href="/admin/reports/sales/export/pdf?filter=<%= filter %><% if (filter === 'custom') { %>&startDate=<%= customStart %>&endDate=<%= customEnd %><% } %>" 
          class="btn btn-primary">
         <i class="text-muted material-icons md-post_add"></i> Export PDF
       </a>
@@ -22,7 +22,7 @@
     <header class="card-header">
       <h4 class="card-title">Latest Orders</h4>
       <!-- Filter Form -->
-      <form method="GET" action="/admin/salesReport">
+      <form method="GET" action="/admin/reports/sales">
         <div class="row align-items-center">
           <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
             <div class="custom_select">

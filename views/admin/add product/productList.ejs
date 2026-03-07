@@ -78,19 +78,19 @@
                                                 </td>
                                                 <%if(products[i].isBlocked){%>
                                                     <td>
-                                                        <a href="/admin/unBlockProduct?id=<%=products[i]._id%>"
+                                                        <a href="javascript:void(0)"
                                                             type="button" class="btn btn-warning"
-                                                            onclick="return confirmUnBlock(event,this)">Unblock</a>
+                                                            onclick="return confirmUnBlock(event, '<%=products[i]._id%>')">Unblock</a>
                                                     </td>
                                                     <%}else{%>
                                                         <td>
-                                                            <a href="/admin/blockProduct?id=<%=products[i]._id%>"
+                                                            <a href="javascript:void(0)"
                                                                 type="button" class="btn btn-danger"
-                                                                onclick="return confirmBlock(event,this)">Block</a>
+                                                                onclick="return confirmBlock(event, '<%=products[i]._id%>')">Block</a>
                                                         </td>
                                                         <%}%>
                                                             <td>
-                                                                <a href="/admin/editVariant?productId=<%=products[i]._id%>" class="btn btn-sm btn-primary" id="variantBtn">Variant</a>
+                                                                <a href="/admin/products/<%=products[i]._id%>/variants/0/edit" class="btn btn-sm btn-primary" id="variantBtn">Variant</a>
                                                             </td>
                                 </tr>
                                 <%}%>
@@ -334,7 +334,7 @@
                     offerPrice: offerPrice.value,
                     color: color.value
                 }
-                fetch(`/admin/editProduct/${id}`, {
+                fetch(`/admin/products/${id}`, {
                     method: "PUT",
                     headers: {
                         'Content-Type': 'application/json'
@@ -363,41 +363,55 @@
             })
         }
 
-        function confirmBlock(event, element) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You won't be able to undo this action!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, block it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = element.href;
-            }
-        });
-    }
+        async function confirmBlock(event, id) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to undo this action!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, block it!',
+                cancelButtonText: 'Cancel'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        let response = await fetch('/admin/products/' + id + '/block', { method: 'PATCH' });
+                        if(response.ok) {
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+        }
         
-        function confirmUnBlock(event, element) {
-        event.preventDefault();
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you want to unblock this product?",
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, unblock it!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = element.href;
-            }
-        });
-    }
+        async function confirmUnBlock(event, id) {
+            event.preventDefault();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to unblock this product?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, unblock it!',
+                cancelButtonText: 'Cancel'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        let response = await fetch('/admin/products/' + id + '/unblock', { method: 'PATCH' });
+                        if(response.ok) {
+                            window.location.reload();
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+        }
 
         //Update product images
         function imageEdit(id,images){
@@ -425,8 +439,8 @@
                             }
                         });
         
-                        fetch(`/admin/updateImages/${id}`,{
-                            method:'POST',
+                        fetch(`/admin/products/${id}/images`,{
+                            method:'PATCH',
                             body:formData
                         })
                         .then(res => res.json())

@@ -49,16 +49,16 @@
                                         <input type="number" value="<%= item.stock %>"
                                             class="form-control form-control-sm" style="width: 80px;"
                                             id="variantStock_<%= item._id %>" min="0">
-                                        <span><button class="btn btn-primary btn-sm ms-2"
-                                                onclick="updatePriceStock('<%=item._id%>')">Update</button></span>
+                                                    <span><button class="btn btn-primary btn-sm ms-2"
+                                                onclick="updatePriceStock('<%=product._id%>', '<%=item._id%>')">Update</button></span>
                                     </td>
                                     <td>
                                         <%if(item.isBlocked){%>
                                             <button class="btn btn-danger px-2"
-                                                        onclick="unblockVariant('<%=item._id%>')">unblock</button>
+                                                        onclick="unblockVariant('<%=product._id%>', '<%=item._id%>')">unblock</button>
                                                 <%}else{%>
                                                     <button class="btn btn-primary"
-                                                onclick="blockVariant('<%=item._id%>')">block</button>
+                                                onclick="blockVariant('<%=product._id%>', '<%=item._id%>')">block</button>
                                                     
                                                     <%}%>
                                     </td>
@@ -116,7 +116,7 @@
 
         <script>
 
-            function updatePriceStock(variantId) {
+            function updatePriceStock(productId, variantId) {
                 const variantPrice = document.getElementById('variantPrice_' + variantId);
                 const variantStock = document.getElementById('variantStock_' + variantId);
                 if(variantStock.value<0){
@@ -135,8 +135,7 @@
                                 confirmButtonText: 'Okay'
                             })
                 }
-                axios.post('/admin/variantUpdate', {
-                    variantId,
+                axios.put(`/admin/products/${productId}/variants/${variantId}`, {
                     variantPrice: Number(variantPrice.value),
                     variantStock: Number(variantStock.value)
                 })
@@ -159,8 +158,8 @@
                     })
             }
 
-            function blockVariant(variantId) {
-                axios.patch(`/admin/blockVariant/${variantId}`)
+            function blockVariant(productId, variantId) {
+                axios.patch(`/admin/products/${productId}/variants/${variantId}/block`)
                     .then(res => {
                         if (res.status == 200) {
                             Swal.fire({
@@ -174,8 +173,8 @@
                         }
                     })
             }
-            function unblockVariant(variantId) {
-                axios.patch(`/admin/unblockVariant/${variantId}`)
+            function unblockVariant(productId, variantId) {
+                axios.patch(`/admin/products/${productId}/variants/${variantId}/unblock`)
                     .then(res => {
                         if (res.status == 200) {
                             Swal.fire({
@@ -229,7 +228,7 @@
                     return;
                 }
 
-                axios.post(`/admin/addVariant?productId=${productId}`, {
+                axios.post(`/admin/products/${productId}/variants`, {
                     variantSize: variantSize.toUpperCase(),
                     variantPrice,
                     variantStock
@@ -264,12 +263,12 @@
                                                         class="form-control form-control-sm" style="width: 80px;"
                                                         id="variantStock_${item._id}">
                                                     <span><button class="btn btn-primary btn-sm ms-2"
-                                                            onclick="updatePriceStock('${item._id}')">Update</button></span>
+                                                            onclick="updatePriceStock('${productId}', '${item._id}')">Update</button></span>
                                                 </td>
                                                 <td>
                                                     ${item.isBlocked
-                                        ? `<button class="btn btn-danger" onclick="blockVariant('${item._id}')">block</button>`
-                                        : `<button class="btn btn-primary px-2" onclick="unblockVariant('${item._id}')">unblock</button>`
+                                        ? `<button class="btn btn-danger px-2" onclick="unblockVariant('${productId}', '${item._id}')">unblock</button>`
+                                        : `<button class="btn btn-primary" onclick="blockVariant('${productId}', '${item._id}')">block</button>`
                                     }
                                                 </td>
                                             </tr>

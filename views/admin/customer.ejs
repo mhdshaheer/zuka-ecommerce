@@ -55,12 +55,12 @@
                                     </td>
                                     <td class="text-end">
                                         <%if(userData[i].isBlocked==false){%>
-                                            <a href="/admin/blockUser?id=<%=userData[i]._id%>"
-                                                onclick="return confirmBlock()"
+                                            <a href="javascript:void(0)"
+                                                onclick="return confirmBlock('<%=userData[i]._id%>')"
                                                 class="btn btn-sm btn-brand rounded font-sm mt-15">BLOCK</a>
                                             <%}else {%>
-                                                <a href="/admin/unBlockUser?id=<%=userData[i]._id%>"
-                                                    onclick="return confirmUnBlock()"
+                                                <a href="javascript:void(0)"
+                                                    onclick="return confirmUnBlock('<%=userData[i]._id%>')"
                                                     class="btn btn-danger btn-sm btn-brand rounded font-sm mt-15 unblockBtn">UNBLOCK</a>
                                                 <%}%>
                                     </td>
@@ -110,8 +110,8 @@
     </main>
 
     <script>
-        function confirmBlock() {
-            return Swal.fire({
+        async function confirmBlock(userId) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you really want to block this user?",
                 icon: 'warning',
@@ -120,14 +120,22 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, block!',
                 cancelButtonText: 'Cancel'
-            }).then((result) => {
+            }).then(async (result) => {
                 if(result.isConfirmed){
-                    return location.reload()
+                    try {
+                        let response = await fetch('/admin/customers/' + userId + '/block', { method: 'PATCH' });
+                        if(response.ok) {
+                            return location.reload();
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                 } 
             });
+            return false;
         }
-        function confirmUnBlock() {
-            return Swal.fire({
+        async function confirmUnBlock(userId) {
+            Swal.fire({
                 title: 'Are you sure?',
                 text: "Do you really want to Unblock this user?",
                 icon: 'warning',
@@ -136,11 +144,19 @@
                 cancelButtonColor: '#d33',
                 confirmButtonText: 'Yes, unblock!',
                 cancelButtonText: 'Cancel'
-            }).then((result) => {
+            }).then(async (result) => {
                 if(result.isConfirmed){
-                    return location.reload()
+                    try {
+                        let response = await fetch('/admin/customers/' + userId + '/unblock', { method: 'PATCH' });
+                        if(response.ok) {
+                            return location.reload();
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
                 } 
             });
+            return false;
         }
 
 

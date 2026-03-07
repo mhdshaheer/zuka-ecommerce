@@ -22,51 +22,51 @@ router.post("/login",adminController.login);
 
 
 //Customer management
-router.get('/users',adminAuth,customerController.customerInfo)
-router.get('/blockUser',adminAuth,customerController.blockUser)
-router.get('/unBlockUser',adminAuth,customerController.unBlockUser);
+router.get('/customers',adminAuth,customerController.customerInfo)
+router.patch('/customers/:id/block',adminAuth,customerController.blockUser)
+router.patch('/customers/:id/unblock',adminAuth,customerController.unBlockUser);
 
 
 //Category Mangement
-router.get('/category',adminAuth,categoryController.categoryInfo);
-router.post('/addCategory',adminAuth,categoryController.addCategory);
-router.patch('/addOffer/:id',adminAuth,categoryController.addOffer);
-router.patch('/removeOffer/:id',adminAuth,categoryController.removeOffer)
-router.put('/editCategory/:id',adminAuth,categoryController.editCategory);
+router.get('/categories',adminAuth,categoryController.categoryInfo);
+router.post('/categories',adminAuth,categoryController.addCategory);
+router.patch('/categories/:id/offer',adminAuth,categoryController.addOffer);
+router.delete('/categories/:id/offer',adminAuth,categoryController.removeOffer);
+router.put('/categories/:id',adminAuth,categoryController.editCategory);
 
 //Product management
 router.get('/products',adminAuth,productController.loadProduct);
-router.post('/addProduct',adminAuth,upload.array('images', 4),productController.addProduct)
-router.get('/productList',adminAuth,productController.productList)
-router.put('/editProduct/:id',adminAuth,productController.editProduct);
-router.get('/blockProduct',adminAuth,productController.blockProduct)
-router.get('/unBlockProduct',adminAuth,productController.unBlockProduct)
-router.post('/updateImages/:id',adminAuth,upload.array('images', 4),productController.updateImages);
-router.get('/editVariant',adminAuth,productController.editVariantLoad);
-router.post('/variantUpdate',adminAuth,productController.variantUpdate);
-router.patch('/blockVariant/:variantId',adminAuth,productController.blockVariant)
-router.patch('/unblockVariant/:variantId',adminAuth,productController.unblockVariant);
-router.post('/addVariant',adminAuth,productController.addVariant)
+router.post('/products',adminAuth,upload.array('images', 4),productController.addProduct)
+router.get('/products/list',adminAuth,productController.productList)
+router.put('/products/:id',adminAuth,productController.editProduct);
+router.patch('/products/:id/block',adminAuth,productController.blockProduct)
+router.patch('/products/:id/unblock',adminAuth,productController.unBlockProduct)
+router.patch('/products/:id/images',adminAuth,upload.array('images', 4),productController.updateImages);
+router.get('/products/:productId/variants/:variantId/edit',adminAuth,productController.editVariantLoad);
+router.put('/products/:productId/variants/:variantId',adminAuth,productController.variantUpdate);
+router.patch('/products/:productId/variants/:variantId/block',adminAuth,productController.blockVariant)
+router.patch('/products/:productId/variants/:variantId/unblock',adminAuth,productController.unblockVariant);
+router.post('/products/:productId/variants',adminAuth,productController.addVariant)
 
 
 
 
 //Orders
 router.get('/orders',adminAuth,orderController.loadOrderList);
-router.get('/orderDetails',adminAuth,orderController.orderDetails);
-router.patch('/changeStatus',orderController.changeOrderStatus);
+router.get('/orders/:id',adminAuth,orderController.orderDetails);
+router.patch('/orders/:id/status',adminAuth,orderController.changeOrderStatus);
 
 
 //Coupon management
-router.get('/coupon',adminAuth,couponController.loadCouponPage);
-router.post('/coupon',couponController.addCoupon);
-router.patch('/blockCoupon',couponController.blockCoupon)
-router.patch('/unBlockCoupon',couponController.unBlockCoupon)
+router.get('/coupons',adminAuth,couponController.loadCouponPage);
+router.post('/coupons',adminAuth,couponController.addCoupon);
+router.patch('/coupons/:id/block',adminAuth,couponController.blockCoupon)
+router.patch('/coupons/:id/unblock',adminAuth,couponController.unBlockCoupon)
 
 
 //Sales report
-router.get('/salesReport',adminAuth,salesController.loadSalesReportPage)
-router.get('/salesReport/export/excel', adminAuth,salesController.exportExcel);
-router.get('/salesReport/export/pdf', adminAuth,salesController.exportPDF);
+router.get('/reports/sales',adminAuth,salesController.loadSalesReportPage)
+router.get('/reports/sales/export/excel', adminAuth,salesController.exportExcel);
+router.get('/reports/sales/export/pdf', adminAuth,salesController.exportPDF);
 
 module.exports = router;

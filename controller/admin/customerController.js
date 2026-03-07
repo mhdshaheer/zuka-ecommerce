@@ -47,21 +47,23 @@ const customerInfo = async (req, res) => {
 
 const blockUser = async (req, res) => {
   try {
-    let userId = req.query.id;
+    let userId = req.params.id;
     await User.updateOne({ _id: userId }, { $set: { isBlocked: true } });
+    res.status(200).json({ success: true, message: 'User blocked' });
   } catch (error) {
-    res.redirect('/admin/admin-error');
     logger.error("error in block user", error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 
 const unBlockUser = async (req, res) => {
   try {
-    let userId = req.query.id;
+    let userId = req.params.id;
     await User.updateOne({ _id: userId }, { $set: { isBlocked: false } });
+    res.status(200).json({ success: true, message: 'User unblocked' });
   } catch (error) {
-    res.redirect('/admin/admin-error');
     logger.error("error in unBlock user", error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 };
 

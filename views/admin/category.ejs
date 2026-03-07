@@ -132,13 +132,13 @@
         <ul class="pagination justify-content-center">
           <% if (currentPage> 1) { %>
             <li class="page-item">
-              <a class="page-link" href="/admin/category?page=<%= currentPage - 1 %>">&laquo; Prev</a>
+              <a class="page-link" href="/admin/categories?page=<%= currentPage - 1 %>">&laquo; Prev</a>
             </li>
             <% } %>
 
               <% for (let i=1; i <=totalPages; i++) { %>
                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                  <a class="page-link" href="/admin/category?page=<%= i %>">
+                  <a class="page-link" href="/admin/categories?page=<%= i %>">
                     <%= i %>
                   </a>
                 </li>
@@ -146,7 +146,7 @@
 
                   <% if (currentPage < totalPages) { %>
                     <li class="page-item">
-                      <a class="page-link" href="/admin/category?page=<%= currentPage + 1 %>">&raquo; Next </a>
+                      <a class="page-link" href="/admin/categories?page=<%= currentPage + 1 %>">&raquo; Next </a>
                     </li>
                     <% } %>
         </ul>
@@ -277,8 +277,8 @@
         a = 0;
       }
 
-      // sent the form data to backend '/addcategory'
-      fetch('/admin/addCategory', {
+      // sent the form data to backend '/categories'
+      fetch('/admin/categories', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -333,7 +333,7 @@
         if (price.value !== '0' && price.value !== '' && price.value) {
 
           //sent data to backend for update offerPrice of category
-          fetch(`/admin/addOffer/${id}`, {
+          fetch(`/admin/categories/${id}/offer`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json'
@@ -376,8 +376,8 @@
     // Remove offerPrice
     function removeOffer(id) {
       if (confirm('Are you sure you want to remove?')) {
-        fetch(`/admin/removeOffer/${id}`, {
-          method: "PATCH",
+        fetch(`/admin/categories/${id}/offer`, {
+          method: "DELETE",
         })
           .then(res => { res.json() })
           .then(data => {
@@ -419,7 +419,7 @@
       const saveCategoryButton = document.getElementById('saveCategoryButton');
       saveCategoryButton.addEventListener('click', (e) => {
         e.preventDefault();
-        fetch(`/admin/editCategory/${id}`, {
+        fetch(`/admin/categories/${id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'

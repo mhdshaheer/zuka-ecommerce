@@ -250,7 +250,7 @@
                 })
                     .then((result) => {
                         if (result.isConfirmed) {
-                            axios.patch(`/admin/changeStatus?order_id=${order_id}`,{
+                            axios.patch(`/admin/orders/${order_id}/status`,{
                                 status : statusOption.value
                             })
                             .then(res=>{

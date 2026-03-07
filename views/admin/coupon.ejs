@@ -72,7 +72,7 @@
                       <ul class="pagination justify-content-start">
                         <% for (let i = 1; i <= totalPages; i++) { %>
                           <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                            <a class="page-link" href="/admin/coupon?page=<%= i %>"><%= i %></a>
+                            <a class="page-link" href="/admin/coupons?page=<%= i %>"><%= i %></a>
                           </li>
                         <% } %>
                       </ul>
@@ -200,7 +200,7 @@
         }else{
             expiryDateError.innerHTML = ''
         }
-        axios.post('/admin/coupon',{
+        axios.post('/admin/coupons',{
             couponCode:couponCode.value.toUpperCase(),
             minAmount:minAmount.value,
             discountValue:discountValue.value,
@@ -231,7 +231,7 @@
   </script>
   <script>
     function blockCoupon(couponId){
-        axios.patch('/admin/blockCoupon',{couponId})
+        axios.patch(`/admin/coupons/${couponId}/block`)
         .then((res)=>{
             if(res.status==200){
                 window.location.reload()
@@ -239,7 +239,7 @@
         })
     }
     function unBlockCoupon(couponId){
-        axios.patch('/admin/unBlockCoupon',{couponId})
+        axios.patch(`/admin/coupons/${couponId}/unblock`)
         .then((res)=>{
             if(res.status==200){
                 window.location.reload()

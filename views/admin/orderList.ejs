@@ -40,7 +40,7 @@
                                         <%}%>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
                                         <td class="text-end">
-                                            <a href="/admin/orderDetails?order_id=<%= item._id %>">
+                                            <a href="/admin/orders/<%= item._id %>">
                                                 <button class="btn btn-primary" >
                                                     View order
                                                 </button>
