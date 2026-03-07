@@ -58,20 +58,20 @@
                     <div class="row align-items-center">
                         <!-- Product Image -->
                         <div class="col-md-3 text-center fixed-size">
-                            <img src="<%= item.productId.images[0] %>" alt="Product Image"
+                            <img src="<%= item.productId && item.productId.images ? item.productId.images[0] : '/admin/assets/imgs/theme/upload.svg' %>" alt="Product Image"
                                 class="img-fluid rounded shadow"
                                 style="max-width: 100%; max-height: 100%; object-fit: cover; border: 2px solid #ddd; padding: 5px;">
                         </div>
                         <!-- Order Details -->
                         <div class="col-md-5">
                             <h4 class="text-primary">
-                                <%=item.productId.productName%>
+                                <%= item.productId ? item.productId.productName : 'Product Removed' %>
                             </h4>
                             <p class="text-dark mb-2"><strong>Price:</strong>
-                                ₹<%=item.productId.regularPrice%>
+                                ₹<%= item.productId ? item.productId.regularPrice : 'N/A' %>
                             </p>
                             <p class="text-dark mb-2"><strong>Color:</strong>
-                                <%=item.productId.color%>
+                                <%= item.productId ? item.productId.color : 'N/A' %>
                             </p>
                             <p class="text-dark mb-2"><strong>Size:</strong>
                                 <%=item.size%>
@@ -124,20 +124,24 @@
                             <hr>
                             <h6 class="text-dark fs-5">Shipping Information</h6>
                                 <p class="text-dark mb-1"><strong>Customer Name:</strong> <span class="text-secondary">
-                                        <%=address.name%>
+                                        <%= address ? address.name : 'Unknown' %>
                                     </span> </p>
                                 <p class="text-dark mb-1"><strong>Shipping Address:</strong> <span
                                         class="text-secondary">
-                                        <%=address.address%>,
-                                            <br>
-                                            <%=address.city%>,<%=address.state%>,<%=address.country%>
-                                                        <br>
-                                                        <%=address.pincode%>
+                                        <% if(address) { %>
+                                            <%=address.address%>,
+                                                <br>
+                                                <%=address.city%>,<%=address.state%>,<%=address.country%>
+                                                            <br>
+                                                            <%=address.pincode%>
+                                        <% } else { %>
+                                            Address Information Unavailable
+                                        <% } %>
                                     </span>
                                 </p>
                                 <p class="text-dark"><strong>Contact:</strong><span class="text-secondary">
-                                        <%=address.phone%> <br>
-                                            <%=address.altPhone%>
+                                        <%= address ? address.phone : 'N/A' %> <br>
+                                        <%= address ? address.altPhone : '' %>
                                     </span></p>
                                 <br>
                                 <p class="text-dark"><strong>Payment Method:</strong><span class="text-secondary">

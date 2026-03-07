@@ -30,15 +30,19 @@ const orderDetails = async (req, res) => {
   try {
     const order_id = req.params.id;
     const orders = await Order.findOne({ _id: order_id }).populate('orderedItems.productId');
-    const address = await Address.findOne({ userId: orders.userId, 'address._id': orders.address }, { 'address.$': 1 });
+    if (!orders) {
+      return res.status(httpStatusCode.NOT_FOUND).redirect('/admin/orders');
+    }
+    const addressDoc = await Address.findOne({ userId: orders.userId, 'address._id': orders.address }, { 'address.$': 1 });
+    const address = addressDoc && addressDoc.address ? addressDoc.address[0] : null;
 
     res.render('orderDetails', {
       orders,
-      address: address.address[0]
+      address
     });
   } catch (error) {
     logger.error(error);
-
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).redirect('/admin/orders');
   }
 };
 

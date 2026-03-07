@@ -27,7 +27,7 @@
                                     <%orders.map((item,index)=>{%>
                                     <tr>
                                         <td>#<%=item.orderId%></td>
-                                        <td><b><%=item.userId.name%></b></td>
+                                        <td><b><%= item.userId ? item.userId.name : 'User Not Found' %></b></td>
                                         <td><%=item.paymentMethod%></td>
                                         <td>₹<%=item.finalAmount%></td>
                                         <%if(item.status==='Cancelled'){%>
