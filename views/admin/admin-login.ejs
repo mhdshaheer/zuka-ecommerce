@@ -78,14 +78,15 @@
 			email: email.value,
 			password: password.value
 		}).then(res => {
-			if (res.data.message) {
-				passError.innerHTML = res.data.message
+			if (res.data.success) {
+				window.location.href = '/admin/dashboard'
 			} else {
-				
-				passError.innerHTML = '';
-				window.location.href = '/admin/login'
-
+				passError.innerHTML = res.data.message || 'Login failed';
 			}
+		}).catch(err => {
+			passError.innerHTML = err.response && err.response.data && err.response.data.message 
+				? err.response.data.message 
+				: 'An error occurred during login';
 		})
 	})
 </script>

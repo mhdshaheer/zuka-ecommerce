@@ -31,9 +31,9 @@ const login = async (req, res) => {
 
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
       req.session.admin = true;
-      return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
+      return res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_SUCCESS });
     } else {
-      return res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_INCORRECT_USERNAME_OR_PASSWORD });
+      return res.status(httpStatusCode.UNAUTHORIZED).json({ success: false, message: constants.MSG_INCORRECT_USERNAME_OR_PASSWORD });
     }
   } catch (error) {
     logger.error("error in admin login");
@@ -141,7 +141,7 @@ const loadDashboard = async (req, res) => {
           totalSales: { $sum: "$orderedItems.quantity" }
         }
       },
-      { $sort: { totalQuantity: -1 } },
+      { $sort: { totalSales: -1 } },
       { $limit: 10 }]
       );
 
@@ -193,6 +193,7 @@ const loadDashboard = async (req, res) => {
 
   } catch (error) {
     logger.error("Dashboard loading error", error);
+    res.redirect('/admin/adminError');
   }
 
 };

@@ -27,21 +27,12 @@ const userAuth = (req,res,next)=>{
 }
 
 
-const adminAuth = (req,res,next)=>{
-    User.findOne({isAdmin:true})
-    .then(data=>{
-        if(data && req.session.admin){
-            next();
-        }else{
-            res.redirect('/admin/login')
-        }
-    })
-    .catch(err=>{
-        logger.error("Error in adminAuth middleware",err);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
-        
-    })
-
+const adminAuth = (req, res, next) => {
+    if (req.session.admin) {
+        next();
+    } else {
+        res.redirect('/admin/login');
+    }
 }
 const backToHome = (req,res,next)=>{
     const user = req.session.user || req.session.googleUser;
