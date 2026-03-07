@@ -1,174 +1,174 @@
+const logger = require('../../helpers/logger');
 const constants = require('../../helpers/constants');
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
-const env = require("dotenv").config()
+const env = require("dotenv").config();
 const Order = require('../../models/orderSchema');
-const Cart = require('../../models/cartSchema')
-const Product = require('../../models/productSchema')
+const Cart = require('../../models/cartSchema');
+const Product = require('../../models/productSchema');
 const Coupon = require('../../models/couponSchema');
-const Category = require('../../models/categorySchema')
-const httpStatusCode = require('../../helpers/httpStatusCode')
+const Category = require('../../models/categorySchema');
+const httpStatusCode = require('../../helpers/httpStatusCode');
 
 
 // Initialize Razorpay instance
 const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
 const createOrder = async (req, res) => {
-    try {
-        const { totalPrice, address, index } = req.body;
-        const user = req.session.user || req.session.googleUser;
-        const cart = await Cart.findOne({ userId: user._id }).populate('items.productId'); 
+  try {
+    const { totalPrice, address, index } = req.body;
+    const user = req.session.user || req.session.googleUser;
+    const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
 
 
-        const cartWithProducts = await Cart.findById(cart._id).populate({
-            path: 'items.productId',
-            select: 'category',
-        });
-        const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
-        const blockedCategoryIds = unblockedCategoryIds.map(category => category._id.toString());
-        const isAnyCategoryBlocked = cartWithProducts.items.some(item =>
-            blockedCategoryIds.includes(item.productId.category.toString())
-        );
+    const cartWithProducts = await Cart.findById(cart._id).populate({
+      path: 'items.productId',
+      select: 'category'
+    });
+    const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+    const blockedCategoryIds = unblockedCategoryIds.map((category) => category._id.toString());
+    const isAnyCategoryBlocked = cartWithProducts.items.some((item) =>
+    blockedCategoryIds.includes(item.productId.category.toString())
+    );
 
 
-        const isAnyProductBlocked = cart.items.some(item => item.productId.isBlocked);
-        if (isAnyProductBlocked || isAnyCategoryBlocked) {
-            return res.status(httpStatusCode.UNAUTHORIZED).json({
-                message: constants.MSG_YOUR_CART_CONTAINS_BLOCKED_PRODUCTS_PLEASE_REMOVE_THEM_TO_PROCEED
-            });
-        }
-
-        const order = await razorpay.orders.create({
-            amount: totalPrice * 100, // Convert to paise
-            currency: "INR",
-            receipt: "order_rcptid_11"
-        });
-        // ===========================
-        const priceTotal = Number(totalPrice) + (req.session.discountPrice ?? 0)
-        const addOrder = await Order.create({
-            cartId: cart._id,
-            userId: user._id,
-            orderedItems: cart.items,
-            totalPrice: priceTotal,
-            finalAmount: Number(totalPrice),
-            address: address._id,
-            index: Number(index),
-            paymentMethod: 'Razorpay',
-            paymentStatus: 'Pending',
-            couponDiscount: req.session.discountPrice || 0,
-            couponApplied: req.session.discountPrice ? true : false
-        });
-        if (addOrder) {
-            const myOrder = await Order.findOne({ cartId: cart._id })
-            const addToCoupon = await Coupon.updateOne(
-                { _id: req.session.couponId },
-                {
-                    $push: { userId: user._id },
-                    $inc: { usedCount: 1 }
-                }
-            )
-            req.session.order = myOrder
-            cart.items.map(async (item) => {
-                let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } })
-            })
-
-            await Cart.deleteOne({ userId: user._id })
-            res.status(httpStatusCode.OK).json({
-                key: razorpay.key_id,
-                order,
-                order_id: myOrder._id
-            });
-        }
-        // ===========================
-    } catch (error) {
-        console.error("Error creating Razorpay order:", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
+    const isAnyProductBlocked = cart.items.some((item) => item.productId.isBlocked);
+    if (isAnyProductBlocked || isAnyCategoryBlocked) {
+      return res.status(httpStatusCode.UNAUTHORIZED).json({
+        message: constants.MSG_YOUR_CART_CONTAINS_BLOCKED_PRODUCTS_PLEASE_REMOVE_THEM_TO_PROCEED
+      });
     }
+
+    const order = await razorpay.orders.create({
+      amount: totalPrice * 100, // Convert to paise
+      currency: "INR",
+      receipt: "order_rcptid_11"
+    });
+    // ===========================
+    const priceTotal = Number(totalPrice) + (req.session.discountPrice ?? 0);
+    const addOrder = await Order.create({
+      cartId: cart._id,
+      userId: user._id,
+      orderedItems: cart.items,
+      totalPrice: priceTotal,
+      finalAmount: Number(totalPrice),
+      address: address._id,
+      index: Number(index),
+      paymentMethod: 'Razorpay',
+      paymentStatus: 'Pending',
+      couponDiscount: req.session.discountPrice || 0,
+      couponApplied: req.session.discountPrice ? true : false
+    });
+    if (addOrder) {
+      const myOrder = await Order.findOne({ cartId: cart._id });
+      const addToCoupon = await Coupon.updateOne(
+        { _id: req.session.couponId },
+        {
+          $push: { userId: user._id },
+          $inc: { usedCount: 1 }
+        }
+      );
+      req.session.order = myOrder;
+      cart.items.map(async (item) => {
+        let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } });
+      });
+
+      await Cart.deleteOne({ userId: user._id });
+      res.status(httpStatusCode.OK).json({
+        key: razorpay.key_id,
+        order,
+        order_id: myOrder._id
+      });
+    }
+    // ===========================
+  } catch (error) {
+    logger.error("Error creating Razorpay order:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
+  }
 };
 
 const verifyPayment = async (req, res) => {
-    try {
+  try {
 
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, totalPrice, address, index, order_id } = req.body;
-        const user = req.session.user || req.session.googleUser;
-
-
-        const hmac = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-            .update(razorpay_order_id + "|" + razorpay_payment_id)
-            .digest("hex");
-
-        if (hmac === razorpay_signature) {
-
-            const updateOrder = await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } });
-
-            res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, totalPrice, address, index, order_id } = req.body;
+    const user = req.session.user || req.session.googleUser;
 
 
+    const hmac = crypto.
+    createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).
+    update(razorpay_order_id + "|" + razorpay_payment_id).
+    digest("hex");
 
-        } else {
-            res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
-        }
-    } catch (error) {
-        console.log(error)
+    if (hmac === razorpay_signature) {
+
+      const updateOrder = await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } });
+
+      res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
+
+
+
+    } else {
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
     }
+  } catch (error) {
+    logger.error(error);
+  }
 };
 
 
 //Order page razor pay setup
 const createOrder_OP = async (req, res) => {
-    try {
-        const { finalAmount } = req.body;
+  try {
+    const { finalAmount } = req.body;
 
-        const order = await razorpay.orders.create({
-            amount: finalAmount * 100,
-            currency: "INR",
-            receipt: "order_rcptid_11"
-        });
+    const order = await razorpay.orders.create({
+      amount: finalAmount * 100,
+      currency: "INR",
+      receipt: "order_rcptid_11"
+    });
 
-        res.status(httpStatusCode.OK).json({ key: razorpay.key_id, order });
+    res.status(httpStatusCode.OK).json({ key: razorpay.key_id, order });
 
-        // ===========================
-    } catch (error) {
-        console.error("Error creating Razorpay order:", error);
-        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
-    }
+    // ===========================
+  } catch (error) {
+    logger.error("Error creating Razorpay order:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ error: constants.MSG_FAILED_TO_CREATE_RAZORPAY_ORDER });
+  }
 };
 
 const verifyRetryPayment = async (req, res) => {
-    try {
-
-        console.log("verify payment")
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, order_id } = req.body;
+  try {
 
 
-        const hmac = crypto
-            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-            .update(razorpay_order_id + "|" + razorpay_payment_id)
-            .digest("hex");
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, order_id } = req.body;
 
-        if (hmac === razorpay_signature) {
 
-            await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } })
-            res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
+    const hmac = crypto.
+    createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).
+    update(razorpay_order_id + "|" + razorpay_payment_id).
+    digest("hex");
 
-        } else {
-            res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
-        }
-    } catch (error) {
-        console.log(error)
+    if (hmac === razorpay_signature) {
+
+      await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: "Paid" } });
+      res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
+
+    } else {
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
     }
+  } catch (error) {
+    logger.error(error);
+  }
 };
 
 
 
 module.exports = {
-    createOrder,
-    verifyPayment,
-    createOrder_OP,
-    verifyRetryPayment
-}
-
+  createOrder,
+  verifyPayment,
+  createOrder_OP,
+  verifyRetryPayment
+};

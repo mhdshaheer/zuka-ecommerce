@@ -1,54 +1,55 @@
 const express = require('express');
+const logger = require('./helpers/logger');
 const app = express();
 const session = require("express-session");
 const nodemailer = require("nodemailer");
 const path = require('path');
 // const morgan = require('morgan')
-const passport = require("./config/passport")
+const passport = require("./config/passport");
 const env = require("dotenv").config();
-const userRouter = require('./routes/userRouter')
+const userRouter = require('./routes/userRouter');
 const adminRouter = require("./routes/adminRouter");
-const paymentRouter = require('./routes/paymentRouter')
+const paymentRouter = require('./routes/paymentRouter');
 const db = require('./config/db');
 const axios = require('axios');
-const nocache = require('nocache')
+const nocache = require('nocache');
 
 db();
-app.use(nocache())
+app.use(nocache());
 // app.use(morgan('tiny'))
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
 
 app.use(express.static('public'));
-app.set("view engine","ejs");
-app.set("views",[path.join(__dirname,'views/user'),path.join(__dirname,'views/admin')])
+app.set("view engine", "ejs");
+app.set("views", [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 
 app.use(session({
-    secret:process.env.SESSION_SECRET,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        secret:false,
-        httponly:true,
-        maxAge:72*60*60*1000
-    }
-}))
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secret: false,
+    httponly: true,
+    maxAge: 72 * 60 * 60 * 1000
+  }
+}));
 
 
 app.use(passport.initialize());
-app.use(passport.session())
+app.use(passport.session());
 
-app.use("/",userRouter);
-app.use("/admin",adminRouter);
-app.use("/payment",paymentRouter);
+app.use("/", userRouter);
+app.use("/admin", adminRouter);
+app.use("/payment", paymentRouter);
 
-app.use((req,res)=>{
-    res.render('page_404')
-})
+app.use((req, res) => {
+  res.render('page_404');
+});
 
 app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server running on port ${process.env.PORT || 5000}`);
+  logger.info(`Server running on port ${process.env.PORT || 5000}`);
 });
 
 

@@ -38,6 +38,13 @@
     "pdfkit": "^0.15.2",
     "puppeteer": "^23.10.4",
     "razorpay": "^2.9.5",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.3",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/generator": "^7.29.1",
+    "@babel/parser": "^7.29.0",
+    "@babel/traverse": "^7.29.0"
   }
 }
