@@ -201,7 +201,7 @@
 
         // Function to resend OTP and reset timer
         async function resendOtp() {
-     console.log('clicked');
+
      
             // Reset timer and UI elements
             timer = 60;
@@ -210,7 +210,7 @@
             document.getElementById("otp").disabled = false; // Re-enable OTP input
 
             try {
-                console.log("before fetch")
+
                 let res = await fetch('/resend-otp', {
                     method:'post'
                 })
@@ -231,8 +231,6 @@
                 }
 
             } catch (error) {
-                console.log(error);
-                
             }
 
 

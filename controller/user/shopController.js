@@ -268,7 +268,7 @@ const addToCart = async (req, res) => {
 
 const deleteFromCart = async (req, res) => {
   try {
-    const { index } = req.query;
+    const { index } = req.params;
     const user = req.session.user || req.session.googleUser;
     const cart = await Cart.findOne({ userId: user._id }, { items: 1 });
     cart.items.splice(Number(index), 1);
@@ -500,7 +500,7 @@ const deleteFromWishlist = async (req, res) => {
   try {
 
     const user = req.session.user || req.session.googleUser;
-    const { index } = req.query;
+    const { index } = req.params;
     const wishlist = await Wishlist.findOne({ userId: user._id });
     wishlist.products.splice(index, 1);
     const removeItem = await Wishlist.updateOne({ userId: user._id }, { $set: { products: wishlist.products } });

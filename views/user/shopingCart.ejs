@@ -195,7 +195,7 @@
 
     <script>
         function deleteItem(index) {
-            console.log(index);
+
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to undo this!",
@@ -232,11 +232,7 @@
     </script>
 
     <script>
-        function saveItem(index) {
-            console.log(index);
-            const itemQty = document.getElementById('itemQty');
-            console.log('hai', itemQty.value)
-        }
+
     </script>
 
     <script>
@@ -268,7 +264,6 @@
 
             // Ensure price is a valid number
             if (isNaN(price)) {
-                console.error("Invalid unit price. Ensure the data-price attribute is set correctly.");
                 return;
             }
             const totalPrice = quantity * price;
@@ -418,7 +413,7 @@
                             confirmButtonText: 'Okay'
                         });
                     } else {
-                        console.error("An unexpected error occurred:", error);
+
                     }
                 })
         }

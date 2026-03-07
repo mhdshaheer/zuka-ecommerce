@@ -337,11 +337,11 @@
 
         //Product Name Validation
         function validateProductName(nameVal) {
-            console.log('inside validate')
+
             const minLength = 3;
             const maxLength = 30;
 
-            console.log("name value is :", nameVal)
+
 
             if (nameVal.trim() == '') {
                 productError.style.display = 'block';
@@ -555,10 +555,7 @@
                     }
                 });
 
-                //Console form data
-                for (let [key, value] of formData.entries()) {
-                    console.log(key + ': ', value);
-                }
+
                 //form data end
                 showSpinner()
                 fetch('/admin/addProduct', {
@@ -566,7 +563,7 @@
                     body: formData
                 }).then(res => res.json())
                     .then(data => {
-                        console.log("inside swal")
+
                         Swal.fire({
                             title: 'Success!',
                             text: 'Product adeded successfully!',
@@ -604,7 +601,7 @@
                 stock: document.getElementById("varientStock").value,
                 price: document.getElementById("varientPrice").value
             }
-            console.log(obj);
+
 
             variantArray.push(obj)
             saveChanges()

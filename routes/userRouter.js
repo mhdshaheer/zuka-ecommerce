@@ -54,7 +54,7 @@ router.route('/addresses')
   .get(userAuth, userController.loadAddress)
   .post(userAuth, userController.addAddress);
 
-router.route('/addresses/:index')
+router.route('/addresses/:addressId')
   .get(userAuth, userController.LoadEditAddress)
   .put(userAuth, userController.editAddressData)
   .delete(userAuth, userController.softDeleteAddress);

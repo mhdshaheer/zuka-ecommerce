@@ -316,9 +316,9 @@
 
             document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
                 e.preventDefault();
-                console.log("hhhhai")
+
                 if(offerPrice.value>100 || offerPrice.value<0){
-                    console.log("fdihjusfdujhjiuhofsdioj")
+
                     return Swal.fire({
                             title: 'Warning!',
                             text: 'Offer between 0 and 100!',
@@ -382,7 +382,7 @@
                             window.location.reload();
                         }
                     } catch (e) {
-                        console.error(e);
+
                     }
                 }
             });
@@ -407,7 +407,7 @@
                             window.location.reload();
                         }
                     } catch (e) {
-                        console.error(e);
+
                     }
                 }
             });
@@ -431,7 +431,7 @@
                             document.getElementById('image3'),
                             document.getElementById('image4'),
                         ];
-                        console.log("input Images:",imageInputs)
+
                         imageInputs.forEach((input, index) => {
                             const files = input.files;
                             for (let i = 0; i < files.length; i++) {

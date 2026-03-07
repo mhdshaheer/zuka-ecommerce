@@ -192,7 +192,7 @@
 
             // Function to resend OTP and reset timer
             async function resendOtp() {
-                console.log('clicked');
+
 
                 // Reset timer and UI elements
                 timer = 60;
@@ -201,12 +201,12 @@
                 document.getElementById("otp").disabled = false; // Re-enable OTP input
 
                 try {
-                    console.log("before fetch")
+
                     let res = await fetch('/forgot-password/resend', {
                         method:'post'
                     })
                     let data = await res?.json();
-                    console.log("response:", data?.success)
+
 
                     if (data.success) {
                         Swal.fire({
@@ -224,10 +224,6 @@
                     }
 
                 } catch (error) {
-                    console.log(error);
-
-                    console.log('error fetch');
-
                 }
 
 
@@ -239,7 +235,7 @@
                 startTimer();
 
                 // Simulate resending the OTP (you can replace this with your actual OTP sending logic)
-                console.log("OTP Resent!");
+
                 Swal.fire({
                     icon: "info",
                     title: "OTP Resent",
@@ -259,10 +255,10 @@
 
             async function validateOtpForm(e) {
                 e.preventDefault();
-                console.log("Inside the validateOtpForm...");
+
 
                 const otpval1 = document.getElementById('otp').value;
-                console.log("OTP value:", otpval1);
+
 
                 let options = {
                     method: "POST",

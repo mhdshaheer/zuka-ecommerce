@@ -1,3 +1,4 @@
+const logger = require('../helpers/logger');
 const User = require("../models/userSchema");
 const Cart = require('../models/cartSchema')
 
@@ -14,7 +15,7 @@ const userAuth = (req,res,next)=>{
                 res.redirect("/login");
             }
         }).catch(err=>{
-            console.log("Error in user auth middleware");
+            logger.error("Error in user auth middleware", err);
             res.status(500).send("Internal Server Error");
         })
     }else{
@@ -34,7 +35,7 @@ const adminAuth = (req,res,next)=>{
         }
     })
     .catch(err=>{
-        console.log("Error in adminAuth middleware",err);
+        logger.error("Error in adminAuth middleware",err);
         res.status(500).send("Internal Server Error");
         
     })
