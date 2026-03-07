@@ -20,7 +20,7 @@ router.route('/login')
 router.route('/logout').get(userController.logout);
 
 router.route('/verify-otp').post(userController.verifyOtp);
-router.route('/resend-otp').post(userController.resendOtp);
+router.route('/resend-otp').post(userController.resentOtp);
 
 router.get("/auth/google", passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
