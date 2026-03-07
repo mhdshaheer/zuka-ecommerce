@@ -36,16 +36,15 @@ const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    const existingCategory = await Category.findOne({ name });
     if (existingCategory) {
-      return res.status(409).json({ error: constants.MSG_409 });
+      return res.status(httpStatusCode.CONFLICT).json({ error: constants.MSG_CATEGORY_ALREADY_EXISTS });
     }
     const newCategory = new Category({
       name,
       description
     });
     await newCategory.save();
-    return res.json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY });
+    return res.status(httpStatusCode.OK).json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY });
 
   } catch (error) {
     logger.error("add category error", error);
@@ -116,7 +115,7 @@ const editCategory = async (req, res) => {
     res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL });
   } catch (error) {
     logger.error('Error updating category:', error);
-    res.status(500).json({ message: constants.MSG_FAILED_TO_UPDATE_CATEGORY, error });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_FAILED_TO_UPDATE_CATEGORY, error });
   }
 };
 

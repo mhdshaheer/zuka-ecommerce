@@ -185,15 +185,15 @@ const couponApply = async (req, res) => {
     if (!coupon) {
       req.session.coupon = 0;
       req.session.discountPrice = 0;
-      return res.status(402).json({ message: constants.MSG_COUPON_IS_INVALID });
+      return res.status(httpStatusCode.PAYMENT_REQUIRED).json({ message: constants.MSG_COUPON_IS_INVALID });
     }
     if (currentDate > coupon.expireOn) {
-      return res.status(402).json({ message: constants.MSG_COUPON_IS_EXPIRED });
+      return res.status(httpStatusCode.PAYMENT_REQUIRED).json({ message: constants.MSG_COUPON_IS_EXPIRED });
     }
     if (userCoupon) {
       req.session.coupon = 0;
       req.session.discountPrice = 0;
-      return res.status(402).json({ message: constants.MSG_COUPON_IS_ALREADY_USED });
+      return res.status(httpStatusCode.PAYMENT_REQUIRED).json({ message: constants.MSG_COUPON_IS_ALREADY_USED });
     }
 
     req.session.discountPrice = coupon.discountPrice;
@@ -213,7 +213,7 @@ const removeCoupon = async (req, res) => {
     req.session.minimumPrice = 0;
     req.session.couponId = null;
     req.session.code = null;
-    res.status(httpStatusCode.OK).json({ message: true });
+    res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
   } catch (error) {
     logger.error("Error in coupon remove from the cart", error);
   }
@@ -224,7 +224,7 @@ const addToCart = async (req, res) => {
     const user = req.session.user || req.session.googleUser;
     let { size, stock, productObj, quantity } = req.body;
     if (!user) {
-      return res.status(httpStatusCode.NOT_FOUND).json({ message: false });
+      return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_USER_NOT_FOUND });
     }
 
     const sizeFound = await Cart.findOne({ userId: user._id, 'items.size': size, 'items.productId': productObj._id });
@@ -256,7 +256,7 @@ const addToCart = async (req, res) => {
         { upsert: true, new: true }
       );
       if (toCart) {
-        res.status(httpStatusCode.OK).json({ message: true });
+        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
       }
     }
   } catch (error) {
@@ -277,7 +277,7 @@ const deleteFromCart = async (req, res) => {
     const cartItems = await Cart.find({ userId: user._id });
 
     if (result) {
-      res.status(httpStatusCode.OK).json({ message: true, cartItems });
+      res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS, cartItems });
     }
 
   } catch (error) {
@@ -331,7 +331,7 @@ const addOrder = async (req, res) => {
     // Insufficient balance 
     if (paymentMethod == 'Wallet') {
       if (userWallet.balance < totalPrice) {
-        return res.status(402).json({ message: constants.MSG_INSUFFICIENT_BALANCE_TO_PROCESS_THE_TRANSACTION });
+        return res.status(httpStatusCode.PAYMENT_REQUIRED).json({ message: constants.MSG_INSUFFICIENT_BALANCE_TO_PROCESS_THE_TRANSACTION });
       }
     }
 
@@ -535,14 +535,14 @@ const manageCartStock = async (req, res) => {
 
       if (stockCheck) {
         let message = `Product ${item.productId.productName} with size '${item.size}' has only ${stockCheck.variant[0].stock} stocks left.`;
-        return res.status(409).json({ message: message });
+        return res.status(httpStatusCode.CONFLICT).json({ message: message });
       }
     }
 
 
-    return res.status(200).json({ message: constants.MSG_ALL_DONE });
+    return res.status(httpStatusCode.OK).json({ message: constants.MSG_ALL_DONE });
   } catch (error) {
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 

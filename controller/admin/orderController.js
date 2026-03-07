@@ -48,9 +48,9 @@ const changeOrderStatus = async (req, res) => {
     const { status } = req.body;
     const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
     if (result) {
-      res.status(httpStatusCode.OK).json({ success: true });
+      res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_ORDER_STATUS_UPDATED });
     } else {
-      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_FAILED_TO_UPDATE_ORDER_STATUS });
     }
 
   } catch (error) {

@@ -37,7 +37,7 @@ const login = async (req, res) => {
 
       if (passwordMatch) {
         req.session.admin = true;
-        return res.status(httpStatusCode.OK).json({ message: "" });
+        return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
 
       } else {
         return res.status(httpStatusCode.OK).json({ message: constants.MSG_INCORRECT_PASSWORD });
@@ -202,7 +202,7 @@ const loadDashboard = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error("Dashboard loading error: constants.MSG_ERROR_RES_REDIRECT/admin/login");
+    logger.error("Dashboard loading error", error);
   }
 
 };
@@ -211,7 +211,7 @@ const adminErrorLoad = async (req, res) => {
   try {
     res.render('admin-error');
   } catch (error) {
-    logger.error("Eroor in adminError page");
+    logger.error("Error in adminError page");
   }
 };
 

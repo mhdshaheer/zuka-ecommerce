@@ -24,9 +24,8 @@ const loadCouponPage = async (req, res) => {
 const addCoupon = async (req, res) => {
   try {
     const { couponCode, minAmount, discountValue, activationDate, expiryDate } = req.body;
-    const findCoupon = await Coupon.findOne({ code: couponCode });
     if (findCoupon) {
-      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_COUPON_ALREADY_EXISTS });
     }
     const coupon = new Coupon({
       code: couponCode,
@@ -37,7 +36,7 @@ const addCoupon = async (req, res) => {
     });
     await coupon.save();
 
-    res.status(httpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_SUCCESS });
   } catch (error) {
 
     logger.error(error);
@@ -48,7 +47,7 @@ const blockCoupon = async (req, res) => {
   try {
     const couponId = req.params.id;
     await Coupon.updateOne({ _id: couponId }, { $set: { isList: false } });
-    res.status(httpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_SUCCESS });
   } catch (error) {
     logger.error(error);
   }
@@ -57,7 +56,7 @@ const unBlockCoupon = async (req, res) => {
   try {
     const couponId = req.params.id;
     await Coupon.updateOne({ _id: couponId }, { $set: { isList: true } });
-    res.status(httpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_SUCCESS });
   } catch (error) {
     logger.error(error);
   }

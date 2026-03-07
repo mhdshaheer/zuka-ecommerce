@@ -26,7 +26,7 @@ const loadSignup = async (req, res) => {
   try {
     res.render('signup', { message: "" });
   } catch (error) {
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('Server error');
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
 };
 
@@ -47,7 +47,7 @@ const signup = async (req, res) => {
 
     const emailSent = await sendEmailVerify(email, otp);
     if (!emailSent) {
-      return res.json("email error");
+      return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json(constants.MSG_EMAIL_ERROR);
     }
     req.session.userOtp = otp;
     req.session.userData = { name, email, password };
@@ -259,7 +259,7 @@ const loadHomePage = async (req, res) => {
 
   } catch (error) {
     logger.error('Home page not found!', error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send('Server error');
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
 
 };
@@ -352,7 +352,7 @@ const changePass = async (req, res) => {
     }
     const changePass = await securePassword(newPassword);
     await User.updateOne({ _id: user._id }, { $set: { password: changePass } });
-    return res.status(httpStatusCode.OK).json({ message: "success" });
+    return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
   } catch (error) {
     logger.error("server error", error);
     res.redirect('/pageNotFound');
@@ -385,7 +385,7 @@ const sentOtp = async (req, res) => {
 
       const sentOtp = await sendEmailVerify(email, otp);
       if (sentOtp) {
-        res.status(httpStatusCode.OK).json({ message: "success" });
+        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
 
       }
 
@@ -529,14 +529,14 @@ const softDeleteAddress = async (req, res) => {
     const userAddress = await Address.findOne({ userId: user._id });
 
     if (!userAddress) {
-      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "User address document not found" });
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: constants.MSG_USER_ADDRESS_DOCUMENT_NOT_FOUND });
     }
 
     // Find the specific address within the array by its _id
     const addressToUpdate = userAddress.address.id(addressId);
 
     if (!addressToUpdate) {
-      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Address not found" });
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: constants.MSG_ADDRESS_NOT_FOUND });
     }
 
     // Update the isBlocked status of the specific address
@@ -568,10 +568,10 @@ const LoadEditAddress = async (req, res) => {
            addressId // Pass addressId for update
          });
        } else {
-         res.status(httpStatusCode.NOT_FOUND).send("Address not found");
+         res.status(httpStatusCode.NOT_FOUND).send(constants.MSG_ADDRESS_NOT_FOUND);
        }
     } else {
-       res.status(httpStatusCode.NOT_FOUND).send("User address document not found");
+       res.status(httpStatusCode.NOT_FOUND).send(constants.MSG_USER_ADDRESS_DOCUMENT_NOT_FOUND);
     }
   } catch (error) {
     logger.error(error);
@@ -588,12 +588,12 @@ const editAddressData = async (req, res) => {
     
     const userAddress = await Address.findOne({ userId: user._id });
     if(!userAddress){
-      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "User address document not found" });
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: constants.MSG_USER_ADDRESS_DOCUMENT_NOT_FOUND });
     }
 
     const addressToUpdate = userAddress.address.id(addressId);
     if(!addressToUpdate){
-      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Address not found" });
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: constants.MSG_ADDRESS_NOT_FOUND });
     }
 
     const result = await Address.updateOne(
@@ -615,7 +615,7 @@ const editAddressData = async (req, res) => {
     if (result) {
       res.status(httpStatusCode.OK).json({ success: true });
     } else {
-      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Failed to update address" });
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_FAILED_TO_UPDATE_ADDRESS });
     }
   } catch (error) {
     logger.error(error);
@@ -734,14 +734,14 @@ const invoiceDownload = async (req, res) => {
     const order = await Order.findOne({ _id: orderId }).populate('orderedItems.productId');
     
     if (!order) {
-      return res.status(httpStatusCode.NOT_FOUND).send('Order not found');
+      return res.status(httpStatusCode.NOT_FOUND).send(constants.MSG_ORDER_NOT_FOUND);
     }
 
     const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 });
     const myAddress = address ? address.address[0] : null;
 
     if (!myAddress) {
-      return res.status(httpStatusCode.NOT_FOUND).send('Shipping address not found for this order');
+      return res.status(httpStatusCode.NOT_FOUND).send(constants.MSG_SHIPPING_ADDRESS_NOT_FOUND_FOR_THIS_ORDER);
     }
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });

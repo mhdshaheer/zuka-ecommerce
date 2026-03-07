@@ -58,7 +58,7 @@ const loadSalesReportPage = async (req, res) => {
     });
   } catch (error) {
     logger.error(error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
 };
 
@@ -175,7 +175,7 @@ const exportPDF = async (req, res) => {
     doc.end();
   } catch (error) {
     logger.error("Error generating PDF:", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send("Internal Server Error");
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
 };
 

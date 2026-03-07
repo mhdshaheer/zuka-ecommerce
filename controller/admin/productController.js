@@ -114,20 +114,20 @@ const blockProduct = async (req, res) => {
   try {
     let productId = req.params.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: true } });
-    res.status(httpStatusCode.OK).json({ success: true, message: 'Product blocked' });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_PRODUCT_BLOCKED });
   } catch (error) {
     logger.error("error in block product", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 const unBlockProduct = async (req, res) => {
   try {
     let productId = req.params.id;
     await Product.updateOne({ _id: productId }, { $set: { isBlocked: false } });
-    res.status(httpStatusCode.OK).json({ success: true, message: 'Product unblocked' });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_PRODUCT_UNBLOCKED });
   } catch (error) {
     logger.error("error in unblock product", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Server error' });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 
@@ -171,9 +171,9 @@ const variantUpdate = async (req, res) => {
     const { variantPrice, variantStock } = req.body;
 
     await Product.updateOne({ 'variant._id': variantId }, { $set: { 'variant.$.stock': variantStock, 'variant.$.price': variantPrice } });
-    res.status(HttpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_SUCCESS });
   } catch (error) {
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 
@@ -181,18 +181,18 @@ const blockVariant = async (req, res) => {
   try {
     const variantId = req.params.variantId;
     await Product.updateOne({ 'variant._id': variantId }, { $set: { 'variant.$.isBlocked': true } });
-    res.status(HttpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_PRODUCT_BLOCKED });
   } catch (error) {
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 const unblockVariant = async (req, res) => {
   try {
     const variantId = req.params.variantId;
     await Product.updateOne({ 'variant._id': variantId }, { $set: { 'variant.$.isBlocked': false } });
-    res.status(HttpStatusCode.OK).json({ success: true });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_PRODUCT_UNBLOCKED });
   } catch (error) {
-    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 

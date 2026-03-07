@@ -49,10 +49,10 @@ const blockUser = async (req, res) => {
   try {
     let userId = req.params.id;
     await User.updateOne({ _id: userId }, { $set: { isBlocked: true } });
-    res.status(200).json({ success: true, message: 'User blocked' });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_USER_BLOCKED });
   } catch (error) {
     logger.error("error in block user", error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 
@@ -60,10 +60,10 @@ const unBlockUser = async (req, res) => {
   try {
     let userId = req.params.id;
     await User.updateOne({ _id: userId }, { $set: { isBlocked: false } });
-    res.status(200).json({ success: true, message: 'User unblocked' });
+    res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_USER_UNBLOCKED });
   } catch (error) {
     logger.error("error in unBlock user", error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_SERVER_ERROR });
   }
 };
 

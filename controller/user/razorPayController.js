@@ -111,7 +111,7 @@ const verifyPayment = async (req, res) => {
 
 
     } else {
-      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED });
     }
   } catch (error) {
     logger.error(error);
@@ -157,7 +157,7 @@ const verifyRetryPayment = async (req, res) => {
       res.status(httpStatusCode.OK).json({ success: true, orderId: order_id });
 
     } else {
-      res.status(httpStatusCode.BAD_REQUEST).json({ success: false });
+      res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED });
     }
   } catch (error) {
     logger.error(error);

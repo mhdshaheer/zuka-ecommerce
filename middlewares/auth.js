@@ -1,6 +1,8 @@
 const logger = require('../helpers/logger');
 const User = require("../models/userSchema");
 const Cart = require('../models/cartSchema')
+const constants = require('../helpers/constants');
+const httpStatusCode = require('../helpers/httpStatusCode');
 
 
 const userAuth = (req,res,next)=>{
@@ -16,7 +18,7 @@ const userAuth = (req,res,next)=>{
             }
         }).catch(err=>{
             logger.error("Error in user auth middleware", err);
-            res.status(500).send("Internal Server Error");
+            res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
         })
     }else{
     req.session.destroy()
@@ -36,7 +38,7 @@ const adminAuth = (req,res,next)=>{
     })
     .catch(err=>{
         logger.error("Error in adminAuth middleware",err);
-        res.status(500).send("Internal Server Error");
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
         
     })
 
@@ -59,7 +61,7 @@ const orderDone = async (req,res,next)=>{
             next();
         }
     } catch (error) {
-        res.status(500).send("Internal Server Error");
+        res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
     }
 }
 
