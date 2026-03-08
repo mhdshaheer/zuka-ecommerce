@@ -68,7 +68,7 @@
                                 <%= item.productId ? item.productId.productName : 'Product Removed' %>
                             </h4>
                             <p class="text-dark mb-2"><strong>Price:</strong>
-                                ₹<%= item.productId ? item.productId.regularPrice : 'N/A' %>
+                                ₹<%= item.productId ? item.productId.regularPrice.toFixed(0) : 'N/A' %>
                             </p>
                             <p class="text-dark mb-2"><strong>Color:</strong>
                                 <%= item.productId ? item.productId.color : 'N/A' %>
@@ -118,7 +118,7 @@
                             <!-- Shipping Information -->
                             <div class="col-md-4">
                                 <p class="text-dark mb-1"><strong>Total Amount:</strong> <span class="text-secondary">
-                                    ₹<%=orders.finalAmount.toFixed(2)%>
+                                    ₹<%=orders.finalAmount.toFixed(0)%>
                                 </span> 
                             </p>
                             <hr>

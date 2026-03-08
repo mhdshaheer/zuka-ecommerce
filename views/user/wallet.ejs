@@ -208,7 +208,7 @@
                                         <%wallet.transactions.map((item)=>{%>
                                             <tr>
                                                 <td><%=item.createdAt.toLocaleDateString()%></td>
-                                                <td>₹<%=item.amount%></td>
+                                                <td>₹<%=item.amount.toFixed(0)%></td>
                                                 <td><span class="badge <%= item.type == 'Debit' ? 'badge-danger' : 'badge-success' %>"><%=item.type%></span></td>
                                             </tr>
                                            <%})%> 

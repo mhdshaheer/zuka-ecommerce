@@ -57,7 +57,7 @@
                                                         <h6>
                                                             <%=item?.productId?.productName%>
                                                         </h6>
-                                                        <h5>₹ <%=item.price%></h5>
+                                                        <h5>₹ <%=item.price.toFixed(0)%></h5>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -285,7 +285,7 @@
                         document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(0)}`;
                         if (discountAmount && response.data.totalSum >= minimumPrice) {
 
-                            document.getElementById('discountId').innerHTML = `₹ -${discountAmount}`
+                            document.getElementById('discountId').innerHTML = `₹ -${discountAmount.toFixed(0)}`
                             document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll - discountAmount).toFixed(0)}`
                         } else {
                             document.getElementById('discountId').innerHTML = `₹ 0.00`

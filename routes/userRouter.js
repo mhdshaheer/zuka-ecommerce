@@ -78,6 +78,9 @@ router.route('/orders/success').get(userAuth, shopController.loadOrderSuccess);
 // Wallet
 router.route('/wallet').get(userAuth, userController.loadWallet);
 
+// Checkout
+router.route('/checkout').get(userAuth, shopController.loadCheckout);
+
 // Cart
 router.route('/cart')
   .get(userAuth, shopController.loadCart)

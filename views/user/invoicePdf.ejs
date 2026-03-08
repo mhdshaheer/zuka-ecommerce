@@ -43,12 +43,12 @@
             <td><%= item.productId.productName %></td>
             <td><%= item.quantity %></td>
             <td><%= item.size || 'N/A' %></td>
-            <td>₹<%= item.price %></td>
-            <td>₹<%= item.totalPrice %></td>
+            <td>₹<%= item.price.toFixed(0) %></td>
+            <td>₹<%= item.totalPrice.toFixed(0) %></td>
           </tr>
         <% }); %>
       </tbody>
     </table>
-    <h2>Total Amount: ₹<%= order.finalAmount %></h2>
+    <h2>Total Amount: ₹<%= order.finalAmount.toFixed(0) %></h2>
   </body>
 </html>

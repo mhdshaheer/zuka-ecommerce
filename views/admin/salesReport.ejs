@@ -71,7 +71,7 @@
                 <td>#<%= item.orderId %></td>
                 <td><%= item.userId?.name %></td>
                 <td><%= item.createdAt.toLocaleDateString() %></td>
-                <td>₹<%= item.finalAmount %></td>
+                <td>₹<%= item.finalAmount.toFixed(0) %></td>
                 <td>
                   <% if (item.paymentStatus === 'Paid') { %>
                     <span class="badge badge-pill badge-soft-success"><%= item.paymentStatus %></span>

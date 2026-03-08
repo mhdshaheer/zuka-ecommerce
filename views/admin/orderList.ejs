@@ -29,7 +29,7 @@
                                         <td>#<%=item.orderId%></td>
                                         <td><b><%= item.userId ? item.userId.name : 'User Not Found' %></b></td>
                                         <td><%=item.paymentMethod%></td>
-                                        <td>₹<%=item.finalAmount%></td>
+                                        <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <%if(item.status==='Cancelled'){%>
                                             <td><span class="badge rounded-pill alert-danger"><%=item.status%></span></td>
                                             <%}else if(item.status==='Delivered'){%>

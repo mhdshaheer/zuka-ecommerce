@@ -162,13 +162,16 @@ const loadCheckout = async (req, res) => {
     const user = req.session.user || req.session.googleUser;
     const userAddress = await Address.findOne({ userId: user._id });
     const userCart = await Cart.findOne({ userId: user._id }).populate('items.productId');
+    if (!userCart || userCart.items.length === 0) {
+      return res.redirect('/cart');
+    }
     const wallet = await Wallet.findOne({ userId: user._id });
 
     res.render('checkout', {
       activePage: "",
       user,
       userAddress,
-      userCart: userCart || [],
+      userCart: userCart || { items: [] },
       wallet,
       couponDiscount: req.session.discountPrice || 0,
       couponMin: req.session.minimumPrice || 0
@@ -409,6 +412,9 @@ const loadOrderSuccess = async (req, res) => {
     const user = req.session.user || req.session.googleUser;
     let orderId = req.query.id;
     const order = await Order.findOne({ _id: orderId });
+    if (!order) {
+      return res.redirect('/shop');
+    }
     const findAddress = await Address.findOne({ userId: user._id, 'address._id': order.address }, { 'address.$': 1 });
 
 
@@ -416,10 +422,11 @@ const loadOrderSuccess = async (req, res) => {
       activePage: '',
       user,
       order,
-      address: findAddress.address[0]
+      address: findAddress ? findAddress.address[0] : null
     });
   } catch (error) {
     logger.error(error);
+    res.redirect('/shop');
   }
 };
 

@@ -213,15 +213,19 @@
                     <h3 class="order-success__subtitle">Order Summary</h3>
                     <ul class="order-summary-list">
                         <li><strong>Order ID:</strong> <span id="orderId">#<%=order.orderId%></span></li>
-                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice"><%=order.finalAmount%></span></li>
+                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice"><%=order.finalAmount.toFixed(0)%></span></li>
                         <li><strong>Payment Method:</strong> <span id="paymentMethod"><%=order.paymentMethod%></span></li>
                         <li><strong>Shipping Address:</strong></li>
                         <li id="shippingAddress">
-                            <%=address.address%> <br> 
-                            <%=address.city%> <br> 
-                            <%=address.state%> <br> 
-                            <%=address.Country%> <br> 
-                            <%=address.phone%> 
+                            <% if(address) { %>
+                                <%=address.address%> <br> 
+                                <%=address.city%> <br> 
+                                <%=address.state%> <br> 
+                                <%=address.country%> <br> 
+                                <%=address.phone%>
+                            <% } else { %>
+                                Address not found
+                            <% } %>
                         </li>
                     </ul>
                 </div>
