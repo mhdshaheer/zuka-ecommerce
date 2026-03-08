@@ -181,11 +181,11 @@
                                     </span>
                             </h3>
                             <%if(product[0].offerPrice!==0){%>
-                                <h3>RS: <%=product[0].offerPrice%>/- <span>
-                                            <%=product[0].regularPrice%>/-
+                                <h3>RS: <%=product[0].offerPrice.toFixed(0)%>/- <span>
+                                            <%=product[0].regularPrice.toFixed(0)%>/-
                                         </span></h3>
                                 <%}else{%>
-                                    <h3>RS: <%=product[0].regularPrice%>/-</h3>
+                                    <h3>RS: <%=product[0].regularPrice.toFixed(0)%>/-</h3>
                                     <%}%>
                                         <p>
                                             <%=product[0].description%>
@@ -346,20 +346,20 @@
                                         </span>
                                         <% } %>
                                             <ul class="product__hover">
-                                                <li><a href="#"><img src="img/icon/heart.png" alt=""></a></li>
+                                                <li><a href="#"><img src="/img/icon/heart.png" alt=""></a></li>
                                             </ul>
                                 </div>
                                 <div class="product__item__text">
                                     <h6>
                                         <%= product.productName %>
                                     </h6>
-                                    <a href="/productInfo?id=<%= product._id %>" class="add-cart">View Product</a>
+                                    <a href="/products/<%= product._id %>" class="add-cart">View Product</a>
                                     <% if (product.offerPrice !==0) { %>
-                                        <h5>Rs: <%= product.offerPrice %>/-</h5>
-                                        <h6 style="text-decoration: line-through;">Rs: <%= product.regularPrice %>.00/-
+                                        <h5>Rs: <%= product.offerPrice.toFixed(0) %>/-</h5>
+                                        <h6 style="text-decoration: line-through;">Rs: <%= product.regularPrice.toFixed(0) %>/-
                                         </h6>
                                         <% } else { %>
-                                            <h5>Rs: <%= product.regularPrice %>.00/-</h5>
+                                            <h5>Rs: <%= product.regularPrice.toFixed(0) %>/-</h5>
                                             <% } %>
                                 </div>
                             </div>

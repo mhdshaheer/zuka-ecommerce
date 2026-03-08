@@ -76,7 +76,7 @@
                                                     </div>
                                                 </td>
                                                 <td class="cart__price" id="price-<%=index%>">₹
-                                                    <%=item.totalPrice.toFixed(2)%>
+                                                    <%=item.totalPrice.toFixed(0)%>
                                                 </td>
                                                 <td class="cart__close" onclick="deleteItem('<%=index%>')"><i
                                                         class="fa fa-close"></i>
@@ -130,7 +130,7 @@
                             </form>
                             <div class="d-flex align-items-center mt-2">
                                 <div style="color: green;" id="couponApplied">Discount amount ₹
-                                    <%=isCouponApplied.toFixed(2)%>
+                                    <%=isCouponApplied.toFixed(0)%>
                                 </div>
                                 <button id="removeCoupon" class="btn btn-outline-danger btn-sm ms-2"
                                     onclick="removeCoupon(event)">Remove</button>
@@ -141,11 +141,11 @@
                         <div class="cart__total">
                             <h6>Cart total</h6>
                             <ul>
-                                <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span></li>
+                                <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(0)%></span></li>
                                 <li>Discount <span class="text-danger" id="discountId">- ₹
-                                        <%=isCouponApplied.toFixed(2)%></span></li>
+                                        <%=isCouponApplied.toFixed(0)%></span></li>
                                 <li>Total <span id="totalAmount" class="text-dark">₹
-                                        <%=(total-isCouponApplied).toFixed(2)%></span></li>
+                                        <%=(total-isCouponApplied).toFixed(0)%></span></li>
 
                             </ul>
                             <a class="primary-btn text-light" id="checkOutBtn" onclick="ToCheckOut('<%=user._id%>')">Proceed to
@@ -173,10 +173,10 @@
                             <div class="cart__total">
                                 <h6>Cart total</h6>
                                 <ul>
-                                    <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(2)%></span>
+                                    <li>Subtotal <span class="text-dark" id="subTotal">₹ <%=total.toFixed(0)%></span>
                                     </li>
                                     <li>Discount <span class="text-danger" id="discountId">₹ 0.00</span></li>
-                                    <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(2)%></span>
+                                    <li>Total <span id="totalAmount" class="text-dark">₹ <%=total.toFixed(0)%></span>
                                     </li>
                                 </ul>
                                 <a class="primary-btn text-light" id="checkOutBtn" onclick="ToCheckOut('<%=user._id%>')">Proceed to
@@ -270,7 +270,7 @@
 
             // Update the price element
             const priceElement = document.getElementById(`price-${index}`);
-            priceElement.textContent = `₹ ${totalPrice.toFixed(2)}`;
+            priceElement.textContent = `₹ ${totalPrice.toFixed(0)}`;
 
             axios.patch('/cart', {
                 itemIndex: index,
@@ -282,14 +282,14 @@
                 .then(response => {
                     if (response.status == 200) {
                         totalAfterAll = response.data.totalSum
-                        document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
+                        document.getElementById('subTotal').innerHTML = `₹ ${totalAfterAll.toFixed(0)}`;
                         if (discountAmount && response.data.totalSum >= minimumPrice) {
 
                             document.getElementById('discountId').innerHTML = `₹ -${discountAmount}`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll - discountAmount).toFixed(2)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${(totalAfterAll - discountAmount).toFixed(0)}`
                         } else {
                             document.getElementById('discountId').innerHTML = `₹ 0.00`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(2)}`;
+                            document.getElementById('totalAmount').innerHTML = `₹ ${totalAfterAll.toFixed(0)}`;
                             // Remove coupon when total price below minimum price of coupon
                             removeCoupon(event);
                         }
@@ -317,18 +317,18 @@
                         minimumPrice = response.data.coupon.minimumPrice;
                         if (totalAfterAll >= minimumPrice) {
                             document.getElementById('couponApplied').style.color = "green"
-                            document.getElementById('couponApplied').innerHTML = `Discount amount ₹${discountAmount.toFixed(2)}`
+                            document.getElementById('couponApplied').innerHTML = `Discount amount ₹${discountAmount.toFixed(0)}`
                             document.getElementById('removeCoupon').hidden = false
 
-                            document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(2)}`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll) - Number(discountAmount)).toFixed(2)}`
+                            document.getElementById('discountId').innerHTML = `- ₹ ${discountAmount.toFixed(0)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${(Number(totalAfterAll) - Number(discountAmount)).toFixed(0)}`
                             // document.getElementById('couponAppyBtn').disabled=true
                         } else {
                             document.getElementById('couponApplied').style.color = "red"
-                            document.getElementById('couponApplied').innerHTML = `${response.data.coupon.code} - min purchase ₹${minimumPrice.toFixed(2)}`
+                            document.getElementById('couponApplied').innerHTML = `${response.data.coupon.code} - min purchase ₹${minimumPrice.toFixed(0)}`
 
                             document.getElementById('discountId').innerHTML = `₹ 0.00`
-                            document.getElementById('totalAmount').innerHTML = `₹ ${total.toFixed(2)}`
+                            document.getElementById('totalAmount').innerHTML = `₹ ${total.toFixed(0)}`
                         }
                         Swal.fire({
                             title: 'Success!',
@@ -384,7 +384,7 @@
                         document.getElementById("couponApplied").innerHTML = ''
                         document.getElementById("removeCoupon").hidden = true
                         document.getElementById('discountId').innerHTML = `₹ 0.00`
-                        document.getElementById('totalAmount').innerHTML = `₹ ${Number(totalAfterAll).toFixed(2)}`
+                        document.getElementById('totalAmount').innerHTML = `₹ ${Number(totalAfterAll).toFixed(0)}`
                     }
                 }).catch(error => {
                     Swal.fire({

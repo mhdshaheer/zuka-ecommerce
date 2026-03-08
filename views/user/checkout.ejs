@@ -250,7 +250,7 @@
                                         <input type="radio" name="paymentMethod" value="Wallet"
                                             class="form-check-input ml-2">
                                         <span class="pl-5">Wallet <span class="fs-6 text-secondary">Rs:
-                                                <%=wallet?.balance?wallet.balance.toFixed(2):0%>
+                                                <%=wallet?.balance?wallet.balance.toFixed(0):0%>
                                             </span></span>
 
                                     </label>
@@ -286,14 +286,14 @@
                                     <%userCart.items.map((item,index)=>{%>
                                         <li>
                                             <%=index+1%>. <%=item.productId.productName%> <span>
-                                                        ₹<%=item.totalPrice.toFixed(2)%>
+                                                        ₹<%=item.totalPrice.toFixed(0)%>
                                                     </span>
                                         </li>
                                         <%})%>
                                 </ul>
                                 <ul class="checkout__total__all">
                                     <li>Subtotal <span class="text-dark">₹ <%=(userCart.items.reduce((acc,curr)=>
-                                                acc+curr.totalPrice,0).toFixed(2))%></span></li>
+                                                acc+curr.totalPrice,0).toFixed(0))%></span></li>
                                     <li>Discount <span>-₹ <%=couponDiscount%></span></li>
                                     <%if(priceFinal>=500){%>
                                         <li>Delivery charge <span class="text-dark">Free</span></li>
@@ -309,9 +309,9 @@
                                                             couponDiscount) : totalPrice;
                                                             %>
                                                             <%if(finalPrice<=500){%>
-                                                                <%= finalPrice+40 %>
+                                                                <%= (finalPrice+40).toFixed(0) %>
                                                                     <%}else{%>
-                                                                        <%= finalPrice %>
+                                                                        <%= finalPrice.toFixed(0) %>
                                                                             <%}%>
                                                     </span></li>
                                 </ul>

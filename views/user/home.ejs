@@ -4,7 +4,7 @@
 <!-- Hero Section Begin -->
 <section class="hero">
   <div class="hero__slider owl-carousel">
-    <div class="hero__items set-bg" data-setbg="img/hero/gym.jpg">
+    <div class="hero__items set-bg" data-setbg="/img/hero/gym.jpg">
       <div class="container">
         <div class="row">
           <div class="col-xl-5 col-lg-7 col-md-8">
@@ -23,7 +23,7 @@
         </div>
       </div>
     </div>
-    <div class="hero__items set-bg" data-setbg="img/hero/running.jpeg">
+    <div class="hero__items set-bg" data-setbg="/img/hero/running.jpeg">
       <div class="container">
         <div class="row">
           <div class="col-xl-5 col-lg-7 col-md-8">
@@ -80,12 +80,12 @@
             >
 
             <%if(product.offerPrice!==0){%>
-            <h5>Rs: <%=product.offerPrice.toFixed(2)%>/-</h5>
+            <h5>Rs: <%=product.offerPrice.toFixed(0)%>/-</h5>
             <h6 style="text-decoration: line-through">
-              Rs: <%=product.regularPrice.toFixed(2)%>/-
+              Rs: <%=product.regularPrice.toFixed(0)%>/-
             </h6>
             <%}else{%>
-            <h5>Rs: <%=product.regularPrice.toFixed(2)%>/-</h5>
+            <h5>Rs: <%=product.regularPrice.toFixed(0)%>/-</h5>
             <%}%>
           </div>
         </div>

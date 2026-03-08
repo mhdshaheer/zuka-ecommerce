@@ -116,7 +116,7 @@
                                                         <ul class="product__hover">
                                                             <li><a href="#"
                                                                     onclick="addToWishlist('<%= products[i]._id %>', event)"><img
-                                                                        src="img/icon/heart.png" alt=""></a></li>
+                                                                        src="/img/icon/heart.png" alt=""></a></li>
                                                         </ul>
                                             </div>
                                             <div class="product__item__text">
@@ -126,11 +126,11 @@
                                                 <a href="/products/<%= products[i]._id %>" class="add-cart">View
                                                     Product</a>
                                                 <% if (products[i].offerPrice !==0) { %>
-                                                    <h5>Rs: <%= products[i].offerPrice.toFixed(2) %>/-</h5>
+                                                    <h5>Rs: <%= products[i].offerPrice.toFixed(0) %>/-</h5>
                                                     <h6 style="text-decoration: line-through;">Rs: <%=
-                                                            products[i].regularPrice.toFixed(2) %>/-</h6>
+                                                            products[i].regularPrice.toFixed(0) %>/-</h6>
                                                     <% } else { %>
-                                                        <h5>Rs: <%= products[i].regularPrice.toFixed(2) %>/-</h5>
+                                                        <h5>Rs: <%= products[i].regularPrice.toFixed(0) %>/-</h5>
                                                         <% } %>
                                             </div>
                                         </div>
