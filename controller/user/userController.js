@@ -38,7 +38,7 @@ const signup = async (req, res) => {
 
     }
 
-    const finduser = await User.findOne({ email });
+    console.log("Signup attempt for email:", email);
     logger.info("Signup attempt for email: %s", email);
     if (finduser) {
       return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST });
@@ -165,22 +165,18 @@ const resentOtp = async (req, res) => {
 // sent mail to user mail
 async function sendEmailVerify(email, otp) {
   try {
+    console.log("Preparing to send email to:", email, "using sender:", process.env.NODEMAILER_EMAIL);
     const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true, // true for 465
+      service: 'gmail',
       auth: {
         user: process.env.NODEMAILER_EMAIL,
         pass: process.env.NODEMAILER_PASSWORD
-      },
-      tls: {
-        rejectUnauthorized: false
       }
     });
 
     // Send the email
     const info = await transporter.sendMail({
-      from: `"Zuka Sports" <${process.env.NODEMAILER_EMAIL}>`,
+      from: process.env.NODEMAILER_EMAIL,
       to: email,
       subject: "Verify Your Email - Zuka Sports",
       text: `Your OTP for Zuka Sports is ${otp}. Please enter this code to verify your email.`,
@@ -215,11 +211,11 @@ async function sendEmailVerify(email, otp) {
       `
     });
 
-
-
+    console.log("Email sent successfully to:", email);
     return info.accepted.length > 0;
 
   } catch (error) {
+    console.error("Email Error:", error);
     logger.error("Error Sending mail: %O", error);
     return false;
   }
