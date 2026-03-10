@@ -15,6 +15,7 @@ const axios = require('axios');
 const nocache = require('nocache');
 
 db();
+app.set('trust proxy', 1);
 app.use(nocache());
 // app.use(morgan('tiny'))
 app.use(express.json());
@@ -25,16 +26,25 @@ app.use(express.static('public'));
 app.set("view engine", "ejs");
 app.set("views", [path.join(__dirname, 'views/user'), path.join(__dirname, 'views/admin')]);
 
+const connectMongo = require('connect-mongo');
+const MongoStore = connectMongo.default || connectMongo.MongoStore || connectMongo;
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    collectionName: 'sessions',
+    ttl: 14 * 24 * 60 * 60 // 14 days
+  }),
   cookie: {
-    secret: false,
-    httponly: true,
+    secure: process.env.NODE_ENV === 'production', 
+    httpOnly: true,
     maxAge: 72 * 60 * 60 * 1000
   }
 }));
+
 
 
 app.use(passport.initialize());

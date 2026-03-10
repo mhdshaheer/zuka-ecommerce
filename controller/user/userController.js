@@ -47,16 +47,24 @@ const signup = async (req, res) => {
 
     const emailSent = await sendEmailVerify(email, otp);
     if (!emailSent) {
-      return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json(constants.MSG_EMAIL_ERROR);
+      return res.render("signup", { message: constants.MSG_EMAIL_ERROR });
     }
+    
     req.session.userOtp = otp;
     req.session.userData = { name, email, password };
-
-    res.render("verify-otp");
+    
+    // Explicitly save the session before rendering to ensure persistence on hosted platforms
+    req.session.save((err) => {
+      if (err) {
+        logger.error("Session save error during signup", err);
+        return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
+      }
+      res.render("verify-otp");
+    });
 
   } catch (error) {
     logger.error("signup error", error);
-    res.redirect('/pageNotFound');
+    res.render("signup", { message: constants.MSG_AN_ERROR_OCCURED });
   }
 };
 
@@ -243,8 +251,15 @@ const verifyOtp = async (req, res) => {
       await saveUserData.save();
 
       req.session.user = saveUserData;
-
-      res.json({ success: true, redirectUrl: "/" });
+      
+      // Explicitly save the session before responding to ensure state is synchronized
+      req.session.save((err) => {
+        if (err) {
+          logger.error("Session save error during OTP verification", err);
+          return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED });
+        }
+        res.json({ success: true, redirectUrl: "/" });
+      });
 
     } else {
       res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_INVALID_OTP_PLEASE_TRY_AGAIN });
@@ -254,6 +269,7 @@ const verifyOtp = async (req, res) => {
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: constants.MSG_AN_ERROR_OCCURED });
   }
 };
+
 
 //================== home page ========================
 
