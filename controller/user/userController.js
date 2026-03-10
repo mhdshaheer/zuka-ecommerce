@@ -177,16 +177,43 @@ const resentOtp = async (req, res) => {
 // sent mail to user mail
 async function sendEmailVerify(email, otp) {
   try {
-    console.log("Preparing to send email to:", email, "using sender:", process.env.NODEMAILER_EMAIL);
+    console.log("INITIALIZING EMAIL FLOW:");
+    console.log("Recipient:", email);
+    console.log("Sender:", process.env.NODEMAILER_EMAIL);
+    
+    if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
+      console.error("CRITICAL: NODEMAILER_EMAIL or NODEMAILER_PASSWORD environment variables are missing!");
+      return false;
+    }
+
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD
+        pass: process.env.NODEMAILER_PASSWORD,
+      },
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 5000,    // 5 seconds
+      socketTimeout: 10000,     // 10 seconds
+      maxConnections: 1,
+      maxMessages: 1,
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
-    // Send the email
+    console.log("Verifying SMTP connection...");
+    try {
+      await transporter.verify();
+      console.log("SMTP Connection verified successfully.");
+    } catch (verifyError) {
+      console.error("SMTP VERIFICATION FAILED:", verifyError);
+      return false;
+    }
+
+    console.log("Attempting to send mail via transporter...");
     const info = await transporter.sendMail({
       from: process.env.NODEMAILER_EMAIL,
       to: email,
@@ -223,11 +250,11 @@ async function sendEmailVerify(email, otp) {
       `
     });
 
-    console.log("Email sent successfully to:", email);
+    console.log("EMAIL DISPATCHED SUCCESSFULLY. Message ID:", info.messageId);
     return info.accepted.length > 0;
 
   } catch (error) {
-    console.error("Email Error:", error);
+    console.error("CRITICAL EMAIL FAILURE:", error);
     logger.error("Error Sending mail: %O", error);
     return false;
   }
