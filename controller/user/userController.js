@@ -39,6 +39,7 @@ const signup = async (req, res) => {
     }
 
     console.log("Signup attempt for email:", email);
+    const finduser = await User.findOne({ email });
     logger.info("Signup attempt for email: %s", email);
     if (finduser) {
       return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST });
