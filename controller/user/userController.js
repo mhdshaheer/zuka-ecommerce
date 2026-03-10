@@ -39,6 +39,7 @@ const signup = async (req, res) => {
     }
 
     const finduser = await User.findOne({ email });
+    logger.info("Signup attempt for email: %s", email);
     if (finduser) {
       return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST });
     }
@@ -216,9 +217,8 @@ async function sendEmailVerify(email, otp) {
 
     return info.accepted.length > 0;
 
-
   } catch (error) {
-    logger.error("Error Sending mail", error);
+    logger.error("Error Sending mail: %O", error);
     return false;
   }
 }
