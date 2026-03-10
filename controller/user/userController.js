@@ -33,42 +33,53 @@ const loadSignup = async (req, res) => {
 const signup = async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
-    if (password != confirmPassword) {
-      return res.render("signup", { message: constants.MSG_PASSWORDS_DO_NOT_MATCH });
+    console.log("Signup attempt - Name:", name, "Email:", email);
 
+    if (password != confirmPassword) {
+      console.log("Signup validation failed: Passwords do not match");
+      return res.render("signup", { message: constants.MSG_PASSWORDS_DO_NOT_MATCH });
     }
 
-    console.log("Signup attempt for email:", email);
+    console.log("Checking for existing user with email:", email);
     const finduser = await User.findOne({ email });
-    logger.info("Signup attempt for email: %s", email);
     if (finduser) {
+      console.log("Signup failed: User already exists");
       return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST });
     }
+
     const otp = generateOtp();
+    console.log("Generated OTP for:", email);
 
-
+    console.log("Attempting to send verification email...");
     const emailSent = await sendEmailVerify(email, otp);
     if (!emailSent) {
+      console.log("Signup failed: Email could not be sent");
       return res.render("signup", { message: constants.MSG_EMAIL_ERROR });
     }
     
+    console.log("Email sent successfully. Storing data in session...");
     req.session.userOtp = otp;
     req.session.userData = { name, email, password };
     
+    console.log("Saving session explicitly...");
     // Explicitly save the session before rendering to ensure persistence on hosted platforms
     req.session.save((err) => {
       if (err) {
+        console.error("CRITICAL: Session save error during signup:", err);
         logger.error("Session save error during signup", err);
         return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
       }
+      console.log("Session saved successfully. Rendering verify-otp page.");
       res.render("verify-otp");
     });
 
   } catch (error) {
+    console.error("FATAL SIGNUP ERROR:", error);
     logger.error("signup error", error);
     res.render("signup", { message: constants.MSG_AN_ERROR_OCCURED });
   }
 };
+
 
 
 //=================== login ============================
