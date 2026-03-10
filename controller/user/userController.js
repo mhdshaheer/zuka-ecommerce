@@ -165,11 +165,12 @@ const resentOtp = async (req, res) => {
 // sent mail to user mail
 async function sendEmailVerify(email, otp) {
   try {
+    const isProduction = process.env.NODE_ENV === 'production';
     const transporter = nodemailer.createTransport({
       service: 'gmail',
-      port: 587,
-      secure: false,
-      requireTLS: true,
+      host: 'smtp.gmail.com',
+      port: isProduction ? 465 : 587,
+      secure: isProduction, // true for 465, false for 587
       auth: {
         user: process.env.NODEMAILER_EMAIL,
         pass: process.env.NODEMAILER_PASSWORD
