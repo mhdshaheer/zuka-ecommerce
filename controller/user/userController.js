@@ -11,6 +11,7 @@ const Wallet = require('../../models/walletSchema');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const puppeteer = require('puppeteer');
+const axios = require('axios');
 const { truncateSync } = require('fs-extra');
 const env = require("dotenv").config();
 const fs = require("fs");
@@ -174,50 +175,30 @@ const resentOtp = async (req, res) => {
   }
 };
 
-// sent mail to user mail
+// sent mail to user mail using Brevo HTTP API
 async function sendEmailVerify(email, otp) {
   try {
-    console.log("INITIALIZING EMAIL FLOW:");
+    console.log("INITIALIZING EMAIL FLOW (VIA BREVO HTTP API):");
     console.log("Recipient:", email);
-    console.log("Sender:", process.env.NODEMAILER_EMAIL);
     
-    if (!process.env.NODEMAILER_EMAIL || !process.env.NODEMAILER_PASSWORD) {
-      console.error("CRITICAL: NODEMAILER_EMAIL or NODEMAILER_PASSWORD environment variables are missing!");
-      return false;
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
+    
+    if (!BREVO_API_KEY) {
+      console.error("CRITICAL: BREVO_API_KEY is missing from environment variables!");
+      console.log("Relying on legacy NODEMAILER (Note: This will likely fail on Render Free Tier)");
+      // Fallback to legacy nodemailer if Brevo key isn't provided (for local testing maybe)
+      return await sendEmailLegacy(email, otp);
     }
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // false for 587
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
+    console.log("Attempting to send email via Brevo API...");
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+      sender: {
+        name: "Zuka Sports",
+        email: process.env.NODEMAILER_EMAIL || "info@zukasports.com"
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000,
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
-
-    console.log("Verifying SMTP connection...");
-    try {
-      await transporter.verify();
-      console.log("SMTP Connection verified successfully.");
-    } catch (verifyError) {
-      console.error("SMTP VERIFICATION FAILED:", verifyError);
-      return false;
-    }
-
-    console.log("Attempting to send mail via transporter...");
-    const info = await transporter.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: email,
+      to: [{ email: email }],
       subject: "Verify Your Email - Zuka Sports",
-      text: `Your OTP for Zuka Sports is ${otp}. Please enter this code to verify your email.`,
-      html: `
+      htmlContent: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eeeeee;">
           <div style="background: linear-gradient(135deg, #000000 0%, #333333 100%); padding: 40px 20px; text-align: center;">
             <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Zuka Sports</h1>
@@ -246,14 +227,58 @@ async function sendEmailVerify(email, otp) {
           </div>
         </div>
       `
+    }, {
+      headers: {
+        'api-key': BREVO_API_KEY,
+        'content-type': 'application/json',
+        'accept': 'application/json'
+      }
     });
 
-    console.log("EMAIL DISPATCHED SUCCESSFULLY. Message ID:", info.messageId);
-    return info.accepted.length > 0;
+    if (response.status === 201 || response.status === 200) {
+      console.log("EMAIL DISPATCHED SUCCESSFULLY VIA BREVO. ID:", response.data.messageId);
+      return true;
+    } else {
+      console.error("BREVO API RETURNED ERROR STATUS:", response.status, response.data);
+      return false;
+    }
 
   } catch (error) {
-    console.error("CRITICAL EMAIL FAILURE:", error);
-    logger.error("Error Sending mail: %O", error);
+    console.error("CRITICAL EMAIL FAILURE (BREVO):", error.response ? error.response.data : error.message);
+    logger.error("Error Sending mail via Brevo: %O", error);
+    return false;
+  }
+}
+
+// Legacy fallback (Original Nodemailer implementation)
+async function sendEmailLegacy(email, otp) {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false, 
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD,
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 5000,
+      socketTimeout: 10000,
+      tls: {
+        rejectUnauthorized: false
+      }
+    });
+
+    const info = await transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: email,
+      subject: "Verify Your Email - Zuka Sports",
+      text: `Your OTP for Zuka Sports is ${otp}. Please enter this code to verify your email.`,
+      html: `OTP: ${otp}` // Simplified for legacy fallback
+    });
+    return info.accepted.length > 0;
+  } catch (error) {
+    console.error("LEGACY EMAIL FAILURE:", error);
     return false;
   }
 }
