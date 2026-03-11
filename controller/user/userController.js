@@ -8,7 +8,6 @@ const Category = require('../../models/categorySchema');
 const mongoose = require('mongoose');
 const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
-const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const puppeteer = require('puppeteer');
 const axios = require('axios');
@@ -180,7 +179,6 @@ async function sendEmailVerify(email, otp) {
       if (response.status === 200 || response.status === 201) return true;
     }
 
-    // Fallback to Brevo if Resend fails/missing
     if (BREVO_API_KEY) {
       const resp = await axios.post('https://api.brevo.com/v3/smtp/email', {
         sender: { name: "Zuka Sports", email: "onboarding@resend.dev" },
@@ -193,37 +191,16 @@ async function sendEmailVerify(email, otp) {
       if (resp.status === 201 || resp.status === 200) return true;
     }
 
-    // If all services fail (common on Render Free Tier), we log the OTP so registration is still POSSIBLE
     console.log("-----------------------------------------");
     console.log(`!!! EMAIL DELIVERY FAILED OR RESTRICTED !!!`);
     console.log(`TARGET EMAIL: ${email}`);
-    console.log(`SUCCESSFUL OTP: ${otp}`);
+    console.log(`OTP FOR TESTING: ${otp}`);
     console.log("-----------------------------------------");
-    
-    return true; // We return true so the user is not blocked from signing up
-
-  } catch (error) {
-    // Log the OTP even on error so user can find it in Render Logs
-    console.log(`[BACKUP] OTP for ${email}: ${otp}`);
     return true; 
-  }
-}
-      tls: {
-        rejectUnauthorized: false
-      }
-    });
 
-    const info = await transporter.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: email,
-      subject: "Verify Your Email - Zuka Sports",
-      text: `Your OTP for Zuka Sports is ${otp}. Please enter this code to verify your email.`,
-      html: `OTP: ${otp}` // Simplified for legacy fallback
-    });
-    return info.accepted.length > 0;
   } catch (error) {
-    console.error("LEGACY EMAIL FAILURE:", error);
-    return false;
+    console.log(`[BACKUP LOG] OTP for ${email}: ${otp}`);
+    return true; 
   }
 }
 
