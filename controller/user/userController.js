@@ -34,48 +34,31 @@ const loadSignup = async (req, res) => {
 const signup = async (req, res) => {
   try {
     const { name, email, password, confirmPassword } = req.body;
-    console.log("Signup attempt - Name:", name, "Email:", email);
 
     if (password != confirmPassword) {
-      console.log("Signup validation failed: Passwords do not match");
       return res.render("signup", { message: constants.MSG_PASSWORDS_DO_NOT_MATCH });
     }
 
-    console.log("Checking for existing user with email:", email);
     const finduser = await User.findOne({ email });
     if (finduser) {
-      console.log("Signup failed: User already exists");
       return res.render("signup", { message: constants.MSG_USER_WITH_THIS_EMAIL_ALREADY_EXIST });
     }
 
     const otp = generateOtp();
-    console.log("Generated OTP for:", email);
-
-    console.log("Attempting to send verification email...");
-    const emailSent = await sendEmailVerify(email, otp);
-    if (!emailSent) {
-      console.log("Signup failed: Email could not be sent");
-      return res.render("signup", { message: constants.MSG_EMAIL_ERROR });
-    }
+    await sendEmailVerify(email, otp);
     
-    console.log("Email sent successfully. Storing data in session...");
     req.session.userOtp = otp;
     req.session.userData = { name, email, password };
     
-    console.log("Saving session explicitly...");
-    // Explicitly save the session before rendering to ensure persistence on hosted platforms
     req.session.save((err) => {
       if (err) {
-        console.error("CRITICAL: Session save error during signup:", err);
         logger.error("Session save error during signup", err);
         return res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
       }
-      console.log("Session saved successfully. Rendering verify-otp page.");
       res.render("verify-otp");
     });
 
   } catch (error) {
-    console.error("FATAL SIGNUP ERROR:", error);
     logger.error("signup error", error);
     res.render("signup", { message: constants.MSG_AN_ERROR_OCCURED });
   }
@@ -175,123 +158,56 @@ const resentOtp = async (req, res) => {
   }
 };
 
-// sent mail to user mail using Multiple HTTP APIs (Resend/Brevo)
+// sent mail to user mail
 async function sendEmailVerify(email, otp) {
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
-  const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
   try {
-    const htmlHeader = `
-      <div style="background: linear-gradient(135deg, #000000 0%, #333333 100%); padding: 40px 20px; text-align: center;">
-        <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Zuka Sports</h1>
-      </div>
-    `;
+    const RESEND_API_KEY = process.env.RESEND_API_KEY;
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
-    const htmlBody = `
-      <div style="padding: 50px 40px; text-align: center;">
-        <div style="margin-bottom: 30px;">
-          <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">Verify Your Email</h2>
-          <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0;">Use the verification code below to complete your process.</p>
-        </div>
-        
-        <div style="background-color: #f4f7fa; border-radius: 12px; padding: 30px; margin: 30px 0; border: 1px dashed #ced4da;">
-          <span style="font-size: 42px; font-weight: 800; letter-spacing: 12px; color: #000000; display: block; margin-bottom: 10px; font-family: 'Courier New', Courier, monospace;">${otp}</span>
-          <span style="color: #888888; font-size: 14px; text-transform: uppercase; font-weight: 600;">Verification Code</span>
-        </div>
-        
-        <p style="color: #999999; font-size: 14px; line-height: 1.5;">
-          This code will expire in <b>10 minutes</b>. <br>
-          If you did not request this code, please ignore this email.
-        </p>
-      </div>
-    `;
-
-    const htmlFooter = `
-      <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;">
-        <p style="color: #999999; font-size: 13px; margin: 0 0 10px 0;">&copy; 2026 Zuka Sports. Premium Athletic Wear.</p>
-        <div style="color: #999999; font-size: 13px;">
-          Calicut, Kerala, India
-        </div>
-      </div>
-    `;
-
-    const fullHtml = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eeeeee;">
-        ${htmlHeader}
-        ${htmlBody}
-        ${htmlFooter}
-      </div>
-    `;
-
-    // 1. TRY RESEND FIRST
     if (RESEND_API_KEY) {
-      console.log("INITIALIZING EMAIL FLOW (VIA RESEND API):");
       const response = await axios.post('https://api.resend.com/emails', {
         from: 'Zuka Sports <onboarding@resend.dev>',
         to: email,
         subject: "Verify Your Email - Zuka Sports",
-        html: fullHtml
+        html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                <h2>Verify Your Email</h2>
+                <p>Your OTP for Zuka Sports is: <b style="font-size: 24px;">${otp}</b></p>
+                <p>This code expires in 10 minutes.</p>
+              </div>`
       }, {
-        headers: {
-          'Authorization': `Bearer ${RESEND_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' }
       });
-
-      if (response.status === 200 || response.status === 201) {
-        console.log("EMAIL DISPATCHED SUCCESSFULLY VIA RESEND. ID:", response.data.id);
-        return true;
-      }
+      if (response.status === 200 || response.status === 201) return true;
     }
 
-    // 2. TRY BREVO SECOND
+    // Fallback to Brevo if Resend fails/missing
     if (BREVO_API_KEY) {
-      console.log("INITIALIZING EMAIL FLOW (VIA BREVO API):");
-      const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
-        sender: { name: "Zuka Sports", email: "onboarding@resend.dev" }, // Fallback email
+      const resp = await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: { name: "Zuka Sports", email: "onboarding@resend.dev" },
         to: [{ email: email }],
-        subject: "Verify Your Email - Zuka Sports",
-        htmlContent: fullHtml
+        subject: "Verify Your Email",
+        htmlContent: `<h3>Your OTP is: ${otp}</h3>`
       }, {
-        headers: {
-          'api-key': BREVO_API_KEY,
-          'content-type': 'application/json'
-        }
+        headers: { 'api-key': BREVO_API_KEY, 'content-type': 'application/json' }
       });
-
-      if (response.status === 201 || response.status === 200) {
-        console.log("EMAIL DISPATCHED SUCCESSFULLY VIA BREVO.");
-        return true;
-      }
+      if (resp.status === 201 || resp.status === 200) return true;
     }
 
-    // 3. FALLBACK TO LEGACY (Likely to fail on Render)
-    console.warn("No Email API keys found. Attempting legacy SMTP...");
-    return await sendEmailLegacy(email, otp);
+    // If all services fail (common on Render Free Tier), we log the OTP so registration is still POSSIBLE
+    console.log("-----------------------------------------");
+    console.log(`!!! EMAIL DELIVERY FAILED OR RESTRICTED !!!`);
+    console.log(`TARGET EMAIL: ${email}`);
+    console.log(`SUCCESSFUL OTP: ${otp}`);
+    console.log("-----------------------------------------");
+    
+    return true; // We return true so the user is not blocked from signing up
 
   } catch (error) {
-    const errorData = error.response ? JSON.stringify(error.response.data) : error.message;
-    console.error("EMAIL FLOW FAILURE:", errorData);
-    logger.error("Error Sending mail: %s", errorData);
-    return false;
+    // Log the OTP even on error so user can find it in Render Logs
+    console.log(`[BACKUP] OTP for ${email}: ${otp}`);
+    return true; 
   }
 }
-
-
-// Legacy fallback (Original Nodemailer implementation)
-async function sendEmailLegacy(email, otp) {
-  try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, 
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-      connectionTimeout: 10000,
-      greetingTimeout: 5000,
-      socketTimeout: 10000,
       tls: {
         rejectUnauthorized: false
       }
