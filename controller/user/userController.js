@@ -175,80 +175,108 @@ const resentOtp = async (req, res) => {
   }
 };
 
-// sent mail to user mail using Brevo HTTP API
+// sent mail to user mail using Multiple HTTP APIs (Resend/Brevo)
 async function sendEmailVerify(email, otp) {
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
+  const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
   try {
-    console.log("INITIALIZING EMAIL FLOW (VIA BREVO HTTP API):");
-    console.log("Recipient:", email);
-    
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
-    
-    if (!BREVO_API_KEY) {
-      console.error("CRITICAL: BREVO_API_KEY is missing from environment variables!");
-      console.log("Relying on legacy NODEMAILER (Note: This will likely fail on Render Free Tier)");
-      // Fallback to legacy nodemailer if Brevo key isn't provided (for local testing maybe)
-      return await sendEmailLegacy(email, otp);
-    }
+    const htmlHeader = `
+      <div style="background: linear-gradient(135deg, #000000 0%, #333333 100%); padding: 40px 20px; text-align: center;">
+        <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Zuka Sports</h1>
+      </div>
+    `;
 
-    console.log("Attempting to send email via Brevo API...");
-    const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
-      sender: {
-        name: "Zuka Sports",
-        email: process.env.NODEMAILER_EMAIL || "info@zukasports.com"
-      },
-      to: [{ email: email }],
-      subject: "Verify Your Email - Zuka Sports",
-      htmlContent: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eeeeee;">
-          <div style="background: linear-gradient(135deg, #000000 0%, #333333 100%); padding: 40px 20px; text-align: center;">
-            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">Zuka Sports</h1>
-          </div>
-          <div style="padding: 50px 40px; text-align: center;">
-            <div style="margin-bottom: 30px;">
-              <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">Verify Your Email</h2>
-              <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0;">Use the verification code below to complete your process.</p>
-            </div>
-            
-            <div style="background-color: #f4f7fa; border-radius: 12px; padding: 30px; margin: 30px 0; border: 1px dashed #ced4da;">
-              <span style="font-size: 42px; font-weight: 800; letter-spacing: 12px; color: #000000; display: block; margin-bottom: 10px; font-family: 'Courier New', Courier, monospace;">${otp}</span>
-              <span style="color: #888888; font-size: 14px; text-transform: uppercase; font-weight: 600;">Verification Code</span>
-            </div>
-            
-            <p style="color: #999999; font-size: 14px; line-height: 1.5;">
-              This code will expire in <b>10 minutes</b>. <br>
-              If you did not request this code, please ignore this email.
-            </p>
-          </div>
-          <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;">
-            <p style="color: #999999; font-size: 13px; margin: 0 0 10px 0;">&copy; 2026 Zuka Sports. Premium Athletic Wear.</p>
-            <div style="color: #999999; font-size: 13px;">
-              Calicut, Kerala, India
-            </div>
-          </div>
+    const htmlBody = `
+      <div style="padding: 50px 40px; text-align: center;">
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1a1a1a; font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">Verify Your Email</h2>
+          <p style="color: #666666; font-size: 16px; line-height: 1.6; margin: 0;">Use the verification code below to complete your process.</p>
         </div>
-      `
-    }, {
-      headers: {
-        'api-key': BREVO_API_KEY,
-        'content-type': 'application/json',
-        'accept': 'application/json'
-      }
-    });
+        
+        <div style="background-color: #f4f7fa; border-radius: 12px; padding: 30px; margin: 30px 0; border: 1px dashed #ced4da;">
+          <span style="font-size: 42px; font-weight: 800; letter-spacing: 12px; color: #000000; display: block; margin-bottom: 10px; font-family: 'Courier New', Courier, monospace;">${otp}</span>
+          <span style="color: #888888; font-size: 14px; text-transform: uppercase; font-weight: 600;">Verification Code</span>
+        </div>
+        
+        <p style="color: #999999; font-size: 14px; line-height: 1.5;">
+          This code will expire in <b>10 minutes</b>. <br>
+          If you did not request this code, please ignore this email.
+        </p>
+      </div>
+    `;
 
-    if (response.status === 201 || response.status === 200) {
-      console.log("EMAIL DISPATCHED SUCCESSFULLY VIA BREVO. ID:", response.data.messageId);
-      return true;
-    } else {
-      console.error("BREVO API RETURNED ERROR STATUS:", response.status, response.data);
-      return false;
+    const htmlFooter = `
+      <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #eeeeee;">
+        <p style="color: #999999; font-size: 13px; margin: 0 0 10px 0;">&copy; 2026 Zuka Sports. Premium Athletic Wear.</p>
+        <div style="color: #999999; font-size: 13px;">
+          Calicut, Kerala, India
+        </div>
+      </div>
+    `;
+
+    const fullHtml = `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; border-radius: 16px; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eeeeee;">
+        ${htmlHeader}
+        ${htmlBody}
+        ${htmlFooter}
+      </div>
+    `;
+
+    // 1. TRY RESEND FIRST
+    if (RESEND_API_KEY) {
+      console.log("INITIALIZING EMAIL FLOW (VIA RESEND API):");
+      const response = await axios.post('https://api.resend.com/emails', {
+        from: 'Zuka Sports <onboarding@resend.dev>',
+        to: email,
+        subject: "Verify Your Email - Zuka Sports",
+        html: fullHtml
+      }, {
+        headers: {
+          'Authorization': `Bearer ${RESEND_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        console.log("EMAIL DISPATCHED SUCCESSFULLY VIA RESEND. ID:", response.data.id);
+        return true;
+      }
     }
+
+    // 2. TRY BREVO SECOND
+    if (BREVO_API_KEY) {
+      console.log("INITIALIZING EMAIL FLOW (VIA BREVO API):");
+      const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+        sender: { name: "Zuka Sports", email: "onboarding@resend.dev" }, // Fallback email
+        to: [{ email: email }],
+        subject: "Verify Your Email - Zuka Sports",
+        htmlContent: fullHtml
+      }, {
+        headers: {
+          'api-key': BREVO_API_KEY,
+          'content-type': 'application/json'
+        }
+      });
+
+      if (response.status === 201 || response.status === 200) {
+        console.log("EMAIL DISPATCHED SUCCESSFULLY VIA BREVO.");
+        return true;
+      }
+    }
+
+    // 3. FALLBACK TO LEGACY (Likely to fail on Render)
+    console.warn("No Email API keys found. Attempting legacy SMTP...");
+    return await sendEmailLegacy(email, otp);
 
   } catch (error) {
-    console.error("CRITICAL EMAIL FAILURE (BREVO):", error.response ? error.response.data : error.message);
-    logger.error("Error Sending mail via Brevo: %O", error);
+    const errorData = error.response ? JSON.stringify(error.response.data) : error.message;
+    console.error("EMAIL FLOW FAILURE:", errorData);
+    logger.error("Error Sending mail: %s", errorData);
     return false;
   }
 }
+
 
 // Legacy fallback (Original Nodemailer implementation)
 async function sendEmailLegacy(email, otp) {
