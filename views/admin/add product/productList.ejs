@@ -60,7 +60,7 @@
                                 <th scope="col" class="text-end">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="productTableBody">
                             <%for(let i=0;i<products.length;i++){%>
                                 <tr>
                                     <td class="text-center">
@@ -130,7 +130,7 @@
 
             </div>
         </div>
-        <div class="pagination-area mt-30 mb-50">
+        <div class="pagination-area mt-30 mb-50" id="paginationArea">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
                     <% if (currentPage> 1) { %>
@@ -380,6 +380,12 @@
                 color: document.getElementById('color').value
             };
 
+            Swal.fire({
+                title: 'Updating...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             fetch(`/admin/products/${currentProductId}`, {
                 method: "PUT",
                 headers: { 'Content-Type': 'application/json' },
@@ -428,6 +434,11 @@
                 confirmButtonText: 'Yes, block it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
                     let response = await fetch('/admin/products/' + id + '/block', { method: 'PATCH' });
                     if(response.ok) window.location.reload();
                 }
@@ -445,6 +456,11 @@
                 confirmButtonText: 'Yes, unblock it!'
             }).then(async (result) => {
                 if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Processing...',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
                     let response = await fetch('/admin/products/' + id + '/unblock', { method: 'PATCH' });
                     if(response.ok) window.location.reload();
                 }
@@ -489,6 +505,12 @@
                 }
             });
 
+            Swal.fire({
+                title: 'Uploading...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
             fetch(`/admin/products/${currentProductId}/images`, {
                 method: 'PATCH',
                 body: formData
@@ -517,8 +539,170 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-    </script>
 
+        // Pagination AJAX
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('.page-link');
+            if (target) {
+                e.preventDefault();
+                const url = new URL(target.href);
+                url.searchParams.set('ajax', 'true');
+
+                Swal.fire({
+                    title: 'Loading Products...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                axios.get(url.toString())
+                    .then(response => {
+                        const { products, currentPage, totalPages, limit } = response.data;
+                        updateTable(products, currentPage, limit);
+                        updatePagination(currentPage, totalPages);
+                        window.history.pushState({}, '', target.href);
+                        Swal.close();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        window.location.href = target.href;
+                    });
+            }
+        });
+
+        function updateTable(products, currentPage, limit) {
+            const tbody = document.getElementById('productTableBody');
+            tbody.innerHTML = products.map((product, i) => `
+                <tr>
+                    <td class="text-center">
+                        <span class="text-muted">${(currentPage - 1) * limit + i + 1}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <img src="${product.images[0]}" alt="${product.productName}" class="img-sm me-3 border" />
+                            <div>
+                                <h6 class="mb-0 product-name">${product.productName}</h6>
+                                <small class="text-muted">${product.color}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold">₹${product.regularPrice.toFixed(0)}</div>
+                        ${product.offerPrice < product.regularPrice ? `<small class="text-success">Now: ₹${product.offerPrice.toFixed(0)}</small>` : ''}
+                    </td>
+                    <td>
+                        <span class="badge rounded-pill ${product.isBlocked ? 'alert-danger' : 'alert-success'} badge-status">
+                            ${product.isBlocked ? 'Blocked' : 'Active'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="text-muted small">${new Date(product.createdAt).toLocaleDateString()}</span>
+                    </td>
+                    <td class="text-end">
+                        <div class="action-btns">
+                            <button class="btn btn-outline-primary btn-edit-product" 
+                                data-id="${product._id}"
+                                data-name="${product.productName}"
+                                data-price="${product.regularPrice}"
+                                data-offer="${product.offerPrice}"
+                                data-color="${product.color}"
+                                data-desc="${product.description}"
+                                data-category="${product.category ? product.category.name : ''}">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button class="btn btn-outline-info btn-edit-images"
+                                data-id="${product._id}"
+                                data-images='${JSON.stringify(product.images)}'>
+                                <i class="fa-solid fa-image"></i>
+                            </button>
+                            <a href="/admin/products/${product._id}/variants/0/edit" class="btn btn-outline-secondary">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </a>
+                            ${product.isBlocked ? `
+                                <button class="btn btn-soft-success btn-unblock-product" data-id="${product._id}">
+                                    <i class="fa-solid fa-unlock"></i>
+                                </button>
+                            ` : `
+                                <button class="btn btn-soft-danger btn-block-product" data-id="${product._id}">
+                                    <i class="fa-solid fa-lock"></i>
+                                </button>
+                            `}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Re-bind listeners for newly created buttons
+            attachActionListeners();
+        }
+
+        function updatePagination(currentPage, totalPages) {
+            const paginationArea = document.getElementById('paginationArea');
+            let paginationHtml = '<nav aria-label="Page navigation example"><ul class="pagination justify-content-start">';
+            
+            if (currentPage > 1) {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage - 1}">Previous</a></li>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                paginationHtml += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="?page=${i}">${i}</a>
+                    </li>
+                `;
+            }
+
+            if (currentPage < totalPages) {
+                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage + 1}">Next</a></li>`;
+            }
+
+            paginationHtml += '</ul></nav>';
+            paginationArea.innerHTML = paginationHtml;
+        }
+
+        function attachActionListeners() {
+            // Re-bind Edit Product
+            document.querySelectorAll('.btn-edit-product').forEach(btn => {
+                btn.onclick = function() {
+                    const { id, name, price, offer, color, desc, category } = this.dataset;
+                    currentProductId = id;
+                    document.getElementById('productName').value = name;
+                    document.getElementById('regularPrice').value = price;
+                    document.getElementById('description').value = desc;
+                    document.getElementById('color').value = color;
+                    document.getElementById('category').value = category;
+                    const regPrice = parseFloat(price);
+                    const offPrice = parseFloat(offer);
+                    document.getElementById('offerPrice').value = Math.floor(((regPrice - offPrice) / regPrice) * 100);
+                    new bootstrap.Modal(document.getElementById('productModal')).show();
+                };
+            });
+
+            // Re-bind Edit Images
+            document.querySelectorAll('.btn-edit-images').forEach(btn => {
+                btn.onclick = function() {
+                    currentProductId = this.dataset.id;
+                    const images = JSON.parse(this.dataset.images);
+                    for(let i=0; i<4; i++){
+                        const imgEl = document.getElementById(`imgDiv${i+1}`);
+                        if(images[i]) { imgEl.src = images[i]; imgEl.style.display = "block"; }
+                        else { imgEl.src = ""; imgEl.style.display = "none"; }
+                    }
+                    new bootstrap.Modal(document.getElementById('imageUploadModal')).show();
+                };
+            });
+
+            // Re-bind Block/Unblock
+            document.querySelectorAll('.btn-block-product').forEach(btn => {
+                btn.onclick = function(e) { confirmBlock(e, this.dataset.id); };
+            });
+            document.querySelectorAll('.btn-unblock-product').forEach(btn => {
+                btn.onclick = function(e) { confirmUnBlock(e, this.dataset.id); };
+            });
+        }
+
+        // Initialize listeners
+        attachActionListeners();
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

@@ -78,6 +78,16 @@ const productList = async (req, res) => {
     limit(limit);
     const category = await Category.find();
 
+    if (req.query.ajax === 'true') {
+      return res.json({
+        products,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts,
+        limit
+      });
+    }
+
     res.render('add product/productList', {
       products,
       category,
