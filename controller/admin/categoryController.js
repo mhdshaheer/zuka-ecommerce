@@ -19,6 +19,16 @@ const categoryInfo = async (req, res) => {
 
     const totalCategories = await Category.countDocuments();
     const totalPages = Math.ceil(totalCategories / limit);
+    
+    if (req.query.ajax === 'true') {
+      return res.json({
+        categoryData,
+        currentPage: page,
+        totalPages,
+        totalCategories
+      });
+    }
+
     res.render('category', {
       categoryData,
       currentPage: page,
@@ -36,6 +46,7 @@ const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    const existingCategory = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
     if (existingCategory) {
       return res.status(httpStatusCode.CONFLICT).json({ error: constants.MSG_CATEGORY_ALREADY_EXISTS });
     }
@@ -44,7 +55,7 @@ const addCategory = async (req, res) => {
       description
     });
     await newCategory.save();
-    return res.status(httpStatusCode.OK).json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY });
+    return res.status(httpStatusCode.OK).json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY, category: newCategory });
 
   } catch (error) {
     logger.error("add category error", error);
@@ -112,7 +123,7 @@ const editCategory = async (req, res) => {
     if (!updateCategory) {
       return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_CATEGORY_NOT_FOUND });
     }
-    res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL });
+    res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL, category: updateCategory });
   } catch (error) {
     logger.error('Error updating category:', error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_FAILED_TO_UPDATE_CATEGORY, error });
