@@ -279,6 +279,14 @@
 
       if (a === 1) return;
 
+      Swal.fire({
+        title: 'Creating...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       axios.post('/admin/categories', catData)
         .then(response => {
           const data = response.data;
@@ -352,6 +360,14 @@
         if (price.value !== '0' && price.value !== '' && price.value) {
           const offerVal = price.value;
 
+          Swal.fire({
+            title: 'Adding offer...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
           axios.patch(`/admin/categories/${id}/offer`, {
               newPrice: offerVal
           })
@@ -401,6 +417,14 @@
         confirmButtonText: 'Yes, remove it!'
       }).then((result) => {
         if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Removing...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+
           axios.delete(`/admin/categories/${id}/offer`)
             .then(response => {
               Swal.fire({
@@ -449,6 +473,15 @@
       const saveCategoryButton = document.getElementById('saveCategoryButton');
       saveCategoryButton.onclick = (e) => {
         e.preventDefault();
+
+        Swal.fire({
+          title: 'Saving...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
         axios.put(`/admin/categories/${id}`, {
             name: categoryName.value,
             description: categoryDescription.value,
