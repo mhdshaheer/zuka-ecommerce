@@ -113,7 +113,7 @@ const editCategory = async (req, res) => {
     if (!updateCategory) {
       return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_CATEGORY_NOT_FOUND });
     }
-    res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL });
+    res.status(httpStatusCode.CREATED).json({ message: constants.MSG_EDIT_SUCCESSFULL, category: updateCategory });
   } catch (error) {
     logger.error('Error updating category:', error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ message: constants.MSG_FAILED_TO_UPDATE_CATEGORY, error });

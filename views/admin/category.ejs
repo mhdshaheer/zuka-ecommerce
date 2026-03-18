@@ -72,7 +72,7 @@
                 </thead>
                 <tbody>
                   <%categoryData.forEach((category,index)=>{%>
-                    <tr>
+                    <tr id="categoryRow-<%=category._id%>">
                       <td class="text-center">
                         <div class="form-check">
                           <input class="form-check-input" type="checkbox" value="" />
@@ -292,6 +292,7 @@
             const tbody = document.querySelector('.table tbody');
             const newIndex = tbody.children.length + 1;
             const newRow = document.createElement('tr');
+            newRow.id = `categoryRow-${data.category._id}`;
             newRow.innerHTML = `
                 <td class="text-center">
                   <div class="form-check">
@@ -427,44 +428,55 @@
       categoryName.value = catname.trim()
       categoryDescription.value = catDesc.trim()
 
-      var modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+      const modalElement = document.getElementById('editCategoryModal');
+      let modal = bootstrap.Modal.getInstance(modalElement);
+      if (!modal) {
+        modal = new bootstrap.Modal(modalElement);
+      }
       modal.show();
 
       const saveCategoryButton = document.getElementById('saveCategoryButton');
-      saveCategoryButton.addEventListener('click', (e) => {
+      saveCategoryButton.onclick = (e) => {
         e.preventDefault();
-        fetch(`/admin/categories/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+        axios.put(`/admin/categories/${id}`, {
             name: categoryName.value,
             description: categoryDescription.value,
-            isListed: categoryStatus.value == 'listed' ? true : false
-          })
+            isListed: categoryStatus.value === 'listed'
         })
-          .then(res => res.json())
-          .then(data => {
+          .then(response => {
+            const data = response.data;
+            modal.hide();
             Swal.fire({
               title: 'Success!',
               text: 'Category Edited successfully!',
               icon: 'success',
               confirmButtonText: 'Okay'
             }).then(() => {
-              window.location.reload();
+              const row = document.getElementById(`categoryRow-${id}`);
+              if (row) {
+                row.children[2].innerHTML = `<b>${data.category.name}</b>`;
+                row.children[3].textContent = data.category.description;
+                row.children[6].innerHTML = data.category.isListed 
+                  ? '<span class="badge rounded-pill alert-success">Listed</span>'
+                  : '<span class="badge rounded-pill alert-danger">Unlisted</span>';
+                
+                // Keep the buttons matching
+                row.children[7].innerHTML = `
+                  <a class="btn btn-primary" href="javascript:void(0)"
+                    onclick="editCategoryModal('${data.category._id}','${data.category.name}','${data.category.description}')">Edit</a>
+                `;
+              }
             });
           })
           .catch(err => {
             Swal.fire({
               title: 'Error!',
-              text: 'Failed to Edit category.',
+              text: err.response?.data?.message || 'Failed to Edit category.',
               icon: 'error',
               confirmButtonText: 'Okay'
             });
           });
-      })
-
+      }
 
     }
 
