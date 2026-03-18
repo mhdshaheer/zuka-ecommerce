@@ -277,44 +277,58 @@
         a = 0;
       }
 
-      // sent the form data to backend '/categories'
-      fetch('/admin/categories', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(catData)
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (a == 0 && data.error!="409") {
+      if (a === 1) return;
 
-            Swal.fire({
-              title: 'Success!',
-              text: 'Category added successfully!',
-              icon: 'success',
-              confirmButtonText: 'Okay'
-            })
-              .then((result) => {
-                if (result.isConfirmed) {
-                  window.location.reload();
-                }
-              });
-          }
-          else{
+      axios.post('/admin/categories', catData)
+        .then(response => {
+          const data = response.data;
+          Swal.fire({
+            title: 'Success!',
+            text: 'Category added successfully!',
+            icon: 'success',
+            confirmButtonText: 'Okay'
+          }).then(() => {
+            // Append safely to the table body
+            const tbody = document.querySelector('.table tbody');
+            const newIndex = tbody.children.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="text-center">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" />
+                  </div>
+                </td>
+                <td>${newIndex}</td>
+                <td><b>${data.category.name}</b></td>
+                <td class="text-truncate">${data.category.description}</td>
+                <td>0%</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="javascript:void(0)"
+                      onclick="showAddOfferModal('${data.category._id}')">Add Offer</a>
+                </td>
+                <td>
+                    <span class="badge rounded-pill alert-success">Listed</span>
+                </td>
+                <td>
+                  <a class="btn btn-primary" href="javascript:void(0)"
+                    onclick="editCategoryModal('${data.category._id}','${data.category.name}','${data.category.description}')">Edit</a>
+                </td>
+            `;
+            tbody.appendChild(newRow);
 
-            Swal.fire({
-              title: 'error!',
-              text: 'Category added successfully!',
-              icon: 'error',
-              confirmButtonText: 'Okay'
-            })
-              
-          }
+            // Clean form
+            catName.value = '';
+            description.value = '';
+          });
         })
         .catch(err => {
-
-        })
+          Swal.fire({
+            title: 'Error!',
+            text: err.response?.data?.error || 'Failed to add category',
+            icon: 'error',
+            confirmButtonText: 'Okay'
+          });
+        });
     })
 
     //add offer 
@@ -458,6 +472,7 @@
   </script>
 
 
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
   <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>

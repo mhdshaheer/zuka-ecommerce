@@ -36,6 +36,7 @@ const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
+    const existingCategory = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
     if (existingCategory) {
       return res.status(httpStatusCode.CONFLICT).json({ error: constants.MSG_CATEGORY_ALREADY_EXISTS });
     }
@@ -44,7 +45,7 @@ const addCategory = async (req, res) => {
       description
     });
     await newCategory.save();
-    return res.status(httpStatusCode.OK).json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY });
+    return res.status(httpStatusCode.OK).json({ message: constants.MSG_CATEGORY_ADDED_SUCCESSFULLY, category: newCategory });
 
   } catch (error) {
     logger.error("add category error", error);
