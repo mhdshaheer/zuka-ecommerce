@@ -99,7 +99,8 @@
                                                 data-price="<%=products[i].regularPrice%>"
                                                 data-offer="<%=products[i].offerPrice%>"
                                                 data-color="<%=products[i].color%>"
-                                                data-desc="<%=products[i].description%>">
+                                                data-desc="<%=products[i].description%>"
+                                                data-category="<%=products[i].category ? products[i].category.name : ''%>">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
                                             <button class="btn btn-outline-info btn-edit-images"
@@ -338,13 +339,14 @@
         // Edit product
         document.querySelectorAll('.btn-edit-product').forEach(btn => {
             btn.addEventListener('click', function() {
-                const { id, name, price, offer, color, desc } = this.dataset;
+                const { id, name, price, offer, color, desc, category } = this.dataset;
                 currentProductId = id;
                 
                 document.getElementById('productName').value = name;
                 document.getElementById('regularPrice').value = price;
                 document.getElementById('description').value = desc;
                 document.getElementById('color').value = color;
+                document.getElementById('category').value = category;
                 
                 // Calculating discount percentage
                 const regPrice = parseFloat(price);
