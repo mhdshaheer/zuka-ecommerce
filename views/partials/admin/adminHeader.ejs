@@ -42,7 +42,7 @@
             </a>
           </li>
           <li class="menu-item has-submenu">
-            <a class="menu-link" href="">
+            <a class="menu-link" href="/admin/products">
               <i class="icon material-icons md-shopping_bag"></i>
               <span class="text">Products</span>
             </a>
@@ -62,7 +62,7 @@
             </div>
           </li>
           <li class="menu-item has-submenu">
-            <a class="menu-link" href="#">
+            <a class="menu-link" href="/admin/customers">
               <i class="icon material-icons md-store"></i>
               <span class="text">Customers</span>
             </a>
@@ -71,7 +71,7 @@
             </div>
           </li>
           <li class="menu-item has-submenu">
-            <a class="menu-link" href="#">
+            <a class="menu-link" href="/admin/categories">
               <i class="icon material-icons md-add_box"></i>
               <span class="text">Categories</span>
             </a>
@@ -114,3 +114,96 @@
       </header>
 
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        function updateActiveMenu() {
+            const currentUrl = window.location.pathname;
+            const menuLinks = document.querySelectorAll('.menu-aside a');
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.submenu').forEach(sub => {
+                if (!sub.closest('.menu-item.active')) sub.style.display = 'none';
+            });
+            document.querySelectorAll('.submenu a').forEach(a => a.classList.remove('active-link'));
+            menuLinks.forEach((link) => {
+                const href = link.getAttribute('href');
+                if (href && href !== '#' && (href === currentUrl || (currentUrl.startsWith(href) && href !== '/admin/dashboard'))) {
+                    const parentMenuItem = link.closest('.menu-item');
+                    if (parentMenuItem) parentMenuItem.classList.add('active');
+                    const submenu = link.closest('.submenu');
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                        link.classList.add('active-link');
+                        const parentHasSubmenu = submenu.closest('.has-submenu');
+                        if (parentHasSubmenu) parentHasSubmenu.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            updateActiveMenu();
+            if (window.spaInitialized) return;
+            window.spaInitialized = true;
+
+            document.addEventListener("click", function (e) {
+                const link = e.target.closest('.menu-aside a');
+                if (!link) return;
+                const url = link.getAttribute('href');
+                if (!url || url === '#' || url === '' || url.includes('/logout')) return;
+
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: 'Loading...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                axios.get(url)
+                    .then(response => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(response.data, 'text/html');
+                        const currentMain = document.querySelector('.main-wrap');
+                        const newMain = doc.querySelector('.main-wrap');
+                        
+                        if (currentMain && newMain) {
+                            currentMain.innerHTML = newMain.innerHTML;
+                            document.querySelectorAll('.appended-ajax-script').forEach(s => s.remove());
+                            const newScripts = doc.querySelectorAll('script');
+                            newScripts.forEach(script => {
+                                if (script.src) {
+                                    if (!document.querySelector(`script[src="${script.src}"]`)) {
+                                        const s = document.createElement('script');
+                                        s.src = script.src;
+                                        s.className = 'appended-ajax-script';
+                                        document.body.appendChild(s);
+                                    }
+                                } else if (script.innerHTML.trim() !== '' && !script.innerHTML.includes('document.write')) {
+                                    const s = document.createElement('script');
+                                      let content = script.innerHTML;
+                                      content = content.replace(/\bconst\s+/g, 'var ').replace(/\blet\s+/g, 'var ');
+                                      s.innerHTML = content;
+                                      s.className = 'appended-ajax-script';
+                                      document.body.appendChild(s);
+                                }
+                            });
+
+                            window.history.pushState({}, '', url);
+                            updateActiveMenu();
+                            setTimeout(() => {
+                                document.dispatchEvent(new Event('DOMContentLoaded'));
+                                window.dispatchEvent(new Event('load'));
+                            }, 50);
+                            Swal.close();
+                        } else {
+                            window.location.href = url;
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        window.location.href = url;
+                    });
+            });
+        });
+      </script>
