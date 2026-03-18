@@ -524,6 +524,112 @@
 
     }
 
+    // Pagination without reload
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('.page-link');
+      if (target) {
+        e.preventDefault();
+        const url = target.getAttribute('href');
+        if (!url) return;
+
+        Swal.fire({
+          title: 'Loading...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        const fetchUrl = url.includes('?') ? `${url}&ajax=true` : `${url}?ajax=true`;
+
+        axios.get(fetchUrl)
+          .then(response => {
+            const data = response.data;
+            let tbodyHtml = '';
+            
+            let startIndex = (data.currentPage - 1) * 4;
+
+            data.categoryData.forEach((category, index) => {
+              const offerCell = category.categoryOffer ? `${category.categoryOffer}%` : '0%';
+              
+              let offerAction = '';
+              if (category.categoryOffer === 0 || !category.categoryOffer) {
+                offerAction = `<a class="btn btn-warning btn-sm" href="javascript:void(0)" onclick="showAddOfferModal('${category._id}')">Add Offer</a>`;
+              } else {
+                offerAction = `<a class="btn btn-danger btn-sm" href="javascript:void(0)" onclick="removeOffer('${category._id}')">Remove</a>`;
+              }
+              
+              const statusBadge = category.isListed
+                ? '<span class="badge rounded-pill alert-success">Listed</span>'
+                : '<span class="badge rounded-pill alert-danger">Unlisted</span>';
+
+              tbodyHtml += `
+                <tr id="categoryRow-${category._id}">
+                  <td class="text-center">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="" />
+                    </div>
+                  </td>
+                  <td>${startIndex + index + 1}</td>
+                  <td><b>${category.name}</b></td>
+                  <td class="text-truncate">${category.description}</td>
+                  <td>${offerCell}</td>
+                  <td>${offerAction}</td>
+                  <td>${statusBadge}</td>
+                  <td>
+                    <a class="btn btn-primary" href="javascript:void(0)"
+                      onclick="editCategoryModal('${category._id}','${category.name}','${category.description}')">Edit</a>
+                  </td>
+                </tr>
+              `;
+            });
+
+            document.querySelector('.table tbody').innerHTML = tbodyHtml;
+
+            // Update Pagination Area
+            let paginationHtml = '';
+            if (data.currentPage > 1) {
+              paginationHtml += `
+                <li class="page-item">
+                  <a class="page-link" href="/admin/categories?page=${data.currentPage - 1}">&laquo; Prev</a>
+                </li>
+              `;
+            }
+            for (let i = 1; i <= data.totalPages; i++) {
+              paginationHtml += `
+                <li class="page-item ${data.currentPage == i ? 'active' : ''}">
+                  <a class="page-link" href="/admin/categories?page=${i}">${i}</a>
+                </li>
+              `;
+            }
+            if (data.currentPage < data.totalPages) {
+              paginationHtml += `
+                <li class="page-item">
+                  <a class="page-link" href="/admin/categories?page=${data.currentPage + 1}">&raquo; Next </a>
+                </li>
+              `;
+            }
+            
+            const paginationEl = document.querySelector('.pagination');
+            if (paginationEl) {
+              paginationEl.innerHTML = paginationHtml;
+            }
+
+            Swal.close();
+            
+            // update browser url without reloading
+            window.history.pushState({}, '', url);
+          })
+          .catch(err => {
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to load page.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          });
+      }
+    });
 
   </script>
 
