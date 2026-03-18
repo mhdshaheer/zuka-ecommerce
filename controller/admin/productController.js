@@ -23,22 +23,31 @@ const addProduct = async (req, res) => {
   try {
     const imageUrls = req.files.map((file) => file.path); // Cloudinary URLs
     const categoryId = await Category.findOne({ name: req.body.category }, { _id: 1 });
+    if (!categoryId) {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ message: "Invalid Category Selected" });
+    }
     let totalStocks = 0;
 
-    const variantArray = JSON.parse(JSON.stringify(req.body.variant));
-    const variants = variantArray.map((size, index) => {
-      totalStocks = totalStocks + Number(variantArray[index].stock);
+    let variantArray;
+    if (typeof req.body.variant === 'string') {
+      variantArray = JSON.parse(req.body.variant);
+    } else {
+      variantArray = req.body.variant;
+    }
+
+    const variants = variantArray.map((v) => {
+      totalStocks += Number(v.stock);
       return {
-        size: variantArray[index].size,
-        price: Number(variantArray[index].price),
-        stock: Number(variantArray[index].stock)
+        size: v.size,
+        price: Number(v.price),
+        stock: Number(v.stock)
       };
     });
 
     const newProduct = new Product({
       productName: req.body.name,
       description: req.body.description,
-      category: categoryId,
+      category: categoryId._id,
       totalStocks: totalStocks,
       regularPrice: req.body.price,
       offerPrice: req.body.offerPrice,
@@ -90,10 +99,10 @@ const editProduct = async (req, res) => {
     const productId = req.params.id;
 
     let updatedFields = {};
-    const categoryId = await Category.find({ name: category }, { _id: 1 });
+    const categoryFound = await Category.findOne({ name: category }, { _id: 1 });
     if (productName !== undefined && productName.trim() !== '') updatedFields.productName = productName;
     if (description !== undefined && description.trim() !== '') updatedFields.description = description;
-    if (category !== undefined && category.trim() !== '') updatedFields.category = categoryId._id;
+    if (categoryFound) updatedFields.category = categoryFound._id;
     if (regularPrice !== undefined && regularPrice.trim() !== '') updatedFields.regularPrice = Number(regularPrice);
     if (offerPrice !== undefined && offerPrice.trim() !== '') updatedFields.offerPrice = Number(regularPrice) * ((100 - Number(offerPrice)) / 100);
     if (color !== undefined && color.trim() !== '') updatedFields.color = color;

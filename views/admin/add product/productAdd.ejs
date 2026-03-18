@@ -534,13 +534,7 @@
                 formData.append('price', price.value)
                 formData.append('offerPrice', offerPrice.value)
                 formData.append('colour', colour.value)
-                formData.append('varient', variantArray)
-
-                variantArray.forEach((obj, index) => {
-                    formData.append(`variant[${index}][size]`, obj.size);
-                    formData.append(`variant[${index}][price]`, obj.price);
-                    formData.append(`variant[${index}][stock]`, obj.stock);
-                });
+                formData.append('variant', JSON.stringify(variantArray));
                 const imageInputs = [
                     document.getElementById('images-1'),
                     document.getElementById('images-2'),
@@ -558,7 +552,7 @@
 
                 //form data end
                 showSpinner()
-                fetch('/admin/addProduct', {
+                fetch('/admin/products', {
                     method: "POST",
                     body: formData
                 }).then(res => res.json())
@@ -615,8 +609,7 @@
 
             let tbody = document.getElementById("tbody")
             tbody.innerHTML = ''
-            variantArray.map((item) => {
-
+            variantArray.map((item, index) => {
                 let element = `
                     <tr>
                         <td>${item.size}</td>
@@ -626,13 +619,18 @@
                             <span class="badge rounded-pill alert-success">Added</span>
                         </td>
                         <td>
-                            <button class="btn btn-danger btn-sm"
-                                onclick="deleteItem()">Delete</button>
+                            <button type="button" class="btn btn-danger btn-sm"
+                                onclick="deleteItem(${index})">Delete</button>
                         </td>
                     </tr>
                 `
                 tbody.innerHTML += element
             })
+        }
+
+        function deleteItem(index) {
+            variantArray.splice(index, 1);
+            saveChanges();
         }
 
     </script>
