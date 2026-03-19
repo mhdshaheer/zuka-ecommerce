@@ -150,7 +150,8 @@
                                 title: 'Success!',
                                 text: 'Stock & price updated successfully!',
                                 icon: 'success',
-                                confirmButtonText: 'Okay'
+                                timer: 1500,
+                                showConfirmButton: false
                             })
                         }
                     }).catch((error) => {
@@ -165,44 +166,70 @@
 
             function blockVariant(productId, variantId) {
                 Swal.fire({
-                    title: 'Blocking...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
+                    title: 'Are you sure?',
+                    text: "You want to block this variant!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, block it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Blocking...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                        axios.patch(`/admin/products/${productId}/variants/${variantId}/block`)
+                            .then(res => {
+                                if (res.status == 200) {
+                                    const btnContainer = document.getElementById('variantPrice_' + variantId).closest('tr').querySelector('td:last-child');
+                                    btnContainer.innerHTML = `<button class="btn btn-danger px-2" onclick="unblockVariant('${productId}', '${variantId}')">unblock</button>`;
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: 'Variant blocked successfully!',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            }).catch(err => Swal.fire('Error', 'Failed to block variant', 'error'));
+                    }
                 });
-                axios.patch(`/admin/products/${productId}/variants/${variantId}/block`)
-                    .then(res => {
-                        if (res.status == 200) {
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Variant blocked successfully!',
-                                icon: 'success',
-                                confirmButtonText: 'Okay'
-                            }).then(()=>{
-                                location.reload()
-                            })
-                        }
-                    })
             }
+
             function unblockVariant(productId, variantId) {
                 Swal.fire({
-                    title: 'Unblocking...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
+                    title: 'Are you sure?',
+                    text: "You want to unblock this variant!",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, unblock it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Unblocking...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                        axios.patch(`/admin/products/${productId}/variants/${variantId}/unblock`)
+                            .then(res => {
+                                if (res.status == 200) {
+                                    const btnContainer = document.getElementById('variantPrice_' + variantId).closest('tr').querySelector('td:last-child');
+                                    btnContainer.innerHTML = `<button class="btn btn-primary" onclick="blockVariant('${productId}', '${variantId}')">block</button>`;
+                                    Swal.fire({
+                                        title: 'Success!',
+                                        text: 'Variant unblocked successfully!',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    });
+                                }
+                            }).catch(err => Swal.fire('Error', 'Failed to unblock variant', 'error'));
+                    }
                 });
-                axios.patch(`/admin/products/${productId}/variants/${variantId}/unblock`)
-                    .then(res => {
-                        if (res.status == 200) {
-                            Swal.fire({
-                                title: 'Success!',
-                                text: 'Variant unblocked successfully!',
-                                icon: 'success',
-                                confirmButtonText: 'Okay'
-                            })
-                            .then(()=>{
-                                location.reload()
-                            })
-                        }
-                    })
             }
 
             function saveVariantData(productId) {
