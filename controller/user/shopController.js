@@ -296,7 +296,11 @@ const deleteFromCart = async (req, res) => {
     const cartItems = await Cart.find({ userId: user._id });
 
     if (result) {
-      res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS, cartItems });
+      res.status(httpStatusCode.OK).json({ 
+        message: constants.MSG_SUCCESS, 
+        cartItems, 
+        cartCount: cartItems[0] ? cartItems[0].items.length : 0 
+      });
     }
 
   } catch (error) {

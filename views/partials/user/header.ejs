@@ -25,7 +25,8 @@
     <link rel="stylesheet" href="/css/style.css" type="text/css">
 
     <style>
-        .header__nav__option a {
+        .header__nav__option a,
+        .offcanvas__nav__option a {
             position: relative;
             display: inline-block;
             margin-right: 15px;
@@ -129,13 +130,13 @@
                 </div>
                 <div class="offcanvas__nav__option">
                     <a href="/wishlist">
-                        <img src="/img/icon/heart.png" alt="">
+                        <i class="fa-regular fa-heart" style="color: #000000; font-size: 1.25rem;"></i>
                         <span class="header__badge wishlist-badge <%= locals.wishlistCount > 0 ? '' : 'd-none' %>">
                             <%= locals.wishlistCount %>
                         </span>
                     </a>
                     <a href="/cart">
-                        <img src="/img/icon/cart.png" alt="">
+                        <i class="fa-solid fa-cart-shopping" style="color: #000000; font-size: 1.25rem;"></i>
                         <span class="header__badge cart-badge <%= locals.cartCount > 0 ? '' : 'd-none' %>">
                             <%= locals.cartCount %>
                         </span>
