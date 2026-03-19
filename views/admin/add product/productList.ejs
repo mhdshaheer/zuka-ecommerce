@@ -499,9 +499,10 @@
                 document.getElementById('image4'),
             ];
 
-            imageInputs.forEach(input => {
+            imageInputs.forEach((input, index) => {
                 if(input.files.length > 0) {
                     formData.append('images', input.files[0]);
+                    formData.append('indexes', index);
                 }
             });
 

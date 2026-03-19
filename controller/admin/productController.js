@@ -156,15 +156,30 @@ const updateImages = async (req, res) => {
   try {
     const productId = req.params.id;
 
-    const imageUrls = req.files.map((file) => file.path);
+    const product = await Product.findOne({ _id: productId });
+    if (!product) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND });
+    }
 
+    let currentImages = [...product.images];
+    const newImages = req.files;
+    let indexes = req.body.indexes;
+
+    if (!Array.isArray(indexes)) {
+      indexes = [indexes];
+    }
+
+    newImages.forEach((file, i) => {
+      const targetIndex = parseInt(indexes[i]);
+      if (!isNaN(targetIndex)) {
+        currentImages[targetIndex] = file.path;
+      }
+    });
 
     const updateImg = await Product.updateOne({ _id: productId }, {
-      images: imageUrls
+      images: currentImages
     });
-    if (!updateImg) {
-      res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND });
-    }
+
     res.status(httpStatusCode.OK).json({ message: constants.MSG_PRODUCT_UPDATED });
 
   } catch (error) {
