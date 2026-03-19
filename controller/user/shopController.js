@@ -275,7 +275,7 @@ const addToCart = async (req, res) => {
         { upsert: true, new: true }
       );
       if (toCart) {
-        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
+        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS, cartCount: toCart.items.length });
       }
     }
   } catch (error) {
@@ -512,7 +512,7 @@ const addToWishlist = async (req, res) => {
       { new: true, upsert: true }
     );
     if (addWishlist) {
-      res.status(httpStatusCode.OK).json({ success: true });
+      res.status(httpStatusCode.OK).json({ success: true, wishlistCount: addWishlist.products.length });
     }
   } catch (error) {
     logger.error(error);

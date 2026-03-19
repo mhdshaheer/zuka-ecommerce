@@ -442,6 +442,9 @@
                         });
 
                         if (res.status == 200) {
+                            if (res.data.cartCount !== undefined) {
+                                window.updateCartBadge(res.data.cartCount);
+                            }
                             Swal.fire({
                                 title: 'Success!',
                                 text: 'Product added to cart successfully!',
@@ -521,6 +524,49 @@
                         icon: 'warning',
                         confirmButtonText: 'Okay'
                     })
+                }
+
+                function addToWishlist(productId, event) {
+                    event.preventDefault();
+                    axios.post('/wishlist', { productId })
+                        .then((res) => {
+                            if (res.data.wishlistCount !== undefined) {
+                                window.updateWishlistBadge(res.data.wishlistCount);
+                            }
+                            
+                            const toastConfig = {
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            };
+
+                            if (res.status === 200) {
+                                Swal.fire({
+                                    ...toastConfig,
+                                    icon: 'success',
+                                    title: 'Added to Wishlist!'
+                                });
+                            } else if (res.status === 201) {
+                                Swal.fire({
+                                    ...toastConfig,
+                                    icon: 'warning',
+                                    title: 'Already in Wishlist!'
+                                });
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Please login first!',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            }).then(() => window.location.href = "/login")
+                        });
                 }
             </script>
 
