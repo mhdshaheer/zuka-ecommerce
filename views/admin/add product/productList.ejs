@@ -333,13 +333,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            let filter = this.value.toUpperCase();
-            let trs = document.querySelectorAll('tbody tr');
-            trs.forEach(tr => {
-                let name = tr.querySelector('.product-name').textContent.toUpperCase();
-                tr.style.display = name.includes(filter) ? "" : "none";
-            });
+        let searchTimer;
+        document.getElementById('searchInput').addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            const search = this.value;
+            
+            searchTimer = setTimeout(() => {
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', '1');
+                url.searchParams.set('search', search);
+                url.searchParams.set('ajax', 'true');
+
+                Swal.fire({
+                    title: 'Searching...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                axios.get(url.toString())
+                    .then(response => {
+                        const { products, currentPage, totalPages, limit } = response.data;
+                        updateTable(products, currentPage, limit);
+                        updatePagination(currentPage, totalPages, search); // Pass search to pagination
+                        window.history.pushState({}, '', `?page=1&search=${search}`);
+                        Swal.close();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.close();
+                    });
+            }, 500); // 500ms debounce
         });
 
         let currentProductId = null;
@@ -566,8 +589,9 @@
                 axios.get(url.toString())
                     .then(response => {
                         const { products, currentPage, totalPages, limit } = response.data;
+                        const search = url.searchParams.get('search') || '';
                         updateTable(products, currentPage, limit);
-                        updatePagination(currentPage, totalPages);
+                        updatePagination(currentPage, totalPages, search);
                         window.history.pushState({}, '', target.href);
                         Swal.close();
                     })
@@ -644,24 +668,26 @@
             attachActionListeners();
         }
 
-        function updatePagination(currentPage, totalPages) {
+        function updatePagination(currentPage, totalPages, search = "") {
             const paginationArea = document.getElementById('paginationArea');
             let paginationHtml = '<nav aria-label="Page navigation example"><ul class="pagination justify-content-start">';
             
+            const searchParam = search ? `&search=${search}` : '';
+
             if (currentPage > 1) {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage - 1}">Previous</a></li>`;
+                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage - 1}${searchParam}">Previous</a></li>`;
             }
 
             for (let i = 1; i <= totalPages; i++) {
                 paginationHtml += `
                     <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="?page=${i}">${i}</a>
+                        <a class="page-link" href="?page=${i}${searchParam}">${i}</a>
                     </li>
                 `;
             }
 
             if (currentPage < totalPages) {
-                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage + 1}">Next</a></li>`;
+                paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage + 1}${searchParam}">Next</a></li>`;
             }
 
             paginationHtml += '</ul></nav>';
