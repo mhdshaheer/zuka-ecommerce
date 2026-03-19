@@ -10,16 +10,42 @@ const loadOrderList = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
     const skip = (page - 1) * limit;
+    const status = req.query.status || "";
+    const sort = req.query.sort || "newest";
 
+    const filter = {};
+    if (status) filter.status = status;
 
-    const orders = await Order.find().populate('userId').sort({ createdAt: -1 }).skip(skip).limit(limit);
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    else if (sort === "total-high") sortOption = { finalAmount: -1 };
+    else if (sort === "total-low") sortOption = { finalAmount: 1 };
 
-    const totalOrders = await Order.countDocuments();
+    const orders = await Order.find(filter)
+      .populate('userId')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    const totalOrders = await Order.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
+
+    if (req.query.ajax === 'true') {
+      return res.json({
+        orders,
+        currentPage: page,
+        totalPages,
+        status,
+        sort
+      });
+    }
+
     res.render('orderList', {
       orders,
       currentPage: page,
-      totalPages
+      totalPages,
+      status,
+      sort
     });
   } catch (error) {
     res.redirect("/admin/login");
