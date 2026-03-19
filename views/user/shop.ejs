@@ -166,9 +166,9 @@
                                                     </span>
                                                     <% } %>
                                                         <ul class="product__hover">
-                                                            <li><a href="#"
-                                                                    onclick="addToWishlist('<%= products[i]._id %>', event)"><img
-                                                                        src="/img/icon/heart.png" alt=""></a></li>
+                                                            <li><a href="#" onclick="addToWishlist('<%= products[i]._id %>', event)">
+                                                                <i class="<%= wishlistProductIds.includes(products[i]._id.toString()) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> wishlist-icon-<%= products[i]._id %>" style="font-size: 20px;"></i>
+                                                            </a></li>
                                                         </ul>
                                             </div>
                                             <div class="product__item__text">
@@ -233,48 +233,52 @@
             let catOut = products.filter(value => value.category && value.category._id === catId)
         }
         
-        function addToWishlist(productId, event) {
-            event.preventDefault();
-            axios.post('/wishlist', {
-                productId
-            }).then((res) => {
-                if (res.status == 200) {
+                function addToWishlist(productId, event) {
+                    event.preventDefault();
+                    axios.post('/wishlist', { productId })
+                        .then((res) => {
+                            if (res.data.wishlistCount !== undefined) {
+                                window.updateWishlistBadge(res.data.wishlistCount);
+                            }
 
-                    if (res.data.wishlistCount !== undefined) {
-                        window.updateWishlistBadge(res.data.wishlistCount);
-                    }
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'success',
-                        title: 'Added to Wishlist!',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true
-                    });
-                } else if (res.status == 201) {
-                    Swal.fire({
-                        toast: true,
-                        position: 'top-end',
-                        icon: 'warning',
-                        title: 'Already in Wishlist!',
-                        showConfirmButton: false,
-                        timer: 1500,
-                        timerProgressBar: true
-                    });
+                            // Update the Icon
+                            const icons = document.querySelectorAll(`.wishlist-icon-${productId}`);
+                            icons.forEach(icon => {
+                                if (res.data.added) {
+                                    icon.classList.remove('fa-heart-o');
+                                    icon.classList.add('fa-heart', 'text-danger');
+                                } else {
+                                    icon.classList.remove('fa-heart', 'text-danger');
+                                    icon.classList.add('fa-heart-o');
+                                }
+                            });
+
+                            const toastConfig = {
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            };
+
+                            Swal.fire({
+                                ...toastConfig,
+                                icon: 'success',
+                                title: res.data.message
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Please login first!',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            }).then(() => window.location.href = "/login")
+                        });
                 }
-            }).catch((error) => {
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'error',
-                    title: 'Add to Wishlist failed!',
-                    showConfirmButton: false,
-                    timer: 1500,
-                    timerProgressBar: true
-                });
-            })
-        }
 
 
     </script>
@@ -364,45 +368,6 @@ function searchItem(value) {
 
 function categorySort(catId) {
     updateURLParameters({ category: catId, page: 1 });
-}
-
-function addToWishlist(productId, event) {
-    event.preventDefault();
-    axios.post('/wishlist', { productId })
-        .then((res) => {
-            const toastConfig = {
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
-            };
-
-            if (res.status === 200) {
-                Swal.fire({
-                    ...toastConfig,
-                    icon: 'success',
-                    title: 'Added to Wishlist!'
-                });
-            } else if (res.status === 201) {
-                Swal.fire({
-                    ...toastConfig,
-                    icon: 'warning',
-                    title: 'Already in Wishlist!'
-                });
-            }
-        })
-        .catch(() => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'error',
-                title: 'Add to Wishlist failed!',
-                showConfirmButton: false,
-                timer: 1500,
-                timerProgressBar: true
-            }).then(()=>window.location.href = "/login")
-        });
 }
 </script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

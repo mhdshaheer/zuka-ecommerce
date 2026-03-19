@@ -63,15 +63,18 @@ app.use(async (req, res, next) => {
       ]);
       res.locals.wishlistCount = wishlist ? wishlist.products.length : 0;
       res.locals.cartCount = cart ? cart.items.length : 0;
+      res.locals.wishlistProductIds = wishlist ? wishlist.products.map(p => p.productId.toString()) : [];
     } else {
       res.locals.wishlistCount = 0;
       res.locals.cartCount = 0;
+      res.locals.wishlistProductIds = [];
     }
     next();
   } catch (error) {
     logger.error("Error in header data middleware:", error);
     res.locals.wishlistCount = 0;
     res.locals.cartCount = 0;
+    res.locals.wishlistProductIds = [];
     next();
   }
 });

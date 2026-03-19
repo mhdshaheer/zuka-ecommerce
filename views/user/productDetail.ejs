@@ -240,8 +240,15 @@
                                                     <input id="itemQuantity" type="text" value="1" readonly>
                                                 </div>
                                             </div>
-                                            <a onclick="selectSize()" class="primary-btn text-light" id="addToCart">add
-                                                to cart</a>
+                                            <a onclick="selectSize()" class="primary-btn text-light" style="cursor: pointer;" id="addToCart">add to cart</a>
+                                        </div>
+                                        <div class="product__details__btns__option mt-3">
+                                            <a href="#" onclick="addToWishlist('<%= product[0]._id %>', event)" class="text-dark text-decoration-none">
+                                                <i class="<%= wishlistProductIds.includes(product[0]._id.toString()) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> wishlist-icon-<%= product[0]._id %>"></i>
+                                                <span class="wishlist-text-<%= product[0]._id %> ms-1">
+                                                    <%= wishlistProductIds.includes(product[0]._id.toString()) ? 'Remove from wishlist' : 'Add to wishlist' %>
+                                                </span>
+                                            </a>
                                         </div>
 
 
@@ -533,6 +540,24 @@
                             if (res.data.wishlistCount !== undefined) {
                                 window.updateWishlistBadge(res.data.wishlistCount);
                             }
+
+                            // Update Icons and Text
+                            const icons = document.querySelectorAll(`.wishlist-icon-${productId}`);
+                            const texts = document.querySelectorAll(`.wishlist-text-${productId}`);
+                            
+                            icons.forEach(icon => {
+                                if (res.data.added) {
+                                    icon.classList.remove('fa-heart-o');
+                                    icon.classList.add('fa-heart');
+                                } else {
+                                    icon.classList.remove('fa-heart');
+                                    icon.classList.add('fa-heart-o');
+                                }
+                            });
+
+                            texts.forEach(text => {
+                                text.innerText = res.data.added ? 'Remove from wishlist' : 'add to wishlist';
+                            });
                             
                             const toastConfig = {
                                 toast: true,
@@ -542,19 +567,11 @@
                                 timerProgressBar: true
                             };
 
-                            if (res.status === 200) {
-                                Swal.fire({
-                                    ...toastConfig,
-                                    icon: 'success',
-                                    title: 'Added to Wishlist!'
-                                });
-                            } else if (res.status === 201) {
-                                Swal.fire({
-                                    ...toastConfig,
-                                    icon: 'warning',
-                                    title: 'Already in Wishlist!'
-                                });
-                            }
+                            Swal.fire({
+                                ...toastConfig,
+                                icon: 'success',
+                                title: res.data.message
+                            });
                         })
                         .catch(() => {
                             Swal.fire({

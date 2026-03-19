@@ -486,19 +486,31 @@ const loadWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
   try {
     const user = req.session.user || req.session.googleUser;
-
     const { productId } = req.body;
-    const wishlistExist = await Wishlist.findOne({ userId: user._id });
+    let wishlistExist = await Wishlist.findOne({ userId: user._id });
 
     if (wishlistExist) {
-      const isIncluded = wishlistExist.products.some((item) =>
-      item.productId.equals(new mongoose.Types.ObjectId(productId))
-      );
+        const isIncluded = wishlistExist.products.some((item) =>
+            item.productId.equals(new mongoose.Types.ObjectId(productId))
+        );
 
-      if (isIncluded) {
-        return res.status(httpStatusCode.CREATED).json({ message: constants.MSG_PRODUCT_ALREADY_EXIST });
-      }
+        if (isIncluded) {
+            // Remove from wishlist (toggle off)
+            const updatedWishlist = await Wishlist.findOneAndUpdate(
+                { userId: user._id },
+                { $pull: { products: { productId: productId } } },
+                { new: true }
+            );
+            return res.status(httpStatusCode.OK).json({ 
+                success: true, 
+                added: false, 
+                message: "Removed from Wishlist", 
+                wishlistCount: updatedWishlist.products.length 
+            });
+        }
     }
+
+    // Add to wishlist (toggle on)
     const addWishlist = await Wishlist.findOneAndUpdate(
       { userId: user._id },
       {
@@ -512,7 +524,12 @@ const addToWishlist = async (req, res) => {
       { new: true, upsert: true }
     );
     if (addWishlist) {
-      res.status(httpStatusCode.OK).json({ success: true, wishlistCount: addWishlist.products.length });
+      res.status(httpStatusCode.OK).json({ 
+        success: true, 
+        added: true, 
+        message: "Added to Wishlist", 
+        wishlistCount: addWishlist.products.length 
+      });
     }
   } catch (error) {
     logger.error(error);
