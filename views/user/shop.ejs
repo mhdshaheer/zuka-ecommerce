@@ -72,7 +72,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-9">
+                <div class="col-lg-9" id="shop-content">
 
                     <div class="shop__product__option">
                         <div class="row">
@@ -98,6 +98,58 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Active Filters Section -->
+                    <% if (search || categoryId || sort) { %>
+                        <div class="active-filters mb-3 d-flex flex-wrap align-items-center gap-2">
+                            <% if (search) { %>
+                                <span class="badge border border-secondary text-dark fw-normal rounded-pill bg-light py-2 px-3">
+                                    <i class="fa fa-search small me-2 text-secondary"></i>
+                                    "<%= search %>"
+                                    <a href="#" class="text-dark ms-2 hover-red" onclick="searchItem(''); return false;"><i class="fa fa-times-circle"></i></a>
+                                </span>
+                            <% } %>
+                    
+                            <% if (categoryId) { %>
+                                <% const selectedCat = category.find(c => c._id.toString() === categoryId.toString()) %>
+                                <% if (selectedCat) { %>
+                                    <span class="badge border border-secondary text-dark fw-normal rounded-pill bg-light py-2 px-3">
+                                        <i class="fa fa-tag small me-2 text-secondary"></i>
+                                        <%= selectedCat.name %>
+                                        <a href="#" class="text-dark ms-2 hover-red" onclick="categorySort(''); return false;"><i class="fa fa-times-circle"></i></a>
+                                    </span>
+                                <% } %>
+                            <% } %>
+                    
+                            <% if (sort) { %>
+                                <% let sortName = ''; 
+                                    switch(sort) {
+                                        case 'new-arrival': sortName = 'New Arrivals'; break;
+                                        case 'low-to-high': sortName = 'Low To High'; break;
+                                        case 'high-to-low': sortName = 'High To Low'; break;
+                                        case 'a-z': sortName = 'A-Z'; break;
+                                        case 'z-a': sortName = 'Z-A'; break;
+                                    }
+                                %>
+                                <% if (sortName) { %>
+                                    <span class="badge border border-secondary text-dark fw-normal rounded-pill bg-light py-2 px-3">
+                                        <i class="fa fa-sort small me-2 text-secondary"></i>
+                                        <%= sortName %>
+                                        <a href="#" class="text-dark ms-2 hover-red" onclick="sortItem(''); return false;"><i class="fa fa-times-circle"></i></a>
+                                    </span>
+                                <% } %>
+                            <% } %>
+                    
+                            <% if ((search && categoryId) || (search && sort) || (categoryId && sort)) { %>
+                                <a href="/shop" class="btn btn-link btn-sm text-decoration-none text-danger fw-bold ms-2">Clear All</a>
+                            <% } %>
+                        </div>
+                        <style>
+                            .hover-red:hover { color: #ff0000 !important; }
+                            .active-filters .badge { font-size: 0.85rem; }
+                        </style>
+                    <% } %>
+
                     <div class="row" id="productList">
                         <% for (let i=0; i < products.length; i++) { %>
                             <% let totalStock=products[i].variant.reduce((acc, curr)=> acc + curr.stock, 0); %>
@@ -226,7 +278,7 @@
 
 
 <script>
-    function updateURLParameters(params) {
+async function updateURLParameters(params) {
     const url = new URL(window.location.href);
     Object.keys(params).forEach(key => {
         if (params[key]) {
@@ -235,8 +287,65 @@
             url.searchParams.delete(key);
         }
     });
+
+    // Update the URL in the address bar without reloading
     window.history.pushState({}, '', url);
-    location.reload(); 
+
+    // Show a loading state (optional but good for UX)
+    const shopContent = document.getElementById('shop-content');
+    shopContent.style.opacity = '0.5';
+    shopContent.style.pointerEvents = 'none';
+
+    try {
+        const response = await axios.get(url.href);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(response.data, 'text/html');
+
+        // Update the shop content dynamically
+        const newShopContent = doc.getElementById('shop-content');
+        if (newShopContent) {
+            shopContent.innerHTML = newShopContent.innerHTML;
+        }
+
+        // --- Sync UI Elements ---
+        // 1. Update Search Input
+        const searchInput = document.getElementById('search');
+        const newSearchValue = url.searchParams.get('search') || '';
+        if (searchInput && searchInput.value !== newSearchValue) {
+            searchInput.value = newSearchValue;
+        }
+
+        // 2. Update Sort Select
+        const sortSelect = document.getElementById('sortItem');
+        const newSortValue = url.searchParams.get('sort') || '';
+        if (sortSelect) {
+            sortSelect.value = newSortValue;
+            // Update niceSelect if present
+            if (typeof $ !== 'undefined' && $.fn.niceSelect) {
+                $(sortSelect).niceSelect('update');
+            }
+        }
+
+        // 3. Re-run background-set logic
+        $('.set-bg').each(function () {
+            var bg = $(this).data('setbg');
+            $(this).css('background-image', 'url(' + bg + ')');
+        });
+
+        // Ensure active state for categories in sidebar are updated
+        const sidebarCategories = document.querySelector('.shop__sidebar__categories');
+        const newSidebarCategories = doc.querySelector('.shop__sidebar__categories');
+        if (sidebarCategories && newSidebarCategories) {
+            sidebarCategories.innerHTML = newSidebarCategories.innerHTML;
+        }
+
+    } catch (error) {
+        console.error('Error updating shop content:', error);
+        location.reload(); // Fallback to full reload on error
+    } finally {
+        shopContent.style.opacity = '1';
+        shopContent.style.pointerEvents = 'auto';
+    }
 }
 
 function sortItem(value) {

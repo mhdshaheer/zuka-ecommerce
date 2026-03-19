@@ -65,16 +65,28 @@ const loadShop = async (req, res) => {
 
     // Execute queries
     const [products, totalProducts, category] = await Promise.all([
-    Product.find(query).
-    populate('category').
-    sort(sortOptions).
-    skip(skip).
-    limit(limit),
-    Product.countDocuments({ isBlocked: false }),
-    Category.find()]
-    );
+      Product.find(query).
+      populate('category').
+      sort(sortOptions).
+      skip(skip).
+      limit(limit),
+      Product.countDocuments(query),
+      Category.find()
+    ]);
 
     const totalPages = Math.ceil(totalProducts / limit);
+
+    if (req.query.ajax) {
+      return res.json({
+        products,
+        totalProducts,
+        totalPages,
+        currentPage: page,
+        search,
+        sort,
+        categoryId
+      });
+    }
 
     res.render('shop', {
       activePage: 'shop',
@@ -93,7 +105,7 @@ const loadShop = async (req, res) => {
 
   } catch (error) {
     logger.error("error in shop page", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('error', { message: constants.MSG_INTERNAL_SERVER_ERROR });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('page_404', { message: constants.MSG_INTERNAL_SERVER_ERROR });
   }
 };
 
