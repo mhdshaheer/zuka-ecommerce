@@ -27,6 +27,8 @@
             font-size: 0.7rem;
             padding: 0.35em 0.65em;
         }
+        #cropModal { z-index: 1100 !important; }
+        .img-container { min-height: 400px; max-height: 500px; width: 100%; overflow: hidden; }
     </style>
     <section class="content-main">
         <div class="content-header">
@@ -306,8 +308,10 @@
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <canvas id="cropCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                <div class="modal-body">
+                    <div class="img-container" style="height: 400px; width: 100%;">
+                        <img id="imageToCrop" style="display: block; max-width: 100%;">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -323,6 +327,10 @@
 
 
 
+    <!-- Cropper.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <!-- Cropper.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -703,6 +711,66 @@
 
         // Initialize listeners
         attachActionListeners();
+
+        // Image Cropping Logic
+        let cropper;
+        let currentInputId;
+        const cropModalEl = document.getElementById('cropModal');
+        const cropModal = new bootstrap.Modal(cropModalEl);
+        const imageToCrop = document.getElementById('imageToCrop');
+
+        function openCropModal(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input.files || !input.files[0]) {
+                Swal.fire('Error', 'Please select an image first', 'error');
+                return;
+            }
+            
+            currentInputId = inputId;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageToCrop.src = e.target.result;
+                // Re-initialize cropper after modal is shown
+                const onShown = () => {
+                    if (cropper) cropper.destroy();
+                    cropper = new Cropper(imageToCrop, {
+                        aspectRatio: 1,
+                        viewMode: 1,
+                        autoCropArea: 1,
+                    });
+                    cropModalEl.removeEventListener('shown.bs.modal', onShown);
+                };
+                cropModalEl.addEventListener('shown.bs.modal', onShown);
+                cropModal.show();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+
+        document.getElementById('saveCrop').addEventListener('click', () => {
+            if (!cropper) return;
+            const canvas = cropper.getCroppedCanvas();
+            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+            
+            // Helper to convert Data URL to File
+            const byteString = atob(croppedDataUrl.split(',')[1]);
+            const mimeString = croppedDataUrl.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            const blob = new Blob([ab], { type: mimeString });
+            const file = new File([blob], `cropped_${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+            const input = document.getElementById(currentInputId);
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+            
+            // Update preview
+            const previewId = 'preview' + currentInputId.replace('image', '');
+            document.getElementById(previewId).innerHTML = `<img src="${croppedDataUrl}" style="max-width: 100%; height: auto;">`;
+            
+            cropModal.hide();
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -714,10 +782,7 @@
     <script src="/admin/assets/js/vendors/jquery.fullscreen.min.js"></script>
     <!-- Main Script -->
     <script src="/admin/assets/js/main.js" type="text/javascript"></script>
-<!-- Cropper.js CSS -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-<!-- Cropper.js JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 
 
 
