@@ -221,9 +221,9 @@ const addVariant = async (req, res) => {
   try {
     const productId = req.params.productId;
     const { variantSize, variantPrice, variantStock } = req.body;
-    const sizeFound = await Product.findOne({ 'variant.size': variantSize });
+    const sizeFound = await Product.findOne({ _id: productId, 'variant.size': variantSize });
     if (sizeFound) {
-      return res.status(HttpStatusCode.FORBIDDEN).json({ message: `Size : ${variantSize}   Already exist` });
+      return res.status(HttpStatusCode.FORBIDDEN).json({ message: `Size : ${variantSize} already exists for this product.` });
     }
     const newVariant = {
       stock: variantStock,
