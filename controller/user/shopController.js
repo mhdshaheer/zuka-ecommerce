@@ -474,11 +474,12 @@ const loadWishlist = async (req, res) => {
     const wishlist = await Wishlist.findOne({ userId: user._id }).populate('products.productId');
     res.render('wishlist', {
       activePage: '',
-      wishProducts: wishlist.products,
+      wishProducts: wishlist ? wishlist.products : [],
       user
     });
   } catch (error) {
     logger.error(error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('page_404', { message: constants.MSG_INTERNAL_SERVER_ERROR });
   }
 };
 

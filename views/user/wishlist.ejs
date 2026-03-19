@@ -37,63 +37,60 @@
             <div class="row">
                 <div class="col d-flex justify-content-center ">
                     <div class="shopping__cart__table">
-                        <%if(wishProducts.length>0){%>
-                        <table class="mx-auto">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Total</th>
-                                    <th>Stock</th>
-                                    <th>Action</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <%wishProducts.map((item,index)=>{%>
-
+                        <% if (wishProducts && wishProducts.length > 0) { %>
+                            <table class="mx-auto">
+                                <thead>
                                     <tr>
-                                        <td class="product__cart__item">
-                                            <div class="product__cart__item__pic">
-                                                <img src="<%=item.productId.images[0]%>" alt="">
-                                            </div>
-                                            <div class="product__cart__item__text">
-                                                <h6>
-                                                    <%=item.productId.productName%>
-                                                </h6>
-                                            </div>
-                                        </td>
-                                        <td class="cart__price">₹ <%=item.productId.regularPrice.toFixed(0)%>
-                                        </td>
-
-                                        <td class="quantity__item">
-                                            <%const totalStock = item.productId.variant.reduce((acc,curr)=>acc+curr.stock,0)%>
-                                            <%if(totalStock<=0){%>
-                                                <span class="badge bg-danger">Out of stock </span>
-                                            <%}else{%>
-                                                <span class="badge bg-success">In stock </span>
-                                            <%}%>
-                                        </td>
-
-
-                                        <td class="pe-5">
-                                            <%if(totalStock<=0){%>
-                                                <a href="#" aria-disabled="">
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                        <th>Action</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% wishProducts.forEach((item, index) => { %>
+                                        <tr>
+                                            <td class="product__cart__item">
+                                                <div class="product__cart__item__pic">
+                                                    <img src="<%= item.productId.images[0] %>" alt="">
+                                                </div>
+                                                <div class="product__cart__item__text">
+                                                    <h6><%= item.productId.productName %></h6>
+                                                </div>
+                                            </td>
+                                            <td class="cart__price">₹ <%= item.productId.regularPrice.toFixed(0) %></td>
+                                            <td class="quantity__item">
+                                                <% const totalStock = item.productId.variant.reduce((acc, curr) => acc + curr.stock, 0) %>
+                                                <% if (totalStock <= 0) { %>
+                                                    <span class="badge bg-danger">Out of stock</span>
+                                                <% } else { %>
+                                                    <span class="badge bg-success">In stock</span>
+                                                <% } %>
+                                            </td>
+                                            <td class="pe-5">
+                                                <% if (totalStock <= 0) { %>
                                                     <button class="btn btn-danger" disabled>Out of stock</button>
-                                                </a>
-                                                <%}else{%>
-                                                    <a href="/products/<%=item.productId._id%>">
+                                                <% } else { %>
+                                                    <a href="/products/<%= item.productId._id %>">
                                                         <button class="btn btn-success">View Product</button>
                                                     </a>
-                                                <%}%>
-                                        </td>
-                                        <td class="cart__close px-3" onclick="removeWishlist('<%=index%>')"><i class="fa fa-close"></i></td>
-                                    </tr>
+                                                <% } %>
+                                            </td>
+                                            <td class="cart__close px-3" style="cursor: pointer;" onclick="removeWishlist('<%= index %>')">
+                                                <i class="fa fa-close"></i>
+                                            </td>
+                                        </tr>
+                                    <% }) %>
                                 </tbody>
                             </table>
-                            <%})%>
-                        <%}else{%>
-                            <div>No Prdoucts found</div>
-                        <%}%>
+                        <% } else { %>
+                            <div class="text-center py-5">
+                                <h3>Your wishlist is empty</h3>
+                                <p class="text-muted">Explore our shop and add some items!</p>
+                                <a href="/shop" class="primary-btn mt-3">Go to Shop</a>
+                            </div>
+                        <% } %>
                     </div>
                    
                 </div>
