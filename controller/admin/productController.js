@@ -23,22 +23,31 @@ const addProduct = async (req, res) => {
   try {
     const imageUrls = req.files.map((file) => file.path); // Cloudinary URLs
     const categoryId = await Category.findOne({ name: req.body.category }, { _id: 1 });
+    if (!categoryId) {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ message: "Invalid Category Selected" });
+    }
     let totalStocks = 0;
 
-    const variantArray = JSON.parse(JSON.stringify(req.body.variant));
-    const variants = variantArray.map((size, index) => {
-      totalStocks = totalStocks + Number(variantArray[index].stock);
+    let variantArray;
+    if (typeof req.body.variant === 'string') {
+      variantArray = JSON.parse(req.body.variant);
+    } else {
+      variantArray = req.body.variant;
+    }
+
+    const variants = variantArray.map((v) => {
+      totalStocks += Number(v.stock);
       return {
-        size: variantArray[index].size,
-        price: Number(variantArray[index].price),
-        stock: Number(variantArray[index].stock)
+        size: v.size,
+        price: Number(v.price),
+        stock: Number(v.stock)
       };
     });
 
     const newProduct = new Product({
       productName: req.body.name,
       description: req.body.description,
-      category: categoryId,
+      category: categoryId._id,
       totalStocks: totalStocks,
       regularPrice: req.body.price,
       offerPrice: req.body.offerPrice,
@@ -60,13 +69,26 @@ const productList = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+    const query = search ? { productName: { $regex: search, $options: "i" } } : {};
 
-    const totalProducts = await Product.countDocuments();
-    const products = await Product.find().
+    const totalProducts = await Product.countDocuments(query);
+    const products = await Product.find(query).
+    populate('category').
     sort({ createdAt: -1 }).
     skip(skip).
     limit(limit);
     const category = await Category.find();
+
+    if (req.query.ajax === 'true') {
+      return res.json({
+        products,
+        currentPage: page,
+        totalPages: Math.ceil(totalProducts / limit),
+        totalProducts,
+        limit
+      });
+    }
 
     res.render('add product/productList', {
       products,
@@ -90,10 +112,10 @@ const editProduct = async (req, res) => {
     const productId = req.params.id;
 
     let updatedFields = {};
-    const categoryId = await Category.find({ name: category }, { _id: 1 });
+    const categoryFound = await Category.findOne({ name: category }, { _id: 1 });
     if (productName !== undefined && productName.trim() !== '') updatedFields.productName = productName;
     if (description !== undefined && description.trim() !== '') updatedFields.description = description;
-    if (category !== undefined && category.trim() !== '') updatedFields.category = categoryId._id;
+    if (categoryFound) updatedFields.category = categoryFound._id;
     if (regularPrice !== undefined && regularPrice.trim() !== '') updatedFields.regularPrice = Number(regularPrice);
     if (offerPrice !== undefined && offerPrice.trim() !== '') updatedFields.offerPrice = Number(regularPrice) * ((100 - Number(offerPrice)) / 100);
     if (color !== undefined && color.trim() !== '') updatedFields.color = color;
@@ -136,15 +158,30 @@ const updateImages = async (req, res) => {
   try {
     const productId = req.params.id;
 
-    const imageUrls = req.files.map((file) => file.path);
+    const product = await Product.findOne({ _id: productId });
+    if (!product) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND });
+    }
 
+    let currentImages = [...product.images];
+    const newImages = req.files;
+    let indexes = req.body.indexes;
+
+    if (!Array.isArray(indexes)) {
+      indexes = [indexes];
+    }
+
+    newImages.forEach((file, i) => {
+      const targetIndex = parseInt(indexes[i]);
+      if (!isNaN(targetIndex)) {
+        currentImages[targetIndex] = file.path;
+      }
+    });
 
     const updateImg = await Product.updateOne({ _id: productId }, {
-      images: imageUrls
+      images: currentImages
     });
-    if (!updateImg) {
-      res.status(httpStatusCode.NOT_FOUND).json({ message: constants.MSG_PRODUCT_NOT_FOUND });
-    }
+
     res.status(httpStatusCode.OK).json({ message: constants.MSG_PRODUCT_UPDATED });
 
   } catch (error) {
@@ -201,9 +238,9 @@ const addVariant = async (req, res) => {
   try {
     const productId = req.params.productId;
     const { variantSize, variantPrice, variantStock } = req.body;
-    const sizeFound = await Product.findOne({ 'variant.size': variantSize });
+    const sizeFound = await Product.findOne({ _id: productId, 'variant.size': variantSize });
     if (sizeFound) {
-      return res.status(HttpStatusCode.FORBIDDEN).json({ message: `Size : ${variantSize}   Already exist` });
+      return res.status(HttpStatusCode.FORBIDDEN).json({ message: `Size : ${variantSize} already exists for this product.` });
     }
     const newVariant = {
       stock: variantStock,
