@@ -3,7 +3,26 @@ const Order = require('../../models/orderSchema');
 const exceljs = require('exceljs');
 const PDFDocument = require("pdfkit");
 const httpStatusCode = require('../../helpers/httpStatusCode');
+const constants = require('../../helpers/constants');
 
+const getOrderUserName = async (order) => {
+  if (order.userId && order.userId.name) {
+    return order.userId.name;
+  }
+  try {
+    const Address = require('../../models/addressSchema');
+    const addressDoc = await Address.findOne(
+      { 'address._id': order.address },
+      { 'address.$': 1 }
+    );
+    if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+      return addressDoc.address[0].name;
+    }
+  } catch (error) {
+    logger.error("Error fetching fallback name for sales report:", error);
+  }
+  return "Deleted User";
+};
 
 const loadSalesReportPage = async (req, res) => {
   try {
@@ -39,90 +58,109 @@ const loadSalesReportPage = async (req, res) => {
       query.createdAt = { $gte: startDate, $lte: endDate };
     }
 
-    const orders = await Order.find(query).
+    const ordersList = await Order.find(query).
     sort({ createdAt: -1 }).
     skip(skip).
     limit(limit).
     populate("userId");
 
-    const totalOrders = await Order.countDocuments(query);
-    const totalPages = Math.ceil(totalOrders / limit);
+    const ordersWithFallback = await Promise.all(ordersList.map(async (order) => {
+      const orderObj = order.toObject();
+      orderObj.fallbackName = await getOrderUserName(order);
+      return orderObj;
+    }));
+
+    const totalOrdersCount = await Order.countDocuments(query);
+    const totalPages = Math.ceil(totalOrdersCount / limit);
+
+    const allFilteredOrders = await Order.find(query);
+    const totalSales = allFilteredOrders.length;
+    const totalRevenue = allFilteredOrders.reduce((acc, curr) => acc + (curr.finalAmount || 0), 0);
+    const totalDiscount = allFilteredOrders.reduce((acc, curr) => acc + (curr.couponDiscount || 0), 0);
 
     res.render("salesReport", {
-      orders,
+      orders: ordersWithFallback,
       filter,
       customStart,
       customEnd,
       currentPage,
-      totalPages
+      totalPages,
+      totalSales,
+      totalRevenue,
+      totalDiscount
     });
   } catch (error) {
-    logger.error(error);
+    logger.error("Sales report page error:", error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
 };
 
 const exportExcel = async (req, res) => {
-  const { filter, startDate: customStart, endDate: customEnd } = req.query;
+  try {
+    const { filter, startDate: customStart, endDate: customEnd } = req.query;
 
-  let startDate, endDate;
-  const now = new Date();
+    let startDate, endDate;
+    const now = new Date();
 
-  if (filter === "daily") {
-    startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 1);
-  } else if (filter === "weekly") {
-    startDate = new Date(now);
-    startDate.setDate(now.getDate() - now.getDay());
-    startDate.setHours(0, 0, 0, 0);
-    endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 7);
-  } else if (filter === "monthly") {
-    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-  } else if (filter === "custom" && customStart && customEnd) {
-    startDate = new Date(customStart);
-    endDate = new Date(customEnd);
-    endDate.setHours(23, 59, 59, 999);
+    if (filter === "daily") {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 1);
+    } else if (filter === "weekly") {
+      startDate = new Date(now);
+      startDate.setDate(now.getDate() - now.getDay());
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 7);
+    } else if (filter === "monthly") {
+      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      endDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    } else if (filter === "custom" && customStart && customEnd) {
+      startDate = new Date(customStart);
+      endDate = new Date(customEnd);
+      endDate.setHours(23, 59, 59, 999);
+    }
+
+    const query = startDate && endDate ? { createdAt: { $gte: startDate, $lte: endDate } } : {};
+    const orders = await Order.find(query).populate("userId").sort({ createdAt: -1 });
+
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet("Sales Report");
+
+    worksheet.columns = [
+      { header: "Order ID", key: "orderId", width: 40 },
+      { header: "Name", key: "billingName", width: 30 },
+      { header: "Date", key: "date", width: 12 },
+      { header: "Discount", key: "discount", width: 12 },
+      { header: "Total", key: "total", width: 12 },
+      { header: "Payment Status", key: "paymentStatus", width: 20 },
+      { header: "Payment Method", key: "paymentMethod", width: 20 }
+    ];
+
+    worksheet.getRow(1).font = { bold: true };
+    for (const order of orders) {
+      worksheet.addRow({
+        orderId: order.orderId,
+        billingName: await getOrderUserName(order),
+        date: order.createdAt.toLocaleDateString(),
+        discount: order.couponDiscount || 0,
+        total: order.finalAmount || 0,
+        paymentStatus: order.paymentStatus,
+        paymentMethod: order.paymentMethod
+      });
+    }
+
+    res.setHeader("Content-Disposition", "attachment; filename=sales_report.xlsx");
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    logger.error("Export Excel error:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
   }
-
-  const query = startDate && endDate ? { createdAt: { $gte: startDate, $lte: endDate } } : {};
-  const orders = await Order.find(query).populate("userId");
-
-  const workbook = new exceljs.Workbook();
-  const worksheet = workbook.addWorksheet("Sales Report");
-
-  worksheet.columns = [
-  { header: "Order ID", key: "orderId", width: 40 },
-  { header: "Name", key: "billingName", width: 30 },
-  { header: "Date", key: "date", width: 12 },
-  { header: "Discount", key: "discount", width: 12 },
-  { header: "Total", key: "total", width: 12 },
-  { header: "Payment Status", key: "paymentStatus", width: 20 },
-  { header: "Payment Method", key: "paymentMethod", width: 20 }];
-
-
-  worksheet.getRow(1).font = { bold: true };
-  orders.forEach((order) => {
-    worksheet.addRow({
-      orderId: order.orderId,
-      billingName: order.userId.name,
-      date: order.createdAt.toLocaleDateString(),
-      discount: order.couponDiscount,
-      total: order.finalAmount,
-      paymentStatus: order.paymentStatus,
-      paymentMethod: order.paymentMethod
-    });
-  });
-
-  res.setHeader("Content-Disposition", "attachment; filename=sales_report.xlsx");
-  res.setHeader(
-    "Content-Type",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-  );
-  await workbook.xlsx.write(res);
-  res.end();
 };
 
 const exportPDF = async (req, res) => {
@@ -152,30 +190,38 @@ const exportPDF = async (req, res) => {
     }
 
     const query = startDate && endDate ? { createdAt: { $gte: startDate, $lte: endDate } } : {};
-    const orders = await Order.find(query).populate("userId");
+    const orders = await Order.find(query).populate("userId").sort({ createdAt: -1 });
 
     const totalSales = orders.length;
-    const totalSalesAmount = orders.reduce((sum, order) => sum + order.finalAmount, 0);
-    const totalDiscount = orders.reduce((sum, order) => sum + order.couponDiscount, 0);
+    const totalSalesAmount = orders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
+    const totalDiscount = orders.reduce((sum, order) => sum + (order.couponDiscount || 0), 0);
 
     const doc = new PDFDocument({ size: "A4", margin: 50 });
 
-    // Set headers for the PDF response
     res.setHeader("Content-Disposition", "attachment; filename=sales_report.pdf");
     res.setHeader("Content-Type", "application/pdf");
 
     doc.pipe(res);
 
-    // Generate the PDF content
     generateHeader(doc);
-    generateReportSummary(doc, { filter, totalSales, totalSalesAmount, totalDiscount });
-    generateOrdersTable(doc, orders);
+    generateReportSummary(doc, { filter: filter || 'Overall', totalSales, totalSalesAmount, totalDiscount });
+    
+    // Process names for PDF
+    const ordersWithFallback = await Promise.all(orders.map(async (order) => {
+        const orderObj = order.toObject();
+        orderObj.fallbackName = await getOrderUserName(order);
+        return orderObj;
+    }));
+    
+    generateOrdersTable(doc, ordersWithFallback);
     generateFooter(doc);
 
     doc.end();
   } catch (error) {
     logger.error("Error generating PDF:", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
+    if (!res.headersSent) {
+      res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
+    }
   }
 };
 
@@ -205,15 +251,15 @@ function generateReportSummary(doc, { filter, totalSales, totalSalesAmount, tota
   fontSize(10).
   text("Filter:", 50, summaryTop).
   font("Helvetica-Bold").
-  text(filter, 150, summaryTop).
+  text((filter || 'Overall').toUpperCase(), 150, summaryTop).
   font("Helvetica").
   text("Date Generated:", 50, summaryTop + 15).
   text(new Date().toLocaleString(), 150, summaryTop + 15).
-  text("Total Sales:", 50, summaryTop + 30).
-  text(totalSales, 150, summaryTop + 30).
-  text("Total Sales Amount:", 50, summaryTop + 45).
+  text("Total Sales Count:", 50, summaryTop + 30).
+  text(totalSales.toString(), 150, summaryTop + 30).
+  text("Total Revenue:", 50, summaryTop + 45).
   text(`₹${totalSalesAmount.toFixed(2)}/-`, 150, summaryTop + 45).
-  text("Total Discount:", 50, summaryTop + 60).
+  text("Total Discount Applied:", 50, summaryTop + 60).
   text(`₹${totalDiscount.toFixed(2)}/-`, 150, summaryTop + 60);
 
   generateHr(doc, 260);
@@ -234,10 +280,10 @@ function generateOrdersTable(doc, orders) {
       doc,
       position,
       index + 1,
-      order._id,
-      order.userId.name || "N/A",
-      `₹${order.couponDiscount.toFixed(2)}`,
-      `₹${order.finalAmount.toFixed(2)}`,
+      order.orderId || "N/A",
+      order.fallbackName || "Deleted User",
+      `₹${(order.couponDiscount || 0).toFixed(2)}`,
+      `₹${(order.finalAmount || 0).toFixed(2)}`,
       new Date(order.createdAt).toLocaleDateString()
     );
 
@@ -281,12 +327,8 @@ function generateHr(doc, y) {
   stroke();
 }
 
-
-
-
-
 module.exports = {
   loadSalesReportPage,
-  exportExcel, // Add exportExcel function to exports
-  exportPDF // Add exportPDF function to exports
+  exportExcel,
+  exportPDF
 };

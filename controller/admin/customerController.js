@@ -5,45 +5,53 @@ const constants = require('../../helpers/constants');
 
 const customerInfo = async (req, res) => {
   try {
-    let search = '';
-    if (req.query.search) {
-      search = req.query.search;
-
-    }
-    let page = 1;
-    if (req.query.page) {
-      page = parseInt(req.query.page);
-    }
-    const limit = 3;
-    const userData = await User.find({
-      isAdmin: false,
+    let search = req.query.search || "";
+    let page = parseInt(req.query.page) || 1;
+    const limit = 10;
+    
+    // Escape special regex characters to prevent crashes
+    const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    
+    // Using $ne: true is safer as it includes both false and undefined/null values
+    const filter = {
+      isAdmin: { $ne: true },
       $or: [
-      { name: { $regex: ".*" + search + ".*" } },
-      { email: { $regex: ".*" + search + ".*" } }]
+        { name: { $regex: escapedSearch, $options: 'i' } },
+        { email: { $regex: escapedSearch, $options: 'i' } }
+      ]
+    };
 
-    }).
-    limit(limit * 1).
-    skip((page - 1) * limit).
-    exec();
+    const userData = await User.find(filter)
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .exec();
 
-    const count = await User.find({
-      isAdmin: false,
-      $or: [
-      { name: { $regex: ".*" + search + ".*" } },
-      { email: { $regex: ".*" + search + ".*" } }]
-
-    }).countDocuments();
-
+    const count = await User.countDocuments(filter);
     const totalPages = Math.ceil(count / limit);
+
+    if (req.query.ajax === 'true') {
+      return res.json({
+        userData,
+        currentPage: page,
+        totalPages,
+        search
+      });
+    }
 
     res.render('customer', {
       userData,
       currentPage: page,
-      totalPages
+      totalPages,
+      search: search
     });
 
   } catch (error) {
-    logger.error("error in customer page", error);
+    logger.error("CRITICAL ERROR in customerInfo controller:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR || 500).json({ 
+      success: false, 
+      message: "Server query failed", 
+      error: error.toString() 
+    });
   }
 };
 
