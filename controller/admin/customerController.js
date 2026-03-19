@@ -14,12 +14,12 @@ const customerInfo = async (req, res) => {
     if (req.query.page) {
       page = parseInt(req.query.page);
     }
-    const limit = 3;
+    const limit = 10;
     const userData = await User.find({
       isAdmin: false,
       $or: [
-      { name: { $regex: ".*" + search + ".*" } },
-      { email: { $regex: ".*" + search + ".*" } }]
+      { name: { $regex: ".*" + search + ".*", $options: 'i' } },
+      { email: { $regex: ".*" + search + ".*", $options: 'i' } }]
 
     }).
     limit(limit * 1).
@@ -29,8 +29,8 @@ const customerInfo = async (req, res) => {
     const count = await User.find({
       isAdmin: false,
       $or: [
-      { name: { $regex: ".*" + search + ".*" } },
-      { email: { $regex: ".*" + search + ".*" } }]
+      { name: { $regex: ".*" + search + ".*", $options: 'i' } },
+      { email: { $regex: ".*" + search + ".*", $options: 'i' } }]
 
     }).countDocuments();
 
@@ -39,7 +39,8 @@ const customerInfo = async (req, res) => {
     res.render('customer', {
       userData,
       currentPage: page,
-      totalPages
+      totalPages,
+      search: search
     });
 
   } catch (error) {

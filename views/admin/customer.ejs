@@ -14,8 +14,12 @@
         <div class="card mb-4">
             <header class="card-header">
                 <div class="row gx-3">
-                   
-                    
+                    <div class="col-lg-4 col-md-6 me-auto">
+                        <form action="/admin/customers/" method="get" class="d-flex">
+                            <input type="text" placeholder="Search..." class="form-control" name="search" value="<%=locals.search || ''%>">
+                            <button class="btn btn-light bg-white" type="submit"><i class="material-icons md-search"></i></button>
+                        </form>
+                    </div>
                 </div>
             </header>
             <!-- card-header end// -->
@@ -77,18 +81,24 @@
         <div class="pagination-area mt-15 mb-50">
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-start">
+                    <% const searchParam = locals.search ? `&search=${locals.search}` : '' %>
+                    <li class="page-item <%= (currentPage === 1) ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %><%= searchParam %>">
+                            <i class="material-icons md-chevron_left"></i>
+                        </a>
+                    </li>
                     <% for (let i=1; i <=totalPages; i++) { %>
                         <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
-                            <a class="page-link" href="?page=<%= i %>">
+                            <a class="page-link" href="?page=<%= i %><%= searchParam %>">
                                 <%= i %>
                             </a>
                         </li>
-                        <% } %>
-                            <li class="page-item <%= (currentPage === totalPages) ? 'disabled' : '' %>">
-                                <a class="page-link" href="?page=<%= currentPage + 1 %>">
-                                    <i class="material-icons md-chevron_right"></i>
-                                </a>
-                            </li>
+                    <% } %>
+                    <li class="page-item <%= (currentPage === totalPages || totalPages === 0) ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %><%= searchParam %>">
+                            <i class="material-icons md-chevron_right"></i>
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
