@@ -108,7 +108,7 @@
                                                 data-images='<%= products[i].images.length > 0 ? JSON.stringify(products[i].images) : "[]" %>'>
                                                 <i class="fa-solid fa-image"></i>
                                             </button>
-                                            <a href="/admin/products/<%=products[i]._id%>/variants/0/edit" class="btn btn-outline-secondary">
+                                            <a href="/admin/products/<%=products[i]._id%>/variants/0" class="btn btn-outline-secondary">
                                                 <i class="fa-solid fa-layer-group"></i>
                                             </a>
                                             <%if(products[i].isBlocked){%>
@@ -614,7 +614,7 @@
                                 data-images='${JSON.stringify(product.images)}'>
                                 <i class="fa-solid fa-image"></i>
                             </button>
-                            <a href="/admin/products/${product._id}/variants/0/edit" class="btn btn-outline-secondary">
+                            <a href="/admin/products/${product._id}/variants/0" class="btn btn-outline-secondary">
                                 <i class="fa-solid fa-layer-group"></i>
                             </a>
                             ${product.isBlocked ? `

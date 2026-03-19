@@ -135,6 +135,11 @@
                                 confirmButtonText: 'Okay'
                             })
                 }
+                Swal.fire({
+                    title: 'Updating...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
                 axios.put(`/admin/products/${productId}/variants/${variantId}`, {
                     variantPrice: Number(variantPrice.value),
                     variantStock: Number(variantStock.value)
@@ -159,6 +164,11 @@
             }
 
             function blockVariant(productId, variantId) {
+                Swal.fire({
+                    title: 'Blocking...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
                 axios.patch(`/admin/products/${productId}/variants/${variantId}/block`)
                     .then(res => {
                         if (res.status == 200) {
@@ -174,6 +184,11 @@
                     })
             }
             function unblockVariant(productId, variantId) {
+                Swal.fire({
+                    title: 'Unblocking...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
                 axios.patch(`/admin/products/${productId}/variants/${variantId}/unblock`)
                     .then(res => {
                         if (res.status == 200) {
@@ -228,6 +243,11 @@
                     return;
                 }
 
+                Swal.fire({
+                    title: 'Adding variant...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
                 axios.post(`/admin/products/${productId}/variants`, {
                     variantSize: variantSize.toUpperCase(),
                     variantPrice,
