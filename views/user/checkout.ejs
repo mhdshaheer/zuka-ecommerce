@@ -437,7 +437,7 @@
                                     icon: 'success',
                                     confirmButtonText: 'Okay'
                                 }).then(() => {
-                                    window.location.href = `/orderSuccess?id=${verification.data.orderId}`;
+                                    window.location.href = `/orders/success?id=${verification.data.orderId}`;
                                 });
                             } else {
                                 Swal.fire({

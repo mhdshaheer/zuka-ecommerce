@@ -205,34 +205,46 @@
                         <i class="fa-solid fa-circle-check fa-4x" style="color: #1ca61e; "></i>
                     </div>
                     <h2 class="order-success__title">Order Placed Successfully!</h2>
-                    <p class="order-success__message">Thank you for shopping with us. Your order has been successfully placed.</p>
+                    <p class="order-success__message">Thank you for shopping with us. Your order has been successfully placed and will be processed shortly.</p>
                 </div>
     
-                <!-- Center-aligned Order Summary -->
-                <div class="order-success__details text-center">
-                    <h3 class="order-success__subtitle">Order Summary</h3>
-                    <ul class="order-summary-list">
-                        <li><strong>Order ID:</strong> <span id="orderId">#<%=order.orderId%></span></li>
-                        <li><strong>Total Price:</strong> Rs. <span id="totalPrice"><%=order.finalAmount.toFixed(0)%></span></li>
-                        <li><strong>Payment Method:</strong> <span id="paymentMethod"><%=order.paymentMethod%></span></li>
-                        <li><strong>Shipping Address:</strong></li>
-                        <li id="shippingAddress">
-                            <% if(address) { %>
-                                <%=address.address%> <br> 
-                                <%=address.city%> <br> 
-                                <%=address.state%> <br> 
-                                <%=address.country%> <br> 
-                                <%=address.phone%>
-                            <% } else { %>
-                                Address not found
-                            <% } %>
-                        </li>
-                    </ul>
+                <!-- Order Summary -->
+                <div class="order-success__details pb-4">
+                    <h3 class="order-success__subtitle text-center mb-4">Order Summary</h3>
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-md-8">
+                            <ul class="order-summary-list w-100 px-4">
+                                <li class="d-flex justify-content-between border-bottom pb-2">
+                                    <strong>Order ID:</strong> <span>#<%= order.orderId.substring(0, 8).toUpperCase() %></span>
+                                </li>
+                                <li class="d-flex justify-content-between border-bottom py-2">
+                                    <strong>Total Price:</strong> <span class="text-success font-weight-bold">Rs. <%= order.finalAmount.toFixed(0) %></span>
+                                </li>
+                                <li class="d-flex justify-content-between border-bottom py-2">
+                                    <strong>Payment Method:</strong> <span><%= order.paymentMethod %></span>
+                                </li>
+                                <li class="py-2">
+                                    <strong>Shipping Address:</strong>
+                                    <div class="mt-2 text-muted" style="line-height: 1.6;">
+                                        <% if (address) { %>
+                                            <strong><%= address.name %></strong><br>
+                                            <%= address.address %><br>
+                                            <%= address.city %>, <%= address.state %> <%= address.pincode %><br>
+                                            <%= address.country %><br>
+                                            <i class="fa fa-phone me-1"></i> <%= address.phone %>
+                                        <% } else { %>
+                                            <span class="text-danger">Address details not available</span>
+                                        <% } %>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
     
-                <div class="order-success__actions text-center">
-                    <a href="/" class="btn btn-dark">Continue Shopping</a>
-                    <a href="/orders" class="btn btn-secondary">View Orders</a>
+                <div class="order-success__actions mt-4">
+                    <a href="/" class="btn btn-dark px-4 py-2 my-2">Continue Shopping</a>
+                    <a href="/orders" class="btn btn-outline-secondary px-4 py-2 my-2">View My Orders</a>
                 </div>
             </div>
         </div>
