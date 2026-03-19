@@ -50,6 +50,35 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const Wishlist = require('./models/wishlistSchema');
+const Cart = require('./models/cartSchema');
+
+app.use(async (req, res, next) => {
+  try {
+    const user = req.session.user || req.session.googleUser;
+    if (user) {
+      const [wishlist, cart] = await Promise.all([
+        Wishlist.findOne({ userId: user._id }),
+        Cart.findOne({ userId: user._id })
+      ]);
+      res.locals.wishlistCount = wishlist ? wishlist.products.length : 0;
+      res.locals.cartCount = cart ? cart.items.length : 0;
+      res.locals.wishlistProductIds = wishlist ? wishlist.products.map(p => p.productId.toString()) : [];
+    } else {
+      res.locals.wishlistCount = 0;
+      res.locals.cartCount = 0;
+      res.locals.wishlistProductIds = [];
+    }
+    next();
+  } catch (error) {
+    logger.error("Error in header data middleware:", error);
+    res.locals.wishlistCount = 0;
+    res.locals.cartCount = 0;
+    res.locals.wishlistProductIds = [];
+    next();
+  }
+});
+
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
 app.use("/payment", paymentRouter);

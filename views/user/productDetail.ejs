@@ -240,8 +240,15 @@
                                                     <input id="itemQuantity" type="text" value="1" readonly>
                                                 </div>
                                             </div>
-                                            <a onclick="selectSize()" class="primary-btn text-light" id="addToCart">add
-                                                to cart</a>
+                                            <a onclick="selectSize()" class="primary-btn text-light" style="cursor: pointer;" id="addToCart">add to cart</a>
+                                        </div>
+                                        <div class="product__details__btns__option mt-3">
+                                            <a href="#" onclick="addToWishlist('<%= product[0]._id %>', event)" class="text-dark text-decoration-none">
+                                                <i class="<%= wishlistProductIds.includes(product[0]._id.toString()) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> wishlist-icon-<%= product[0]._id %>"></i>
+                                                <span class="wishlist-text-<%= product[0]._id %> ms-1">
+                                                    <%= wishlistProductIds.includes(product[0]._id.toString()) ? 'Remove from wishlist' : 'Add to wishlist' %>
+                                                </span>
+                                            </a>
                                         </div>
 
 
@@ -395,75 +402,95 @@
             </script>
 
             <script>
-                let itemStock = null
+                let currentSize = null;
+                let currentStock = null;
+                let currentProductObj = null;
                 const addToCart = document.getElementById('addToCart');
-                const itemSize = document.getElementById('itemSize');
-                const sizeLabel = document.getElementById('sizeLabel')
-                const itemColor = document.getElementById('itemColor')
-                const itemQuantity = document.getElementById('itemQuantity')
+                const itemQuantity = document.getElementById('itemQuantity');
+
                 function itemSizeFun(size, stock, product) {
-                    addToCart.onclick = null;
-                    addToCart.addEventListener('click', (e) => {
-
-                        e.preventDefault();
-
-                        itemStock = stock;
-                        if (Number(stock) < Number(itemQuantity.value)) {
-                            return Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Quantity exceeded!',
-                                confirmButtonText: 'OK'
-                            })
-                        }
-                        const productObj = JSON.parse(product)
-                        axios.post('/cart/items', {
-                            size,
-                            stock,
-                            productObj,
-                            quantity: itemQuantity.value
-                        })
-                            .then(res => {
-                                if (res.status == 200) {
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        text: 'Product added to cart successfully!',
-                                        icon: 'success',
-                                        confirmButtonText: 'Okay'
-                                    })
-                                }
-                            }).catch((error) => {
-                                if (error.response && error.response.data.itemFound) {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Item exist',
-                                        text: 'Item already exist on cart!',
-                                        confirmButtonText: 'OK'
-                                    })
-                                } else if (error.response && error.response.status === 404 && !error.response.data.itemFound) {
-
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Please login first!',
-                                        confirmButtonText: 'OK'
-                                    }).then(() => {
-                                        window.location.href = '/login'
-                                    })
-                                } else {
-                                    // Handle other errors
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'An Error Occurred',
-                                        text: error.message,
-                                        confirmButtonText: 'OK'
-                                    });
-                                }
-                            })
-
-                    })
+                    currentSize = size;
+                    currentStock = stock;
+                    currentProductObj = JSON.parse(product);
+                    
+                    // If it still has the initial selectSize onclick, switch to the actual handler
+                    if (addToCart.onclick) {
+                        addToCart.onclick = null;
+                        addToCart.addEventListener('click', handleAddToCartAction);
+                    }
                 }
 
+                async function handleAddToCartAction(e) {
+                    e.preventDefault();
+                    
+                    if (addToCart.classList.contains('loading')) return;
+
+                    if (Number(currentStock) < Number(itemQuantity.value)) {
+                        return Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Quantity exceeded!',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+
+                    // Set loading state
+                    const originalContent = addToCart.innerHTML;
+                    addToCart.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...`;
+                    addToCart.classList.add('loading');
+                    addToCart.style.pointerEvents = 'none';
+
+                    try {
+                        const res = await axios.post('/cart/items', {
+                            size: currentSize,
+                            stock: currentStock,
+                            productObj: currentProductObj,
+                            quantity: itemQuantity.value
+                        });
+
+                        if (res.status == 200) {
+                            if (res.data.cartCount !== undefined) {
+                                window.updateCartBadge(res.data.cartCount);
+                            }
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Product added to cart successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            });
+                        }
+                    } catch (error) {
+                        if (error.response && error.response.data.itemFound) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Item exist',
+                                text: 'Item already exist on cart!',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (error.response && error.response.status === 404 && !error.response.data.itemFound) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Please login first!',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '/login';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'An Error Occurred',
+                                text: error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } finally {
+                        // Reset button state
+                        addToCart.innerHTML = originalContent;
+                        addToCart.classList.remove('loading');
+                        addToCart.style.pointerEvents = 'auto';
+                    }
+                }
             </script>
             <script>
                 //Stock add field
@@ -504,6 +531,59 @@
                         icon: 'warning',
                         confirmButtonText: 'Okay'
                     })
+                }
+
+                function addToWishlist(productId, event) {
+                    event.preventDefault();
+                    axios.post('/wishlist', { productId })
+                        .then((res) => {
+                            if (res.data.wishlistCount !== undefined) {
+                                window.updateWishlistBadge(res.data.wishlistCount);
+                            }
+
+                            // Update Icons and Text
+                            const icons = document.querySelectorAll(`.wishlist-icon-${productId}`);
+                            const texts = document.querySelectorAll(`.wishlist-text-${productId}`);
+                            
+                            icons.forEach(icon => {
+                                if (res.data.added) {
+                                    icon.classList.remove('fa-heart-o');
+                                    icon.classList.add('fa-heart');
+                                } else {
+                                    icon.classList.remove('fa-heart');
+                                    icon.classList.add('fa-heart-o');
+                                }
+                            });
+
+                            texts.forEach(text => {
+                                text.innerText = res.data.added ? 'Remove from wishlist' : 'add to wishlist';
+                            });
+                            
+                            const toastConfig = {
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            };
+
+                            Swal.fire({
+                                ...toastConfig,
+                                icon: 'success',
+                                title: res.data.message
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Please login first!',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            }).then(() => window.location.href = "/login")
+                        });
                 }
             </script>
 

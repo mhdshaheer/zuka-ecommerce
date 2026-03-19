@@ -65,16 +65,28 @@ const loadShop = async (req, res) => {
 
     // Execute queries
     const [products, totalProducts, category] = await Promise.all([
-    Product.find(query).
-    populate('category').
-    sort(sortOptions).
-    skip(skip).
-    limit(limit),
-    Product.countDocuments({ isBlocked: false }),
-    Category.find()]
-    );
+      Product.find(query).
+      populate('category').
+      sort(sortOptions).
+      skip(skip).
+      limit(limit),
+      Product.countDocuments(query),
+      Category.find()
+    ]);
 
     const totalPages = Math.ceil(totalProducts / limit);
+
+    if (req.query.ajax) {
+      return res.json({
+        products,
+        totalProducts,
+        totalPages,
+        currentPage: page,
+        search,
+        sort,
+        categoryId
+      });
+    }
 
     res.render('shop', {
       activePage: 'shop',
@@ -93,7 +105,7 @@ const loadShop = async (req, res) => {
 
   } catch (error) {
     logger.error("error in shop page", error);
-    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('error', { message: constants.MSG_INTERNAL_SERVER_ERROR });
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('page_404', { message: constants.MSG_INTERNAL_SERVER_ERROR });
   }
 };
 
@@ -263,7 +275,7 @@ const addToCart = async (req, res) => {
         { upsert: true, new: true }
       );
       if (toCart) {
-        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
+        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS, cartCount: toCart.items.length });
       }
     }
   } catch (error) {
@@ -284,7 +296,11 @@ const deleteFromCart = async (req, res) => {
     const cartItems = await Cart.find({ userId: user._id });
 
     if (result) {
-      res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS, cartItems });
+      res.status(httpStatusCode.OK).json({ 
+        message: constants.MSG_SUCCESS, 
+        cartItems, 
+        cartCount: cartItems[0] ? cartItems[0].items.length : 0 
+      });
     }
 
   } catch (error) {
@@ -462,30 +478,43 @@ const loadWishlist = async (req, res) => {
     const wishlist = await Wishlist.findOne({ userId: user._id }).populate('products.productId');
     res.render('wishlist', {
       activePage: '',
-      wishProducts: wishlist.products,
+      wishProducts: wishlist ? wishlist.products : [],
       user
     });
   } catch (error) {
     logger.error(error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).render('page_404', { message: constants.MSG_INTERNAL_SERVER_ERROR });
   }
 };
 
 const addToWishlist = async (req, res) => {
   try {
     const user = req.session.user || req.session.googleUser;
-
     const { productId } = req.body;
-    const wishlistExist = await Wishlist.findOne({ userId: user._id });
+    let wishlistExist = await Wishlist.findOne({ userId: user._id });
 
     if (wishlistExist) {
-      const isIncluded = wishlistExist.products.some((item) =>
-      item.productId.equals(new mongoose.Types.ObjectId(productId))
-      );
+        const isIncluded = wishlistExist.products.some((item) =>
+            item.productId.equals(new mongoose.Types.ObjectId(productId))
+        );
 
-      if (isIncluded) {
-        return res.status(httpStatusCode.CREATED).json({ message: constants.MSG_PRODUCT_ALREADY_EXIST });
-      }
+        if (isIncluded) {
+            // Remove from wishlist (toggle off)
+            const updatedWishlist = await Wishlist.findOneAndUpdate(
+                { userId: user._id },
+                { $pull: { products: { productId: productId } } },
+                { new: true }
+            );
+            return res.status(httpStatusCode.OK).json({ 
+                success: true, 
+                added: false, 
+                message: "Removed from Wishlist", 
+                wishlistCount: updatedWishlist.products.length 
+            });
+        }
     }
+
+    // Add to wishlist (toggle on)
     const addWishlist = await Wishlist.findOneAndUpdate(
       { userId: user._id },
       {
@@ -499,7 +528,12 @@ const addToWishlist = async (req, res) => {
       { new: true, upsert: true }
     );
     if (addWishlist) {
-      res.status(httpStatusCode.OK).json({ success: true });
+      res.status(httpStatusCode.OK).json({ 
+        success: true, 
+        added: true, 
+        message: "Added to Wishlist", 
+        wishlistCount: addWishlist.products.length 
+      });
     }
   } catch (error) {
     logger.error(error);
