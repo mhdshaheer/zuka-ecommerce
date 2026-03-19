@@ -9,13 +9,10 @@ const mongoose = require('mongoose');
 const Order = require('../../models/orderSchema');
 const Wallet = require('../../models/walletSchema');
 const bcrypt = require('bcrypt');
-const puppeteer = require('puppeteer');
-const axios = require('axios');
-const { truncateSync } = require('fs-extra');
-const env = require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
+const nodemailer = require('nodemailer');
 const httpStatusCode = require('../../helpers/httpStatusCode');
 
 //===================================================
@@ -127,7 +124,7 @@ const logout = async (req, res) => {
 //===================== otp generation ============================
 
 function generateOtp() {
-  return Math.floor(100000 + Math.random() * 90000).toString();
+  return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 //================= sent & resent otp for signUp ================================
@@ -160,46 +157,43 @@ const resentOtp = async (req, res) => {
 // sent mail to user mail
 async function sendEmailVerify(email, otp) {
   try {
-    const RESEND_API_KEY = process.env.RESEND_API_KEY;
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD
+      }
+    });
 
-    if (RESEND_API_KEY) {
-      const response = await axios.post('https://api.resend.com/emails', {
-        from: 'Zuka Sports <onboarding@resend.dev>',
-        to: email,
-        subject: "Verify Your Email - Zuka Sports",
-        html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2>Verify Your Email</h2>
-                <p>Your OTP for Zuka Sports is: <b style="font-size: 24px;">${otp}</b></p>
-                <p>This code expires in 10 minutes.</p>
-              </div>`
-      }, {
-        headers: { 'Authorization': `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' }
-      });
-      if (response.status === 200 || response.status === 201) return true;
-    }
+    const mailOptions = {
+      from: `Zuka Sports <${process.env.NODEMAILER_EMAIL}>`,
+      to: email,
+      subject: "Verify Your Email - Zuka Sports",
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-top: 5px solid #0d0d0d; border-radius: 10px; max-width: 500px; margin: auto;">
+          <h2 style="color: #0d0d0d; text-align: center;">Welcome to Züka!</h2>
+          <p style="font-size: 16px; color: #555;">To complete your registration, please verify your email addresses by entering the OTP code below:</p>
+          <div style="background: #f4f4f4; padding: 15px; text-align: center; border-radius: 8px; margin: 20px 0;">
+            <b style="font-size: 32px; letter-spacing: 5px; color: #0d0d0d;">${otp}</b>
+          </div>
+          <p style="font-size: 14px; color: #777; text-align: center;">This code expires in <b>10 minutes</b>. If you didn't request this, you can safely ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 12px; color: #999; text-align: center;">Züka Sports &copy; 2024</p>
+        </div>`
+    };
 
-    if (BREVO_API_KEY) {
-      const resp = await axios.post('https://api.brevo.com/v3/smtp/email', {
-        sender: { name: "Zuka Sports", email: "onboarding@resend.dev" },
-        to: [{ email: email }],
-        subject: "Verify Your Email",
-        htmlContent: `<h3>Your OTP is: ${otp}</h3>`
-      }, {
-        headers: { 'api-key': BREVO_API_KEY, 'content-type': 'application/json' }
-      });
-      if (resp.status === 201 || resp.status === 200) return true;
-    }
+    const info = await transporter.sendMail(mailOptions);
+    logger.info("Email sent: %s", info.messageId);
+    return true;
 
+  } catch (error) {
+    logger.error("Error sending email", error);
+    // Log OTP to console as fallback for development
     console.log("-----------------------------------------");
-    console.log(`!!! EMAIL DELIVERY FAILED OR RESTRICTED !!!`);
+    console.log(`!!! EMAIL DELIVERY FAILED !!!`);
     console.log(`TARGET EMAIL: ${email}`);
     console.log(`OTP FOR TESTING: ${otp}`);
     console.log("-----------------------------------------");
-    return true; 
-
-  } catch (error) {
-    console.log(`[BACKUP LOG] OTP for ${email}: ${otp}`);
     return true; 
   }
 }
