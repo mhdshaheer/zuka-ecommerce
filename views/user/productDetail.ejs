@@ -395,75 +395,92 @@
             </script>
 
             <script>
-                let itemStock = null
+                let currentSize = null;
+                let currentStock = null;
+                let currentProductObj = null;
                 const addToCart = document.getElementById('addToCart');
-                const itemSize = document.getElementById('itemSize');
-                const sizeLabel = document.getElementById('sizeLabel')
-                const itemColor = document.getElementById('itemColor')
-                const itemQuantity = document.getElementById('itemQuantity')
+                const itemQuantity = document.getElementById('itemQuantity');
+
                 function itemSizeFun(size, stock, product) {
-                    addToCart.onclick = null;
-                    addToCart.addEventListener('click', (e) => {
-
-                        e.preventDefault();
-
-                        itemStock = stock;
-                        if (Number(stock) < Number(itemQuantity.value)) {
-                            return Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Quantity exceeded!',
-                                confirmButtonText: 'OK'
-                            })
-                        }
-                        const productObj = JSON.parse(product)
-                        axios.post('/cart/items', {
-                            size,
-                            stock,
-                            productObj,
-                            quantity: itemQuantity.value
-                        })
-                            .then(res => {
-                                if (res.status == 200) {
-                                    Swal.fire({
-                                        title: 'Success!',
-                                        text: 'Product added to cart successfully!',
-                                        icon: 'success',
-                                        confirmButtonText: 'Okay'
-                                    })
-                                }
-                            }).catch((error) => {
-                                if (error.response && error.response.data.itemFound) {
-                                    Swal.fire({
-                                        icon: 'warning',
-                                        title: 'Item exist',
-                                        text: 'Item already exist on cart!',
-                                        confirmButtonText: 'OK'
-                                    })
-                                } else if (error.response && error.response.status === 404 && !error.response.data.itemFound) {
-
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Error',
-                                        text: 'Please login first!',
-                                        confirmButtonText: 'OK'
-                                    }).then(() => {
-                                        window.location.href = '/login'
-                                    })
-                                } else {
-                                    // Handle other errors
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'An Error Occurred',
-                                        text: error.message,
-                                        confirmButtonText: 'OK'
-                                    });
-                                }
-                            })
-
-                    })
+                    currentSize = size;
+                    currentStock = stock;
+                    currentProductObj = JSON.parse(product);
+                    
+                    // If it still has the initial selectSize onclick, switch to the actual handler
+                    if (addToCart.onclick) {
+                        addToCart.onclick = null;
+                        addToCart.addEventListener('click', handleAddToCartAction);
+                    }
                 }
 
+                async function handleAddToCartAction(e) {
+                    e.preventDefault();
+                    
+                    if (addToCart.classList.contains('loading')) return;
+
+                    if (Number(currentStock) < Number(itemQuantity.value)) {
+                        return Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Quantity exceeded!',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+
+                    // Set loading state
+                    const originalContent = addToCart.innerHTML;
+                    addToCart.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...`;
+                    addToCart.classList.add('loading');
+                    addToCart.style.pointerEvents = 'none';
+
+                    try {
+                        const res = await axios.post('/cart/items', {
+                            size: currentSize,
+                            stock: currentStock,
+                            productObj: currentProductObj,
+                            quantity: itemQuantity.value
+                        });
+
+                        if (res.status == 200) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: 'Product added to cart successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Okay'
+                            });
+                        }
+                    } catch (error) {
+                        if (error.response && error.response.data.itemFound) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Item exist',
+                                text: 'Item already exist on cart!',
+                                confirmButtonText: 'OK'
+                            });
+                        } else if (error.response && error.response.status === 404 && !error.response.data.itemFound) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Please login first!',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href = '/login';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'An Error Occurred',
+                                text: error.message,
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    } finally {
+                        // Reset button state
+                        addToCart.innerHTML = originalContent;
+                        addToCart.classList.remove('loading');
+                        addToCart.style.pointerEvents = 'auto';
+                    }
+                }
             </script>
             <script>
                 //Stock add field

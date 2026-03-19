@@ -14,6 +14,9 @@ const userAuth = (req,res,next)=>{
                 next();
             }else{
                 req.session.destroy()
+                if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+                    return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: 'Please login first!' });
+                }
                 res.redirect("/login");
             }
         }).catch(err=>{
@@ -21,7 +24,10 @@ const userAuth = (req,res,next)=>{
             res.status(httpStatusCode.INTERNAL_SERVER_ERROR).send(constants.MSG_SERVER_ERROR);
         })
     }else{
-    req.session.destroy()
+        req.session.destroy();
+        if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+            return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: 'Please login first!' });
+        }
         res.redirect('/login');
     }
 }
@@ -31,6 +37,9 @@ const adminAuth = (req, res, next) => {
     if (req.session.admin) {
         next();
     } else {
+        if (req.xhr || (req.headers.accept && req.headers.accept.includes('application/json'))) {
+            return res.status(httpStatusCode.UNAUTHORIZED).json({ success: false, message: 'Admin login required' });
+        }
         res.redirect('/admin/login');
     }
 }
