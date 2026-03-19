@@ -4,22 +4,68 @@ const Product = require('../../models/productSchema');
 const Order = require('../../models/orderSchema');
 const Address = require('../../models/addressSchema');
 const httpStatusCode = require('../../helpers/httpStatusCode');
+const constants = require('../../helpers/constants');
 
 const loadOrderList = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = 12;
     const skip = (page - 1) * limit;
+    const status = req.query.status || "";
+    const sort = req.query.sort || "newest";
 
+    const filter = {};
+    if (status) filter.status = status;
 
-    const orders = await Order.find().populate('userId').sort({ createdAt: -1 }).skip(skip).limit(limit);
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    else if (sort === "total-high") sortOption = { finalAmount: -1 };
+    else if (sort === "total-low") sortOption = { finalAmount: 1 };
 
-    const totalOrders = await Order.countDocuments();
+    const ordersList = await Order.find(filter)
+      .populate('userId')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit);
+
+    // Process orders to fix "User Not Found" by falling back to address name
+    const orders = await Promise.all(ordersList.map(async (order) => {
+      const orderData = order.toObject();
+      if (!orderData.userId || !orderData.userId.name) {
+        try {
+          const addressDoc = await Address.findOne(
+            { 'address._id': order.address },
+            { 'address.$': 1 }
+          );
+          if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+            orderData.userNameFallback = addressDoc.address[0].name;
+          }
+        } catch (error) {
+          logger.error("Error fetching fallback name for order:", order._id, error);
+        }
+      }
+      return orderData;
+    }));
+
+    const totalOrders = await Order.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
+
+    if (req.query.ajax === 'true') {
+      return res.json({
+        orders,
+        currentPage: page,
+        totalPages,
+        status,
+        sort
+      });
+    }
+
     res.render('orderList', {
       orders,
       currentPage: page,
-      totalPages
+      totalPages,
+      status,
+      sort
     });
   } catch (error) {
     res.redirect("/admin/login");

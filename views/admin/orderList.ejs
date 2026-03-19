@@ -1,5 +1,17 @@
 <%-include('../../views/partials/admin/adminHeader')%>
-            <section class="content-main">
+<% 
+const getStatusClassServer = (status) => {
+    switch(status) {
+        case 'Cancelled': return 'alert-danger';
+        case 'Delivered': return 'alert-primary';
+        case 'Shipped': return 'alert-success';
+        case 'Processing': return 'alert-info';
+        case 'Returned': return 'alert-warning';
+        default: return 'alert-warning';
+    }
+}
+%>
+<section class="content-main">
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Order List</h2>
@@ -7,8 +19,31 @@
                 </div>
                 <div class="card mb-4">
                     <header class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="Pending" <%=status==='Pending'?'selected':''%>>Pending</option>
+                                    <option value="Processing" <%=status==='Processing'?'selected':''%>>Processing</option>
+                                    <option value="Shipped" <%=status==='Shipped'?'selected':''%>>Shipped</option>
+                                    <option value="Delivered" <%=status==='Delivered'?'selected':''%>>Delivered</option>
+                                    <option value="Cancelled" <%=status==='Cancelled'?'selected':''%>>Cancelled</option>
+                                    <option value="Return Requested" <%=status==='Return Requested'?'selected':''%>>Return Requested</option>
+                                    <option value="Returned" <%=status==='Returned'?'selected':''%>>Returned</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <label class="form-label">Sort by</label>
+                                <select class="form-select" id="sortOption">
+                                    <option value="newest" <%=sort==='newest'?'selected':''%>>Newest First</option>
+                                    <option value="oldest" <%=sort==='oldest'?'selected':''%>>Oldest First</option>
+                                    <option value="total-high" <%=sort==='total-high'?'selected':''%>>Amount: High to Low</option>
+                                    <option value="total-low" <%=sort==='total-low'?'selected':''%>>Amount: Low to High</option>
+                                </select>
+                            </div>
+                        </div>
                     </header>
-                    <!-- card-header end// -->
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -23,29 +58,33 @@
                                         <th scope="col" class="text-end">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="orderTableBody">
                                     <%orders.map((item,index)=>{%>
                                     <tr>
                                         <td>#<%=item.orderId%></td>
-                                        <td><b><%= item.userId ? item.userId.name : 'User Not Found' %></b></td>
+                                        <td><b><%= item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found') %></b></td>
                                         <td><%=item.paymentMethod%></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
-                                        <%if(item.status==='Cancelled'){%>
-                                            <td><span class="badge rounded-pill alert-danger"><%=item.status%></span></td>
-                                            <%}else if(item.status==='Delivered'){%>
-                                                <td><span class="badge rounded-pill alert-primary"><%=item.status%></span></td>
-
-                                        <%}else{%>
-                                            <td><span class="badge rounded-pill alert-warning"><%=item.status%></span></td>
-                                        <%}%>
+                                        <td id="status-<%=item._id%>">
+                                            <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') { %>
+                                                <span class="badge rounded-pill <%= getStatusClassServer(item.status) %>"><%=item.status%></span>
+                                            <% } else { %>
+                                                <select class="form-select form-select-sm status-select" 
+                                                    onchange="updateOrderStatus('<%=item._id%>', this.value)"
+                                                    style="width: 140px; font-size: 0.75rem;">
+                                                    <option value="Pending" <%=item.status==='Pending'?'selected':''%>>Pending</option>
+                                                    <option value="Processing" <%=item.status==='Processing'?'selected':''%>>Processing</option>
+                                                    <option value="Shipped" <%=item.status==='Shipped'?'selected':''%>>Shipped</option>
+                                                    <option value="Delivered" <%=item.status==='Delivered'?'selected':''%>>Delivered</option>
+                                                    <option value="Cancelled" <%=item.status==='Cancelled'?'selected':''%>>Cancelled</option>
+                                                </select>
+                                            <% } %>
+                                        </td>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
                                         <td class="text-end">
-                                            <a href="/admin/orders/<%= item._id %>">
-                                                <button class="btn btn-primary" >
-                                                    View order
-                                                </button>
+                                            <a href="/admin/orders/<%= item._id %>" class="btn btn-sm btn-primary">
+                                                View
                                             </a>
-                                            
                                         </td>
                                     </tr>
                                     <%})%>
@@ -55,27 +94,23 @@
                     </div>
                 </div>
                 
-                <div class="pagination-area mt-15 mb-50">
+                <div class="pagination-area mt-15 mb-50" id="paginationArea">
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-start">
-                            <!-- Previous Button -->
+                            <% const searchParams = (status ? `&status=${status}` : '') + (sort ? `&sort=${sort}` : ''); %>
                             <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
-                                <a class="page-link" href="?page=<%= currentPage - 1 %>">
-                                    <i class="material-icons md-chevron_left"></i>
+                                <a class="page-link" href="?page=<%= currentPage - 1 %><%= searchParams %>">
+                                    <i class="fa-solid fa-chevron-left"></i>
                                 </a>
                             </li>
-                
-                            <!-- Page Numbers -->
                             <% for (let i = 1; i <= totalPages; i++) { %>
                                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                                    <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                                    <a class="page-link" href="?page=<%= i %><%= searchParams %>"><%= i %></a>
                                 </li>
                             <% } %>
-                
-                            <!-- Next Button -->
                             <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
-                                <a class="page-link" href="?page=<%= currentPage + 1 %>">
-                                    <i class="material-icons md-chevron_right"></i>
+                                <a class="page-link" href="?page=<%= currentPage + 1 %><%= searchParams %>">
+                                    <i class="fa-solid fa-chevron-right"></i>
                                 </a>
                             </li>
                         </ul>
@@ -83,6 +118,7 @@
                 </div>
                 
             </section>
+            <%-include('../../views/partials/admin/adminFooter')%>
 
 
 
@@ -106,7 +142,154 @@
         
 
 
-<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        const statusFilter = document.getElementById('statusFilter');
+        const sortOption = document.getElementById('sortOption');
+
+        function fetchOrders(page = 1) {
+            const status = statusFilter.value;
+            const sort = sortOption.value;
+            const url = `?page=${page}&status=${status}&sort=${sort}&ajax=true`;
+
+            Swal.fire({
+                title: 'Processing...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            axios.get(url)
+                .then(response => {
+                    const { orders, currentPage, totalPages, status, sort } = response.data;
+                    updateTable(orders);
+                    updatePagination(currentPage, totalPages, status, sort);
+                    window.history.pushState({}, '', `?page=${currentPage}&status=${status}&sort=${sort}`);
+                    Swal.close();
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Error', 'Failed to fetch orders', 'error');
+                });
+        }
+
+        function updateTable(orders) {
+            const tbody = document.getElementById('orderTableBody');
+            tbody.innerHTML = orders.map(item => `
+                <tr>
+                    <td>#${item.orderId}</td>
+                    <td><b>${item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found')}</b></td>
+                    <td>${item.paymentMethod}</td>
+                    <td>₹${item.finalAmount.toFixed(0)}</td>
+                    <td id="status-${item._id}">
+                        ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') 
+                            ? `<span class="badge rounded-pill ${getStatusClass(item.status)}">${item.status}</span>`
+                            : `<select class="form-select form-select-sm status-select" 
+                                onchange="updateOrderStatus('${item._id}', this.value)"
+                                style="width: 140px; font-size: 0.75rem;">
+                                <option value="Pending" ${item.status==='Pending'?'selected':''}>Pending</option>
+                                <option value="Processing" ${item.status==='Processing'?'selected':''}>Processing</option>
+                                <option value="Shipped" ${item.status==='Shipped'?'selected':''}>Shipped</option>
+                                <option value="Delivered" ${item.status==='Delivered'?'selected':''}>Delivered</option>
+                                <option value="Cancelled" ${item.status==='Cancelled'?'selected':''}>Cancelled</option>
+                                ${item.status === 'Return Requested' ? `<option value="Return Requested" selected>Return Requested</option>` : ''}
+                                ${item.status === 'Returned' ? `<option value="Returned" selected>Returned</option>` : ''}
+                            </select>`
+                        }
+                    </td>
+                    <td>${new Date(item.createdAt).toLocaleDateString()}</td>
+                    <td class="text-end">
+                        <a href="/admin/orders/${item._id}" class="btn btn-sm btn-primary">View</a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            Swal.fire({
+                title: 'Updating Status...',
+                text: `Changing status to ${newStatus}`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            axios.patch(`/admin/orders/${orderId}/status`, { status: newStatus })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Order status updated successfully',
+                            icon: 'success',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        
+                        // If it's a final state, convert to badge
+                        if (newStatus === 'Delivered' || newStatus === 'Cancelled' || newStatus === 'Returned') {
+                            document.getElementById(`status-${orderId}`).innerHTML = 
+                                `<span class="badge rounded-pill ${getStatusClass(newStatus)}">${newStatus}</span>`;
+                        }
+                    } else {
+                        Swal.fire('Error', response.data.message || 'Failed to update status', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Error', 'Something went wrong', 'error');
+                });
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Cancelled': return 'alert-danger';
+                case 'Delivered': return 'alert-primary';
+                case 'Shipped': return 'alert-success';
+                case 'Processing': return 'alert-info';
+                default: return 'alert-warning';
+            }
+        }
+
+        function updatePagination(currentPage, totalPages, status, sort) {
+            const paginationArea = document.getElementById('paginationArea');
+            const searchParams = (status ? `&status=${status}` : '') + (sort ? `&sort=${sort}` : '');
+            
+            let html = '<nav aria-label="Page navigation example"><ul class="pagination justify-content-start">';
+            
+            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="?page=${currentPage - 1}${searchParams}"><i class="fa-solid fa-chevron-left"></i></a>
+            </li>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="?page=${i}${searchParams}">${i}</a>
+                </li>`;
+            }
+
+            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="?page=${currentPage + 1}${searchParams}"><i class="fa-solid fa-chevron-right"></i></a>
+            </li>`;
+
+            html += '</ul></nav>';
+            paginationArea.innerHTML = html;
+        }
+
+        [statusFilter, sortOption].forEach(el => {
+            el.addEventListener('change', () => fetchOrders(1));
+        });
+
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('.page-link');
+            if (link) {
+                e.preventDefault();
+                const url = new URL(link.href, window.location.origin);
+                const page = url.searchParams.get('page');
+                fetchOrders(page);
+            }
+        });
+    </script>
 
 
         <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
