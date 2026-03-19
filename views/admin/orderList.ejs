@@ -1,5 +1,17 @@
 <%-include('../../views/partials/admin/adminHeader')%>
-            <section class="content-main">
+<% 
+const getStatusClassServer = (status) => {
+    switch(status) {
+        case 'Cancelled': return 'alert-danger';
+        case 'Delivered': return 'alert-primary';
+        case 'Shipped': return 'alert-success';
+        case 'Processing': return 'alert-info';
+        case 'Returned': return 'alert-warning';
+        default: return 'alert-warning';
+    }
+}
+%>
+<section class="content-main">
                 <div class="content-header">
                     <div>
                         <h2 class="content-title card-title">Order List</h2>
@@ -53,17 +65,19 @@
                                         <td><b><%= item.userId ? item.userId.name : 'User Not Found' %></b></td>
                                         <td><%=item.paymentMethod%></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
-                                        <td>
-                                            <% if(item.status === 'Cancelled') { %>
-                                                <span class="badge rounded-pill alert-danger"><%=item.status%></span>
-                                            <% } else if(item.status === 'Delivered') { %>
-                                                <span class="badge rounded-pill alert-primary"><%=item.status%></span>
-                                            <% } else if(item.status === 'Shipped') { %>
-                                                <span class="badge rounded-pill alert-success"><%=item.status%></span>
-                                            <% } else if(item.status === 'Processing') { %>
-                                                <span class="badge rounded-pill alert-info"><%=item.status%></span>
+                                        <td id="status-<%=item._id%>">
+                                            <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') { %>
+                                                <span class="badge rounded-pill <%= getStatusClassServer(item.status) %>"><%=item.status%></span>
                                             <% } else { %>
-                                                <span class="badge rounded-pill alert-warning"><%=item.status%></span>
+                                                <select class="form-select form-select-sm status-select" 
+                                                    onchange="updateOrderStatus('<%=item._id%>', this.value)"
+                                                    style="width: 140px; font-size: 0.75rem;">
+                                                    <option value="Pending" <%=item.status==='Pending'?'selected':''%>>Pending</option>
+                                                    <option value="Processing" <%=item.status==='Processing'?'selected':''%>>Processing</option>
+                                                    <option value="Shipped" <%=item.status==='Shipped'?'selected':''%>>Shipped</option>
+                                                    <option value="Delivered" <%=item.status==='Delivered'?'selected':''%>>Delivered</option>
+                                                    <option value="Cancelled" <%=item.status==='Cancelled'?'selected':''%>>Cancelled</option>
+                                                </select>
                                             <% } %>
                                         </td>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
@@ -168,8 +182,21 @@
                     <td><b>${item.userId ? item.userId.name : 'User Not Found'}</b></td>
                     <td>${item.paymentMethod}</td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
-                    <td>
-                        <span class="badge rounded-pill ${getStatusClass(item.status)}">${item.status}</span>
+                    <td id="status-${item._id}">
+                        ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') 
+                            ? `<span class="badge rounded-pill ${getStatusClass(item.status)}">${item.status}</span>`
+                            : `<select class="form-select form-select-sm status-select" 
+                                onchange="updateOrderStatus('${item._id}', this.value)"
+                                style="width: 140px; font-size: 0.75rem;">
+                                <option value="Pending" ${item.status==='Pending'?'selected':''}>Pending</option>
+                                <option value="Processing" ${item.status==='Processing'?'selected':''}>Processing</option>
+                                <option value="Shipped" ${item.status==='Shipped'?'selected':''}>Shipped</option>
+                                <option value="Delivered" ${item.status==='Delivered'?'selected':''}>Delivered</option>
+                                <option value="Cancelled" ${item.status==='Cancelled'?'selected':''}>Cancelled</option>
+                                ${item.status === 'Return Requested' ? `<option value="Return Requested" selected>Return Requested</option>` : ''}
+                                ${item.status === 'Returned' ? `<option value="Returned" selected>Returned</option>` : ''}
+                            </select>`
+                        }
                     </td>
                     <td>${new Date(item.createdAt).toLocaleDateString()}</td>
                     <td class="text-end">
@@ -177,6 +204,42 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            Swal.fire({
+                title: 'Updating Status...',
+                text: `Changing status to ${newStatus}`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            axios.patch(`/admin/orders/${orderId}/status`, { status: newStatus })
+                .then(response => {
+                    if (response.data.success) {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Order status updated successfully',
+                            icon: 'success',
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                        
+                        // If it's a final state, convert to badge
+                        if (newStatus === 'Delivered' || newStatus === 'Cancelled' || newStatus === 'Returned') {
+                            document.getElementById(`status-${orderId}`).innerHTML = 
+                                `<span class="badge rounded-pill ${getStatusClass(newStatus)}">${newStatus}</span>`;
+                        }
+                    } else {
+                        Swal.fire('Error', response.data.message || 'Failed to update status', 'error');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire('Error', 'Something went wrong', 'error');
+                });
         }
 
         function getStatusClass(status) {
