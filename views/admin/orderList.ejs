@@ -62,7 +62,7 @@ const getStatusClassServer = (status) => {
                                     <%orders.map((item,index)=>{%>
                                     <tr>
                                         <td>#<%=item.orderId%></td>
-                                        <td><b><%= item.userId ? item.userId.name : 'User Not Found' %></b></td>
+                                        <td><b><%= item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found') %></b></td>
                                         <td><%=item.paymentMethod%></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <td id="status-<%=item._id%>">
@@ -179,7 +179,7 @@ const getStatusClassServer = (status) => {
             tbody.innerHTML = orders.map(item => `
                 <tr>
                     <td>#${item.orderId}</td>
-                    <td><b>${item.userId ? item.userId.name : 'User Not Found'}</b></td>
+                    <td><b>${item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found')}</b></td>
                     <td>${item.paymentMethod}</td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
                     <td id="status-${item._id}">

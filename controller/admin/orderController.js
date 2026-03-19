@@ -22,11 +22,30 @@ const loadOrderList = async (req, res) => {
     else if (sort === "total-high") sortOption = { finalAmount: -1 };
     else if (sort === "total-low") sortOption = { finalAmount: 1 };
 
-    const orders = await Order.find(filter)
+    const ordersList = await Order.find(filter)
       .populate('userId')
       .sort(sortOption)
       .skip(skip)
       .limit(limit);
+
+    // Process orders to fix "User Not Found" by falling back to address name
+    const orders = await Promise.all(ordersList.map(async (order) => {
+      const orderData = order.toObject();
+      if (!orderData.userId || !orderData.userId.name) {
+        try {
+          const addressDoc = await Address.findOne(
+            { 'address._id': order.address },
+            { 'address.$': 1 }
+          );
+          if (addressDoc && addressDoc.address && addressDoc.address.length > 0) {
+            orderData.userNameFallback = addressDoc.address[0].name;
+          }
+        } catch (error) {
+          logger.error("Error fetching fallback name for order:", order._id, error);
+        }
+      }
+      return orderData;
+    }));
 
     const totalOrders = await Order.countDocuments(filter);
     const totalPages = Math.ceil(totalOrders / limit);
