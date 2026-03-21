@@ -14,6 +14,7 @@ const db = require('./config/db');
 const axios = require('axios');
 const nocache = require('nocache');
 
+console.log("App initialization started...");
 db();
 app.set('trust proxy', 1);
 app.use(nocache());
@@ -87,7 +88,8 @@ app.use((req, res) => {
   res.render('page_404');
 });
 
-app.listen(process.env.PORT || 5000, () => {
+app.listen(process.env.PORT || 5000, "0.0.0.0", () => {
+  console.log(`Server is listening on 0.0.0.0:${process.env.PORT || 5000}`);
   logger.info(`Server running on port ${process.env.PORT || 5000}`);
 });
 
