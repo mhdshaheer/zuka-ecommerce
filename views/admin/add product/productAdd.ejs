@@ -290,8 +290,10 @@
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <canvas id="cropCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                <div class="modal-body">
+                    <div class="img-container" style="max-height: 500px; width: 100%;">
+                        <img id="cropImage" src="" alt="Crop image" style="max-width: 100%; display: block;">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -507,18 +509,29 @@
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
             function validateAll() {
-                if (
-                    !validateProductName(name.value) ||
-                    !validateProductDescription(description.value) ||
-                    !validateCategory(category.value) ||
-                    !validatePrice(price.value) ||
-                    !validateOfferPrice(offerPrice.value) ||
-                    !validateColour(colour.value)||
-                    !variantValidation()
-                ) {
-                    return false
+                let isValid = true;
+                
+                // Call all validation functions to show all errors
+                const v1 = validateProductName(name.value);
+                const v2 = validateProductDescription(description.value);
+                const v3 = validateCategory(category.value);
+                const v4 = validatePrice(price.value);
+                const v5 = validateOfferPrice(offerPrice.value);
+                const v6 = validateColour(colour.value);
+                const v7 = variantValidation();
+                
+                isValid = v1 && v2 && v3 && v4 && v5 && v6 && v7;
+                
+                if (!isValid) {
+                    Swal.fire({
+                        title: 'Form Invalid!',
+                        text: 'Please check all required fields and correct the errors highlighted in red.',
+                        icon: 'warning',
+                        confirmButtonText: 'Okay'
+                    });
                 }
-                return true
+                
+                return isValid;
             }
             // variant validation
             
@@ -637,21 +650,42 @@
     
     <script>
         let cropper;
-        let activeInputId;
+        let activeIndex = -1;
+
+        // Initialize Cropper when modal shows
+        const cropModal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+
+        cropModal.addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1, // Change as per your requirement
+                viewMode: 1,
+                guides: true,
+                autoCropArea: 0.8,
+                dragMode: 'move'
+            });
+        });
+
+        // Destroy Cropper when modal hides
+        cropModal.addEventListener('hidden.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
 
         for (let i = 1; i <= 4; i++) {
             const imageInput = document.getElementById(`images-${i}`);
             const previewDiv = document.getElementById(`preview-${i}`);
             const cropButton = document.getElementById(`cropButton-${i}`);
 
-            // Display uploaded image and prepare for cropping
-            imageInput.addEventListener('change', (event) => {
-                event.preventDefault()
-                const file = event.target.files[0];
+            // Direct change event for previewing the original image
+            imageInput.addEventListener('change', function (event) {
+                const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; max-height: 150px;">`;
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
                     };
                     reader.readAsDataURL(file);
                 } else {
@@ -659,67 +693,56 @@
                 }
             });
 
-            // Set up cropper when "Crop" button is clicked
-            cropButton.addEventListener('click', () => {
+            // Crop button logic
+            cropButton.addEventListener('click', function () {
                 const file = imageInput.files[0];
                 if (file) {
+                    activeIndex = i; // Store correctly which input we are working on
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const canvas = document.getElementById('cropCanvas');
-                        const ctx = canvas.getContext('2d');
-
-                        const image = new Image();
-                        image.onload = () => {
-                            canvas.width = image.width;
-                            canvas.height = image.height;
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            ctx.drawImage(image, 0, 0);
-
-                            // Initialize Cropper.js
-                            if (cropper) cropper.destroy();
-                            cropper = new Cropper(canvas, {
-                                aspectRatio: 1,
-                                viewMode: 2,
-                            });
-
-                            activeInputId = `images-${i}`;
-                        };
-                        image.src = e.target.result;
+                    reader.onload = function (e) {
+                        cropImage.src = e.target.result;
+                        // Modal is triggered by data-bs-toggle="modal", so it will open automatically
+                        // but we handle initialization in 'shown.bs.modal'
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    Swal.fire({
+                        title: 'Wait!',
+                        text: 'Please select an image first before trying to crop it.',
+                        icon: 'info',
+                        confirmButtonText: 'Okay'
+                    });
+                    // Prevent modal from showing if no image selected
+                    const modalInstance = bootstrap.Modal.getInstance(cropModal);
+                    if (modalInstance) modalInstance.hide();
                 }
             });
         }
 
-        // Save cropped image and update preview
-        document.getElementById('saveCrop').addEventListener('click', (e) => {
-            e.preventDefault()
-            if (cropper) {
+        // Save Cropped Image
+        document.getElementById('saveCrop').addEventListener('click', function () {
+            if (cropper && activeIndex !== -1) {
                 const canvas = cropper.getCroppedCanvas();
-                const croppedImageURL = canvas.toDataURL('image/png');
+                const croppedImageUrl = canvas.toDataURL('image/jpeg');
 
-                // Update the preview div with cropped image
-                const previewDiv = document.getElementById(`preview-${activeInputId.split('-')[1]}`);
-                previewDiv.innerHTML = `<img src="${croppedImageURL}" alt="Cropped Image" style="max-width: 100%; max-height: 150px;">`;
+                // Update the correct preview
+                const previewDiv = document.getElementById(`preview-${activeIndex}`);
+                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
 
-                // Convert the cropped image to a Blob for backend submission
+                // Set the cropped file back to the original input
                 canvas.toBlob((blob) => {
-                    const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
-                    document.getElementById(activeInputId).files = createFileList([file]);
-                });
+                    const file = new File([blob], `product-image-${activeIndex}.jpg`, { type: 'image/jpeg' });
+                    
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById(`images-${activeIndex}`).files = dataTransfer.files;
+                }, 'image/jpeg');
 
-                // Close the modal
-                const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropModal'));
-                cropModal.hide();
+                // Close Modal
+                const modalInstance = bootstrap.Modal.getInstance(cropModal);
+                modalInstance.hide();
             }
         });
-
-        // Helper function to create a FileList object
-        function createFileList(files) {
-            const dataTransfer = new DataTransfer();
-            files.forEach((file) => dataTransfer.items.add(file));
-            return dataTransfer.files;
-        }
     </script>
     <script>
         const loadingSpinner = document.getElementById('loading-spinner');
