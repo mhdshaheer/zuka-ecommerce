@@ -287,8 +287,49 @@
                     <!-- Edit Product Form -->
                     <form id="editProductForm">
                         <div class="mb-3">
-                            <label for="productSize" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="varientSize" placeholder="Enter size">
+                            <label for="productSize" class="form-label">Size*</label>
+                            <select class="form-control select-nice" id="varientSize" style="width: 100%;">
+                                <option value="" disabled selected>Search or select size</option>
+                                <optgroup label="General Sizes">
+                                    <option value="XS">XS (Extra Small)</option>
+                                    <option value="S">S (Small)</option>
+                                    <option value="M">M (Medium)</option>
+                                    <option value="L">L (Large)</option>
+                                    <option value="XL">XL (Extra Large)</option>
+                                    <option value="XXL">XXL (Double Extra Large)</option>
+                                    <option value="3XL">3XL</option>
+                                    <option value="4XL">4XL</option>
+                                    <option value="5XL">5XL</option>
+                                </optgroup>
+                                <optgroup label="Waist Sizes (Inches)">
+                                    <option value="28">28</option>
+                                    <option value="30">30</option>
+                                    <option value="32">32</option>
+                                    <option value="34">34</option>
+                                    <option value="36">36</option>
+                                    <option value="38">38</option>
+                                    <option value="40">40</option>
+                                    <option value="42">42</option>
+                                </optgroup>
+                                <optgroup label="Shoe Sizes (UK)">
+                                    <option value="UK 6">UK 6</option>
+                                    <option value="UK 7">UK 7</option>
+                                    <option value="UK 8">UK 8</option>
+                                    <option value="UK 9">UK 9</option>
+                                    <option value="UK 10">UK 10</option>
+                                    <option value="UK 11">UK 11</option>
+                                    <option value="UK 12">UK 12</option>
+                                </optgroup>
+                                <optgroup label="Shoe Sizes (US)">
+                                    <option value="US 7">US 7</option>
+                                    <option value="US 8">US 8</option>
+                                    <option value="US 9">US 9</option>
+                                    <option value="US 10">US 10</option>
+                                    <option value="US 11">US 11</option>
+                                    <option value="US 12">US 12</option>
+                                    <option value="US 13">US 13</option>
+                                </optgroup>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="productStocks" class="form-label">Stocks</label>
@@ -371,10 +412,19 @@
         }
 
         $(document).ready(function() {
+            // General Color Select2
             $('#colour').select2({
                 placeholder: "Search or select a color",
                 allowClear: true,
                 width: '100%'
+            });
+
+            // Variant Size Select2 (using dropdownParent for modal support)
+            $('#varientSize').select2({
+                placeholder: "Search or select a size",
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editProductModal')
             });
         });
         const name = document.getElementById('productName')
