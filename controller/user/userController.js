@@ -671,58 +671,55 @@ const loadOrders = async (req, res) => {
   }
 };
 
-const cancelOrder = async (req, res) => {;p;
+const cancelOrder = async (req, res) => {
   try {
     const { orderId, reason } = req.body;
     const user = req.session.user || req.session.googleUser;
 
-    const cancelOrder = await Order.updateOne({ orderId: orderId }, {
+    const result = await Order.updateOne({ orderId: orderId }, {
       $set: {
         status: 'Cancelled',
         cancellationReason: reason
       }
     });
+
     const orders = await Order.findOne({ orderId: orderId });
 
     if (orders.paymentStatus === 'Paid') {
       let transactions = {
         type: 'Refund',
         amount: orders.finalAmount
-
       };
-      const wallet = await Wallet.findOneAndUpdate(
+      
+      await Wallet.findOneAndUpdate(
         { userId: user._id },
         {
           $inc: { balance: orders.finalAmount },
-          $push: {
-            transactions: transactions
-          }
+          $push: { transactions: transactions }
         },
         { upsert: true, new: true }
       );
+      
       await Order.updateOne({ orderId: orderId }, { $set: { paymentStatus: 'Refunded' } });
     }
 
-    //Return the stock to dataBase
+    // Return the stock to database
+    for (const item of orders.orderedItems) {
+      await Product.updateOne(
+        { [`variant._id`]: item.varientId }, 
+        { $inc: { 'variant.$.stock': item.quantity } }
+      );
+    }
 
-    orders.orderedItems.map(async (item) => {
-
-      let updateStock = await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': item.quantity } });
-      let stock = await Product.findOne({ 'variant._id': item.varientId }, { $lt: { 'variant.stock': 10 } });
-      if (stock) {
-        await Product.updateOne({ _id: stock._id }, { $set: { productName: "new name" } });
-      }
-    });
-    //=============================
-    if (cancelOrder.matchedCount === 0) {
-      logger.error("No cart found with the specified ID");
-    } else if (cancelOrder.modifiedCount === 0) {
-      logger.error("Status was not modified (maybe it was already the same)");
+    if (result.matchedCount === 0) {
+      logger.error("No order found with the specified ID");
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
     } else {
       res.status(httpStatusCode.OK).json({ success: true });
     }
   } catch (error) {
-    logger.error(error);
+    logger.error("Error in cancelOrder:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
