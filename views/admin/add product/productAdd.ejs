@@ -24,6 +24,21 @@
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.375rem !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 36px !important;
+            padding-left: 12px !important;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+        }
+    </style>
     <section class="content-main">
         <div class="row">
             <div class="col-9">
@@ -96,8 +111,43 @@
                                         <div class="row mb-4">
                                             <label class="col-lg-3 col-form-label">Colour*</label>
                                             <div class="col-lg-9">
-                                                <input type="text" id="colour" name="colour" class="form-control"
-                                                    placeholder="Type here" />
+                                                <select id="colour" name="colour" class="form-control select-nice">
+                                                    <option value="" disabled selected>Search or select color</option>
+                                                    <option value="Black">Black</option>
+                                                    <option value="White">White</option>
+                                                    <option value="Red">Red</option>
+                                                    <option value="Blue">Blue</option>
+                                                    <option value="Green">Green</option>
+                                                    <option value="Yellow">Yellow</option>
+                                                    <option value="Grey">Grey</option>
+                                                    <option value="Pink">Pink</option>
+                                                    <option value="Purple">Purple</option>
+                                                    <option value="Orange">Orange</option>
+                                                    <option value="Brown">Brown</option>
+                                                    <option value="Gold">Gold</option>
+                                                    <option value="Silver">Silver</option>
+                                                    <option value="Navy Blue">Navy Blue</option>
+                                                    <option value="Maroon">Maroon</option>
+                                                    <option value="Teal">Teal</option>
+                                                    <option value="Olive">Olive</option>
+                                                    <option value="Lime">Lime</option>
+                                                    <option value="Cyan">Cyan</option>
+                                                    <option value="Magenta">Magenta</option>
+                                                    <option value="Beige">Beige</option>
+                                                    <option value="Ivory">Ivory</option>
+                                                    <option value="Khaki">Khaki</option>
+                                                    <option value="Coral">Coral</option>
+                                                    <option value="Turquoise">Turquoise</option>
+                                                    <option value="Lavender">Lavender</option>
+                                                    <option value="Indigo">Indigo</option>
+                                                    <option value="Charcoal">Charcoal</option>
+                                                    <option value="Copper">Copper</option>
+                                                    <option value="Peach">Peach</option>
+                                                    <option value="Tan">Tan</option>
+                                                    <option value="Cream">Cream</option>
+                                                    <option value="Burgundy">Burgundy</option>
+                                                    <option value="Mint Green">Mint Green</option>
+                                                </select>
                                                 <div id="colourError" class="text-danger"></div>
                                             </div>
                                         </div>
@@ -237,8 +287,49 @@
                     <!-- Edit Product Form -->
                     <form id="editProductForm">
                         <div class="mb-3">
-                            <label for="productSize" class="form-label">Size</label>
-                            <input type="text" class="form-control" id="varientSize" placeholder="Enter size">
+                            <label for="productSize" class="form-label">Size*</label>
+                            <select class="form-control select-nice" id="varientSize" style="width: 100%;">
+                                <option value="" disabled selected>Search or select size</option>
+                                <optgroup label="General Sizes">
+                                    <option value="XS">XS (Extra Small)</option>
+                                    <option value="S">S (Small)</option>
+                                    <option value="M">M (Medium)</option>
+                                    <option value="L">L (Large)</option>
+                                    <option value="XL">XL (Extra Large)</option>
+                                    <option value="XXL">XXL (Double Extra Large)</option>
+                                    <option value="3XL">3XL</option>
+                                    <option value="4XL">4XL</option>
+                                    <option value="5XL">5XL</option>
+                                </optgroup>
+                                <optgroup label="Waist Sizes (Inches)">
+                                    <option value="28">28</option>
+                                    <option value="30">30</option>
+                                    <option value="32">32</option>
+                                    <option value="34">34</option>
+                                    <option value="36">36</option>
+                                    <option value="38">38</option>
+                                    <option value="40">40</option>
+                                    <option value="42">42</option>
+                                </optgroup>
+                                <optgroup label="Shoe Sizes (UK)">
+                                    <option value="UK 6">UK 6</option>
+                                    <option value="UK 7">UK 7</option>
+                                    <option value="UK 8">UK 8</option>
+                                    <option value="UK 9">UK 9</option>
+                                    <option value="UK 10">UK 10</option>
+                                    <option value="UK 11">UK 11</option>
+                                    <option value="UK 12">UK 12</option>
+                                </optgroup>
+                                <optgroup label="Shoe Sizes (US)">
+                                    <option value="US 7">US 7</option>
+                                    <option value="US 8">US 8</option>
+                                    <option value="US 9">US 9</option>
+                                    <option value="US 10">US 10</option>
+                                    <option value="US 11">US 11</option>
+                                    <option value="US 12">US 12</option>
+                                    <option value="US 13">US 13</option>
+                                </optgroup>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="productStocks" class="form-label">Stocks</label>
@@ -290,8 +381,10 @@
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <canvas id="cropCanvas" style="max-width: 100%; max-height: 500px;"></canvas>
+                <div class="modal-body">
+                    <div class="img-container" style="max-height: 500px; width: 100%;">
+                        <img id="cropImage" src="" alt="Crop image" style="max-width: 100%; display: block;">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -317,6 +410,23 @@
             var myModal = new bootstrap.Modal(document.getElementById('editProductModal'));
             myModal.show();
         }
+
+        $(document).ready(function() {
+            // General Color Select2
+            $('#colour').select2({
+                placeholder: "Search or select a color",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Variant Size Select2 (using dropdownParent for modal support)
+            $('#varientSize').select2({
+                placeholder: "Search or select a size",
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#editProductModal')
+            });
+        });
         const name = document.getElementById('productName')
         const description = document.getElementById('description');
         const category = document.getElementById('category');
@@ -464,26 +574,11 @@
 
         //Colour Validation
         function validateColour(colourVal) {
-            const minLength = 3;
-            const maxLength = 30;
             const colourError = document.getElementById('colourError')
 
-
-            if (colourVal.trim() === '') {
+            if (!colourVal || colourVal.trim() === '') {
                 colourError.style.display = 'block';
-                colourError.innerHTML = 'This Field is required';
-                return false
-            } else if (colourVal.length < minLength || colourVal.length > maxLength) {
-                colourError.style.display = 'block';
-                colourError.innerHTML = `Field value must be between ${minLength} and ${maxLength} characters`;
-                return false
-            } else if (!/^[A-Za-z]/.test(colourVal)) {
-                colourError.style.display = 'block';
-                colourError.innerHTML = 'Field value must start with a letter.';
-                return false
-            } else if (!/^[A-Za-z\s]+$/.test(colourVal)) {
-                colourError.style.display = 'block';
-                colourError.innerHTML = 'Field value can only contain letters and spaces.';
+                colourError.innerHTML = 'Please select a color';
                 return false
             } else {
                 colourError.style.display = 'none';
@@ -507,18 +602,29 @@
         productForm.addEventListener('submit', (e) => {
             e.preventDefault()
             function validateAll() {
-                if (
-                    !validateProductName(name.value) ||
-                    !validateProductDescription(description.value) ||
-                    !validateCategory(category.value) ||
-                    !validatePrice(price.value) ||
-                    !validateOfferPrice(offerPrice.value) ||
-                    !validateColour(colour.value)||
-                    !variantValidation()
-                ) {
-                    return false
+                let isValid = true;
+                
+                // Call all validation functions to show all errors
+                const v1 = validateProductName(name.value);
+                const v2 = validateProductDescription(description.value);
+                const v3 = validateCategory(category.value);
+                const v4 = validatePrice(price.value);
+                const v5 = validateOfferPrice(offerPrice.value);
+                const v6 = validateColour(colour.value);
+                const v7 = variantValidation();
+                
+                isValid = v1 && v2 && v3 && v4 && v5 && v6 && v7;
+                
+                if (!isValid) {
+                    Swal.fire({
+                        title: 'Form Invalid!',
+                        text: 'Please check all required fields and correct the errors highlighted in red.',
+                        icon: 'warning',
+                        confirmButtonText: 'Okay'
+                    });
                 }
-                return true
+                
+                return isValid;
             }
             // variant validation
             
@@ -637,21 +743,42 @@
     
     <script>
         let cropper;
-        let activeInputId;
+        let activeIndex = -1;
+
+        // Initialize Cropper when modal shows
+        const cropModal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+
+        cropModal.addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1, // Change as per your requirement
+                viewMode: 1,
+                guides: true,
+                autoCropArea: 0.8,
+                dragMode: 'move'
+            });
+        });
+
+        // Destroy Cropper when modal hides
+        cropModal.addEventListener('hidden.bs.modal', function () {
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+        });
 
         for (let i = 1; i <= 4; i++) {
             const imageInput = document.getElementById(`images-${i}`);
             const previewDiv = document.getElementById(`preview-${i}`);
             const cropButton = document.getElementById(`cropButton-${i}`);
 
-            // Display uploaded image and prepare for cropping
-            imageInput.addEventListener('change', (event) => {
-                event.preventDefault()
-                const file = event.target.files[0];
+            // Direct change event for previewing the original image
+            imageInput.addEventListener('change', function (event) {
+                const file = this.files[0];
                 if (file) {
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image" style="max-width: 100%; max-height: 150px;">`;
+                    reader.onload = function (e) {
+                        previewDiv.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
                     };
                     reader.readAsDataURL(file);
                 } else {
@@ -659,67 +786,56 @@
                 }
             });
 
-            // Set up cropper when "Crop" button is clicked
-            cropButton.addEventListener('click', () => {
+            // Crop button logic
+            cropButton.addEventListener('click', function () {
                 const file = imageInput.files[0];
                 if (file) {
+                    activeIndex = i; // Store correctly which input we are working on
                     const reader = new FileReader();
-                    reader.onload = (e) => {
-                        const canvas = document.getElementById('cropCanvas');
-                        const ctx = canvas.getContext('2d');
-
-                        const image = new Image();
-                        image.onload = () => {
-                            canvas.width = image.width;
-                            canvas.height = image.height;
-                            ctx.clearRect(0, 0, canvas.width, canvas.height);
-                            ctx.drawImage(image, 0, 0);
-
-                            // Initialize Cropper.js
-                            if (cropper) cropper.destroy();
-                            cropper = new Cropper(canvas, {
-                                aspectRatio: 1,
-                                viewMode: 2,
-                            });
-
-                            activeInputId = `images-${i}`;
-                        };
-                        image.src = e.target.result;
+                    reader.onload = function (e) {
+                        cropImage.src = e.target.result;
+                        // Modal is triggered by data-bs-toggle="modal", so it will open automatically
+                        // but we handle initialization in 'shown.bs.modal'
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    Swal.fire({
+                        title: 'Wait!',
+                        text: 'Please select an image first before trying to crop it.',
+                        icon: 'info',
+                        confirmButtonText: 'Okay'
+                    });
+                    // Prevent modal from showing if no image selected
+                    const modalInstance = bootstrap.Modal.getInstance(cropModal);
+                    if (modalInstance) modalInstance.hide();
                 }
             });
         }
 
-        // Save cropped image and update preview
-        document.getElementById('saveCrop').addEventListener('click', (e) => {
-            e.preventDefault()
-            if (cropper) {
+        // Save Cropped Image
+        document.getElementById('saveCrop').addEventListener('click', function () {
+            if (cropper && activeIndex !== -1) {
                 const canvas = cropper.getCroppedCanvas();
-                const croppedImageURL = canvas.toDataURL('image/png');
+                const croppedImageUrl = canvas.toDataURL('image/jpeg');
 
-                // Update the preview div with cropped image
-                const previewDiv = document.getElementById(`preview-${activeInputId.split('-')[1]}`);
-                previewDiv.innerHTML = `<img src="${croppedImageURL}" alt="Cropped Image" style="max-width: 100%; max-height: 150px;">`;
+                // Update the correct preview
+                const previewDiv = document.getElementById(`preview-${activeIndex}`);
+                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
 
-                // Convert the cropped image to a Blob for backend submission
+                // Set the cropped file back to the original input
                 canvas.toBlob((blob) => {
-                    const file = new File([blob], 'cropped-image.png', { type: 'image/png' });
-                    document.getElementById(activeInputId).files = createFileList([file]);
-                });
+                    const file = new File([blob], `product-image-${activeIndex}.jpg`, { type: 'image/jpeg' });
+                    
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById(`images-${activeIndex}`).files = dataTransfer.files;
+                }, 'image/jpeg');
 
-                // Close the modal
-                const cropModal = bootstrap.Modal.getInstance(document.getElementById('cropModal'));
-                cropModal.hide();
+                // Close Modal
+                const modalInstance = bootstrap.Modal.getInstance(cropModal);
+                modalInstance.hide();
             }
         });
-
-        // Helper function to create a FileList object
-        function createFileList(files) {
-            const dataTransfer = new DataTransfer();
-            files.forEach((file) => dataTransfer.items.add(file));
-            return dataTransfer.files;
-        }
     </script>
     <script>
         const loadingSpinner = document.getElementById('loading-spinner');
