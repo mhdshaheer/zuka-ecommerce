@@ -45,7 +45,7 @@ const orderSchema = new Schema({
         status: {
             type: String,
             required: true,
-            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+            enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned', 'Return Rejected'],
             default:'Pending',
          },
          totalPrice: {
@@ -90,7 +90,7 @@ const orderSchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned'],
+        enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Return Request', 'Returned', 'Return Rejected'],
         default:'Pending',
     },
     couponApplied: {
@@ -103,6 +103,12 @@ const orderSchema = new Schema({
     },
     cancellationReason:{
         type:String
+    },
+    returnReason: {
+        type: String
+    },
+    returnRejectionReason: {
+        type: String
     }
 }, { timestamps: true })
 

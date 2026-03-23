@@ -95,9 +95,41 @@ const orderDetails = async (req, res) => {
 const changeOrderStatus = async (req, res) => {
   try {
     const order_id = req.params.id;
-    const { status } = req.body;
-    const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
-    if (result) {
+    const { status, reason } = req.body;
+
+    const order = await Order.findById(order_id);
+    if (order && order.paymentStatus === 'Failed') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ 
+        success: false, 
+        message: "Cannot change status of an order with failed payment." 
+      });
+    }
+
+    const oldStatus = order.status;
+    const updateFields = { status: status };
+    if (status === 'Return Rejected') {
+      updateFields.returnRejectionReason = reason;
+    }
+
+    const result = await Order.updateOne({ _id: order_id }, { $set: updateFields });
+    
+    if (result.modifiedCount > 0) {
+      if (status === 'Returned' && oldStatus !== 'Returned') {
+          const Wallet = require('../../models/walletSchema');
+          let wallet = await Wallet.findOne({ userId: order.userId });
+          if (!wallet) {
+              wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+          }
+          wallet.balance += order.finalAmount;
+          wallet.transactions.push({
+              type: 'refund',
+              amount: order.finalAmount,
+              description: `Refund for returned order #${order.orderId}`
+          });
+          await wallet.save();
+          
+          await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: 'Refunded' } });
+      }
       res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_ORDER_STATUS_UPDATED });
     } else {
       res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_FAILED_TO_UPDATE_ORDER_STATUS });
