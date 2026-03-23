@@ -7,6 +7,7 @@ const getStatusClassServer = (status) => {
         case 'Shipped': return 'alert-success';
         case 'Processing': return 'alert-info';
         case 'Returned': return 'alert-warning';
+        case 'Return Request': return 'alert-warning';
         default: return 'alert-warning';
     }
 }
@@ -38,7 +39,7 @@ const getPaymentStatusClassServer = (status) => {
                                     <option value="Shipped" <%=status==='Shipped'?'selected':''%>>Shipped</option>
                                     <option value="Delivered" <%=status==='Delivered'?'selected':''%>>Delivered</option>
                                     <option value="Cancelled" <%=status==='Cancelled'?'selected':''%>>Cancelled</option>
-                                    <option value="Return Requested" <%=status==='Return Requested'?'selected':''%>>Return Requested</option>
+                                    <option value="Return Request" <%=status==='Return Request'?'selected':''%>>Return Request</option>
                                     <option value="Returned" <%=status==='Returned'?'selected':''%>>Returned</option>
                                 </select>
                             </div>
@@ -75,19 +76,9 @@ const getPaymentStatusClassServer = (status) => {
                                         <td><span class="badge rounded-pill <%= getPaymentStatusClassServer(item.paymentStatus) %>"><%=item.paymentStatus%></span></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <td id="status-<%=item._id%>">
-                                            <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') { %>
-                                                <span class="badge rounded-pill <%= item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClassServer(item.status) %>"><%=item.status%></span>
-                                            <% } else { %>
-                                                <select class="form-select form-select-sm status-select" 
-                                                    onchange="updateOrderStatus('<%=item._id%>', this.value)"
-                                                    style="width: 140px; font-size: 0.75rem;">
-                                                    <option value="Pending" <%=item.status==='Pending'?'selected':''%>>Pending</option>
-                                                    <option value="Processing" <%=item.status==='Processing'?'selected':''%>>Processing</option>
-                                                    <option value="Shipped" <%=item.status==='Shipped'?'selected':''%>>Shipped</option>
-                                                    <option value="Delivered" <%=item.status==='Delivered'?'selected':''%>>Delivered</option>
-                                                    <option value="Cancelled" <%=item.status==='Cancelled'?'selected':''%>>Cancelled</option>
-                                                </select>
-                                            <% } %>
+                                            <span class="badge rounded-pill <%= item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClassServer(item.status) %> text-dark">
+                                                <%=item.status%>
+                                            </span>
                                         </td>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
                                         <td class="text-end">
@@ -192,20 +183,9 @@ const getPaymentStatusClassServer = (status) => {
                     <td><span class="badge rounded-pill ${getPaymentStatusClass(item.paymentStatus)}">${item.paymentStatus}</span></td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
                     <td id="status-${item._id}">
-                        ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') 
-                            ? `<span class="badge rounded-pill ${item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClass(item.status)}">${item.status}</span>`
-                            : `<select class="form-select form-select-sm status-select" 
-                                onchange="updateOrderStatus('${item._id}', this.value)"
-                                style="width: 140px; font-size: 0.75rem;">
-                                <option value="Pending" ${item.status==='Pending'?'selected':''}>Pending</option>
-                                <option value="Processing" ${item.status==='Processing'?'selected':''}>Processing</option>
-                                <option value="Shipped" ${item.status==='Shipped'?'selected':''}>Shipped</option>
-                                <option value="Delivered" ${item.status==='Delivered'?'selected':''}>Delivered</option>
-                                <option value="Cancelled" ${item.status==='Cancelled'?'selected':''}>Cancelled</option>
-                                ${item.status === 'Return Requested' ? `<option value="Return Requested" selected>Return Requested</option>` : ''}
-                                ${item.status === 'Returned' ? `<option value="Returned" selected>Returned</option>` : ''}
-                            </select>`
-                        }
+                        <span class="badge rounded-pill ${item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClass(item.status)} text-dark">
+                            ${item.status}
+                        </span>
                     </td>
                     <td>${new Date(item.createdAt).toLocaleDateString()}</td>
                     <td class="text-end">
@@ -257,6 +237,8 @@ const getPaymentStatusClassServer = (status) => {
                 case 'Delivered': return 'alert-primary';
                 case 'Shipped': return 'alert-success';
                 case 'Processing': return 'alert-info';
+                case 'Returned': return 'alert-warning';
+                case 'Return Request': return 'alert-warning';
                 default: return 'alert-warning';
             }
         }
