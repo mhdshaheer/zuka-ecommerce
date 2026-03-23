@@ -95,7 +95,7 @@ const orderDetails = async (req, res) => {
 const changeOrderStatus = async (req, res) => {
   try {
     const order_id = req.params.id;
-    const { status } = req.body;
+    const { status, reason } = req.body;
 
     const order = await Order.findById(order_id);
     if (order && order.paymentStatus === 'Failed') {
@@ -106,7 +106,12 @@ const changeOrderStatus = async (req, res) => {
     }
 
     const oldStatus = order.status;
-    const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
+    const updateFields = { status: status };
+    if (status === 'Return Rejected') {
+      updateFields.returnRejectionReason = reason;
+    }
+
+    const result = await Order.updateOne({ _id: order_id }, { $set: updateFields });
     
     if (result.modifiedCount > 0) {
       if (status === 'Returned' && oldStatus !== 'Returned') {

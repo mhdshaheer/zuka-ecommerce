@@ -133,6 +133,17 @@
                     </div>
                 <% } %>
 
+                <% if (orders.status === 'Return Rejected' && orders.returnRejectionReason) { %>
+                    <div class="card mb-4 border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title text-white">Return Rejected</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0 text-dark"><strong>Reason:</strong> <%= orders.returnRejectionReason %></p>
+                        </div>
+                    </div>
+                <% } %>
+
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row align-items-center">
@@ -233,11 +244,15 @@
                                     </select>
                                     
                                         <%}else if(orders.status=='Return Request'){%>
-                                            <select class="form-select" id="orderStatus" name="status" required>
-                                                <option value="Cancelled">Cancelled</option>
+                                            <select class="form-select" id="orderStatus" name="status" required onchange="toggleRejectionReason(this.value)">
                                                 <option value="Return Request" selected>Return Request</option>
                                                 <option value="Returned">Returned</option>
+                                                <option value="Return Rejected">Return Rejected</option>
                                             </select>
+                                            <div id="rejectionReasonDiv" style="display: none;" class="mt-3">
+                                                <label for="rejectionReason" class="form-label">Return Rejection Reason</label>
+                                                <textarea class="form-control" id="rejectionReason" name="rejectionReason"></textarea>
+                                            </div>
                             <%}%>
                         </div>
                         <input type="hidden" id="orderId" name="order_id" value="">
@@ -255,12 +270,29 @@
     <!-- ============================= -->
 
     <script>
+        function toggleRejectionReason(status) {
+            const div = document.getElementById('rejectionReasonDiv');
+            if (div) {
+                div.style.display = status === 'Return Rejected' ? 'block' : 'none';
+            }
+        }
+
         function updateStatus(order_id, orderStatus) {
             const statusOption = document.getElementById('orderStatus')
             statusOption.value = orderStatus;
-            const updateStatus = document.getElementById('updateStatusButton');
-            updateStatus.addEventListener('click', (e) => {
+            toggleRejectionReason(orderStatus);
+
+            const updateStatusBtn = document.getElementById('updateStatusButton');
+            updateStatusBtn.onclick = (e) => {
                 e.preventDefault();
+                const newStatus = statusOption.value;
+                const reason = document.getElementById('rejectionReason') ? document.getElementById('rejectionReason').value : '';
+
+                if (newStatus === 'Return Rejected' && !reason.trim()) {
+                    Swal.fire('Error', 'Please provide a reason for rejecting the return.', 'error');
+                    return;
+                }
+
                 Swal.fire({
                     title: 'Are you sure!',
                     text: 'Do you want to change status!',
@@ -272,7 +304,8 @@
                     .then((result) => {
                         if (result.isConfirmed) {
                             axios.patch(`/admin/orders/${order_id}/status`,{
-                                status : statusOption.value
+                                status : newStatus,
+                                reason : reason
                             })
                             .then(res=>{
                                 if(res.status==200){
@@ -287,12 +320,12 @@
                                 })
                                 }
                             })
+                            .catch(err => {
+                                Swal.fire('Error', err.response?.data?.message || 'Failed to update status', 'error');
+                            })
                         }
                     })
-
-
-            })
-
+            }
         }
     </script>
 

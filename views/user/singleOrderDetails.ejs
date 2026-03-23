@@ -299,6 +299,16 @@
                         </div>
                     </div>
                 <% } %>
+                <% if (order.status === 'Return Rejected' && order.returnRejectionReason) { %>
+                    <div class="card border-danger mt-3">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title text-white">Return Rejected</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0"><strong>Reason:</strong> <%= order.returnRejectionReason %></p>
+                        </div>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
