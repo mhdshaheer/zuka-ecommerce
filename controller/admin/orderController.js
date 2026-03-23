@@ -105,8 +105,26 @@ const changeOrderStatus = async (req, res) => {
       });
     }
 
+    const oldStatus = order.status;
     const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
-    if (result) {
+    
+    if (result.modifiedCount > 0) {
+      if (status === 'Returned' && oldStatus !== 'Returned') {
+          const Wallet = require('../../models/walletSchema');
+          let wallet = await Wallet.findOne({ userId: order.userId });
+          if (!wallet) {
+              wallet = new Wallet({ userId: order.userId, balance: 0, transactions: [] });
+          }
+          wallet.balance += order.finalAmount;
+          wallet.transactions.push({
+              type: 'refund',
+              amount: order.finalAmount,
+              description: `Refund for returned order #${order.orderId}`
+          });
+          await wallet.save();
+          
+          await Order.updateOne({ _id: order_id }, { $set: { paymentStatus: 'Refunded' } });
+      }
       res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_ORDER_STATUS_UPDATED });
     } else {
       res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_FAILED_TO_UPDATE_ORDER_STATUS });
