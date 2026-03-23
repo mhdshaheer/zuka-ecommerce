@@ -10,6 +10,15 @@ const getStatusClassServer = (status) => {
         default: return 'alert-warning';
     }
 }
+const getPaymentStatusClassServer = (status) => {
+    switch(status) {
+        case 'Paid': return 'alert-success';
+        case 'Failed': return 'alert-danger';
+        case 'Pending': return 'alert-warning';
+        case 'Refunded': return 'alert-info';
+        default: return 'alert-secondary';
+    }
+}
 %>
 <section class="content-main">
                 <div class="content-header">
@@ -51,7 +60,7 @@ const getStatusClassServer = (status) => {
                                     <tr>
                                         <th>#ID</th>
                                         <th scope="col">Name</th>
-                                        <th scope="col">Payment Type</th>
+                                        <th scope="col">Payment Status</th>
                                         <th scope="col">Total</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Date</th>
@@ -63,7 +72,7 @@ const getStatusClassServer = (status) => {
                                     <tr>
                                         <td>#<%=item.orderId%></td>
                                         <td><b><%= item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found') %></b></td>
-                                        <td><%=item.paymentMethod%></td>
+                                        <td><span class="badge rounded-pill <%= getPaymentStatusClassServer(item.paymentStatus) %>"><%=item.paymentStatus%></span></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <td id="status-<%=item._id%>">
                                             <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') { %>
@@ -180,7 +189,7 @@ const getStatusClassServer = (status) => {
                 <tr>
                     <td>#${item.orderId}</td>
                     <td><b>${item.userId ? item.userId.name : (item.userNameFallback || 'User Not Found')}</b></td>
-                    <td>${item.paymentMethod}</td>
+                    <td><span class="badge rounded-pill ${getPaymentStatusClass(item.paymentStatus)}">${item.paymentStatus}</span></td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
                     <td id="status-${item._id}">
                         ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') 
@@ -249,6 +258,16 @@ const getStatusClassServer = (status) => {
                 case 'Shipped': return 'alert-success';
                 case 'Processing': return 'alert-info';
                 default: return 'alert-warning';
+            }
+        }
+
+        function getPaymentStatusClass(status) {
+            switch(status) {
+                case 'Paid': return 'alert-success';
+                case 'Failed': return 'alert-danger';
+                case 'Pending': return 'alert-warning';
+                case 'Refunded': return 'alert-info';
+                default: return 'alert-secondary';
             }
         }
 
