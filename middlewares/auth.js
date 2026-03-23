@@ -8,7 +8,8 @@ const httpStatusCode = require('../helpers/httpStatusCode');
 const userAuth = (req,res,next)=>{
     const user = req.session.user || req.session.googleUser;
     if(user){
-        User.findById(user)
+        const userId = user._id || user;
+        User.findById(userId)
         .then(data=>{
             if(data && !data.isBlocked){
                 next();
@@ -54,7 +55,8 @@ const backToHome = (req,res,next)=>{
 const orderDone = async (req,res,next)=>{
     try {
         const user = req.session.user || req.session.googleUser;
-        const cart = await Cart.findOne({userId:user._id});
+        const userId = user._id || user;
+        const cart = await Cart.findOne({userId:userId});
         if(!cart || cart.items.length>0){
             res.redirect('/shop')
         }else{

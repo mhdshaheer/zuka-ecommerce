@@ -60,6 +60,9 @@ router.route('/addresses/:addressId')
   .delete(userAuth, userController.softDeleteAddress);
 
 // Orders
+router.route('/orders/view/:id')
+  .get(userAuth, userController.loadOrderDetails);
+
 router.route('/orders')
   .get(userAuth, userController.loadOrders)
   .post(userAuth, shopController.addOrder);

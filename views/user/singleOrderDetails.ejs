@@ -1,0 +1,302 @@
+<%-include('../partials/user/header')%>
+
+<style>
+    .order-details-container {
+        padding: 40px 0;
+        background-color: #f8f9fa;
+    }
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        padding: 20px 25px;
+    }
+    .card-title {
+        margin: 0;
+        font-weight: 700;
+        color: #333;
+    }
+    .order-meta {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .meta-item b {
+        color: #777;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        display: block;
+        margin-bottom: 5px;
+    }
+    .meta-item p {
+        margin: 0;
+        font-weight: 600;
+        color: #333;
+    }
+    .product-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .product-item {
+        display: flex;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #f1f1f1;
+    }
+    .product-item:last-child {
+        border-bottom: none;
+    }
+    .product-img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-right: 20px;
+    }
+    .product-info {
+        flex: 1;
+    }
+    .product-name {
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 5px 0;
+        text-decoration: none;
+        display: block;
+    }
+    .product-name:hover {
+        color: #e61e2b;
+    }
+    .product-details {
+        font-size: 0.9rem;
+        color: #777;
+    }
+    .product-price {
+        font-weight: 700;
+        color: #333;
+        text-align: right;
+    }
+    .order-summary {
+        background-color: #fff;
+        padding: 25px;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        color: #555;
+    }
+    .summary-row.total {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #f8f9fa;
+        font-weight: 700;
+        color: #333;
+        font-size: 1.2rem;
+    }
+    .badge-custom {
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+    .status-pending { background-color: #fff4e5; color: #ff9800; }
+    .status-processing { background-color: #e3f2fd; color: #2196f3; }
+    .status-shipped { background-color: #f3e5f5; color: #9c27b0; }
+    .status-delivered { background-color: #e8f5e9; color: #4caf50; }
+    .status-cancelled { background-color: #ffebee; color: #f44336; }
+    .status-returned { background-color: #eceff1; color: #607d8b; }
+    .status-return-request { background-color: #fef9e7; color: #f1c40f; }
+    
+    .breadcrumb-section {
+        background-color: #fff;
+        padding: 20px 0;
+        border-bottom: 1px solid #eee;
+    }
+    .breadcrumb-links a {
+        color: #777;
+        text-decoration: none;
+    }
+    .breadcrumb-links span {
+        color: #333;
+        font-weight: 600;
+    }
+</style>
+
+<div class="breadcrumb-section">
+    <div class="container">
+        <div class="breadcrumb-links">
+            <a href="/">Home</a> / 
+            <a href="/orders">Orders</a> / 
+            <span>Order Details</span>
+        </div>
+    </div>
+</div>
+
+<div class="order-details-container">
+    <div class="container">
+        <div class="row">
+            <!-- Order Info & Products -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap">
+                            <h4 class="card-title">Order #<%= order.orderId %></h4>
+                            <span class="badge-custom status-<%= order.status.toLowerCase().replace(' ', '-') %>">
+                                <%= order.status %>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="order-meta">
+                            <div class="meta-item">
+                                <b>Order Date</b>
+                                <p><%= order.createdAt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+                            </div>
+                            <div class="meta-item">
+                                <b>Payment Method</b>
+                                <p><%= order.paymentMethod %></p>
+                            </div>
+                            <div class="meta-item">
+                                <b>Payment Status</b>
+                                <p><%= order.paymentStatus %></p>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h5 class="mb-4 font-weight-bold">Items in this order</h5>
+                        <ul class="product-list">
+                            <% order.orderedItems.forEach(item => { %>
+                                <li class="product-item">
+                                    <% if (item.productId) { %>
+                                        <img src="<%= item.productId.images && item.productId.images[0] ? item.productId.images[0] : '/js/main.js' %>" alt="<%= item.productId.productName %>" class="product-img">
+                                        <div class="product-info">
+                                            <a href="/products/<%= item.productId._id %>" class="product-name">
+                                                <%= item.productId.productName %>
+                                            </a>
+                                            <div class="product-details">
+                                                Size: <%= item.size %> | Quantity: <%= item.quantity %>
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="product-info">
+                                            <span class="product-name text-muted">Product no longer available</span>
+                                            <div class="product-details">
+                                                Size: <%= item.size %> | Quantity: <%= item.quantity %>
+                                            </div>
+                                        </div>
+                                    <% } %>
+                                    <div class="product-price">
+                                        ₹<%= (item.price * item.quantity).toFixed(0) %>
+                                    </div>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Shipping Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <% if (address) { %>
+                            <p class="mb-1"><strong><%= address.name %></strong></p>
+                            <p class="mb-1"><%= address.address %></p>
+                            <p class="mb-1"><%= address.city %>, <%= address.state %>, <%= address.country %></p>
+                            <p class="mb-1">Pincode: <%= address.pincode %></p>
+                            <p class="mb-0">Phone: <%= address.phone %></p>
+                        <% } else { %>
+                            <p class="text-muted">Address information not available.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title">Order Summary</h5>
+                    </div>
+                    <div class="order-summary">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span>₹<%= order.totalPrice.toFixed(0) %></span>
+                        </div>
+                        <% if (order.discount > 0) { %>
+                            <div class="summary-row">
+                                <span>Discount</span>
+                                <span class="text-success">- ₹<%= order.discount.toFixed(0) %></span>
+                            </div>
+                        <% } %>
+                        <% if (order.couponDiscount > 0) { %>
+                            <div class="summary-row">
+                                <span>Coupon Discount</span>
+                                <span class="text-success">- ₹<%= order.couponDiscount.toFixed(0) %></span>
+                            </div>
+                        <% } %>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span class="text-success">Free</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total Amount</span>
+                            <span>₹<%= order.finalAmount.toFixed(0) %></span>
+                        </div>
+                    </div>
+                    <% if (order.status === 'Delivered') { %>
+                        <div class="card-footer bg-white border-0">
+                            <a href="/orders/<%= order._id %>/invoice" class="btn btn-dark btn-block mt-2" target="_blank">
+                                Download Invoice
+                            </a>
+                        </div>
+                    <% } %>
+                    <div class="card-footer bg-white border-0 pt-0">
+                        <a href="/orders" class="btn btn-outline-dark btn-block mt-2">
+                             Back to My Orders
+                        </a>
+                    </div>
+                </div>
+                
+                <% if (order.status === 'Cancelled' && order.cancellationReason) { %>
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title text-white">Cancellation Reason</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0"><%= order.cancellationReason %></p>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/jquery.nice-select.min.js"></script>
+<script src="/js/jquery.nicescroll.min.js"></script>
+<script src="/js/jquery.magnific-popup.min.js"></script>
+<script src="/js/jquery.countdown.min.js"></script>
+<script src="/js/jquery.slicknav.js"></script>
+<script src="/js/mixitup.min.js"></script>
+<script src="/js/owl.carousel.min.js"></script>
+<script src="/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -860,6 +860,44 @@ const loadWallet = async (req, res) => {
 
 
 
+const loadOrderDetails = async (req, res) => {
+  try {
+    const user = req.session.user || req.session.googleUser;
+    if (!user) {
+      return res.redirect('/login');
+    }
+    const orderId = req.params.id;
+    const userId = user._id || user;
+    
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.redirect('/page_404');
+    }
+
+    const order = await Order.findOne({ _id: orderId, userId: userId }).populate('orderedItems.productId');
+    
+    if (!order) {
+      return res.redirect('/page_404');
+    }
+
+    const addressDoc = await Address.findOne(
+      { userId: userId, 'address._id': order.address }, 
+      { 'address.$': 1 }
+    );
+    const address = addressDoc && addressDoc.address ? addressDoc.address[0] : null;
+
+    res.render('singleOrderDetails', {
+      user,
+      order,
+      address,
+      activePage: 'orders'
+    });
+  } catch (error) {
+    logger.error("Error in loadOrderDetails: %O", error);
+    res.redirect('/page_404');
+  }
+};
+
+
 module.exports = {
   loadSignup, //load
   loadLogin, //load
@@ -896,6 +934,7 @@ module.exports = {
 
   //Orders
   loadOrders,
+  loadOrderDetails,
   cancelOrder,
   returnOrder,
   invoiceDownload,
