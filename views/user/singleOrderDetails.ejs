@@ -262,6 +262,12 @@
                         </div>
                     <% } %>
                     <div class="card-footer bg-white border-0 pt-0">
+                        <% if(order.paymentStatus=='Pending' && order.paymentMethod==='Razorpay' ){ %>
+                            <button class="btn btn-success btn-block"
+                                onclick="razorPay(event,'<%=order.finalAmount%>','<%=order._id%>')">
+                                Pay Again
+                            </button>
+                        <% } %>
                         <a href="/orders" class="btn btn-outline-dark btn-block mt-2">
                              Back to My Orders
                         </a>
@@ -297,6 +303,69 @@
 <script src="/js/owl.carousel.min.js"></script>
 <script src="/js/main.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+    async function razorPay(event, finalAmount, order_id) {
+      event.preventDefault();
+
+      const { data } = await axios.post('/payment/razorpay/page-order', {
+        finalAmount
+      });
+      const options = {
+        key: data.key,
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: "Zuka Sports",
+        description: "Order Payment",
+        order_id: data.order.id,
+        handler: async function (response) {
+
+          // Verify payment on the server
+          const verification = await axios.post('/payment/razorpay/retry-verify', {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            order_id:order_id
+          });
+
+          if (verification.data.success) {
+            Swal.fire({
+              title: 'Success!',
+              text: 'Payment completed successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then(() => {
+              window.location.reload();
+            });
+          } else {
+            Swal.fire({
+              title: 'Verification Failed!',
+              text: 'Payment verification failed. Please contact support.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            Swal.fire({
+              title: 'Payment Failed!',
+              text: 'Your last payment was failed',
+              icon: 'error',
+              confirmButtonText: 'Close'
+            });
+          }
+        },
+        theme: {
+          color: "#FF0000"
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+</script>
 
 </body>
 </html>
