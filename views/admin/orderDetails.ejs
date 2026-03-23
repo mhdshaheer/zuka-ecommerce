@@ -39,8 +39,10 @@
                     <div class="col-lg-2 col-6 col-md-3">
                         <%if(orders.status=='Cancelled'){%>
                             <button class="btn btn-danger" disabled>cancelled</button>
-                            <%}else if(orders.status=='Delivered'){%>
-                                <span class="badge rounded-pill alert-primary"><%=orders.status%></span>
+                        <%}else if(orders.status=='Delivered'){%>
+                            <span class="badge rounded-pill alert-primary"><%=orders.status%></span>
+                        <%}else if(orders.paymentStatus == 'Failed'){%>
+                            <button class="btn btn-secondary" disabled>Status Disabled</button>
                         <%}else{%>
                             <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
                                 onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
@@ -94,7 +96,7 @@
                                         <%}%>
                             </p>
                             <p class="text-dark mb-2"><strong>Payment status:</strong>
-                                <%if(orders.paymentStatus==='Cancelled' ){%>
+                                <%if(orders.paymentStatus==='Cancelled' || orders.paymentStatus==='Failed'){%>
                                     <span class="badge custom-badge badge-cancel">
                                         <%=orders.paymentStatus%>
                                     </span>
@@ -170,11 +172,7 @@
 
     <!-- modal for status change -->
     <!-- Button to Trigger Modal -->
-    <div class="col-lg-2 col-6 col-md-3">
-        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal">
-            Status
-        </button>
-    </div>
+
 
     <!-- Modal Structure -->
     <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">

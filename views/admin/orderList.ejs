@@ -66,8 +66,8 @@ const getStatusClassServer = (status) => {
                                         <td><%=item.paymentMethod%></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <td id="status-<%=item._id%>">
-                                            <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') { %>
-                                                <span class="badge rounded-pill <%= getStatusClassServer(item.status) %>"><%=item.status%></span>
+                                            <% if(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') { %>
+                                                <span class="badge rounded-pill <%= item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClassServer(item.status) %>"><%=item.status%></span>
                                             <% } else { %>
                                                 <select class="form-select form-select-sm status-select" 
                                                     onchange="updateOrderStatus('<%=item._id%>', this.value)"
@@ -183,8 +183,8 @@ const getStatusClassServer = (status) => {
                     <td>${item.paymentMethod}</td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
                     <td id="status-${item._id}">
-                        ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned') 
-                            ? `<span class="badge rounded-pill ${getStatusClass(item.status)}">${item.status}</span>`
+                        ${(item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.paymentStatus === 'Failed') 
+                            ? `<span class="badge rounded-pill ${item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClass(item.status)}">${item.status}</span>`
                             : `<select class="form-select form-select-sm status-select" 
                                 onchange="updateOrderStatus('${item._id}', this.value)"
                                 style="width: 140px; font-size: 0.75rem;">

@@ -96,6 +96,15 @@ const changeOrderStatus = async (req, res) => {
   try {
     const order_id = req.params.id;
     const { status } = req.body;
+
+    const order = await Order.findById(order_id);
+    if (order && order.paymentStatus === 'Failed') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ 
+        success: false, 
+        message: "Cannot change status of an order with failed payment." 
+      });
+    }
+
     const result = await Order.updateOne({ _id: order_id }, { $set: { status: status } });
     if (result) {
       res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_ORDER_STATUS_UPDATED });
