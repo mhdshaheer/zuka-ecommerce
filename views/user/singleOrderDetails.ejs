@@ -289,23 +289,37 @@
                         </div>
                     </div>
                 <% } %>
-                <% if (order.status === 'Return Request' && order.returnReason) { %>
-                    <div class="card border-warning">
-                        <div class="card-header bg-warning text-white">
-                            <h5 class="card-title text-white">Return Reason</h5>
+                <% if (order.returnReason || order.returnRejectionReason) { %>
+                    <div class="card mt-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Return History</h5>
                         </div>
                         <div class="card-body">
-                            <p class="mb-0"><%= order.returnReason %></p>
-                        </div>
-                    </div>
-                <% } %>
-                <% if (order.status === 'Return Rejected' && order.returnRejectionReason) { %>
-                    <div class="card border-danger mt-3">
-                        <div class="card-header bg-danger text-white">
-                            <h5 class="card-title text-white">Return Rejected</h5>
-                        </div>
-                        <div class="card-body">
-                            <p class="mb-0"><strong>Reason:</strong> <%= order.returnRejectionReason %></p>
+                            <ul class="list-group list-group-flush">
+                                <% if (order.returnReason) { %>
+                                    <li class="list-group-item px-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 text-warning">Return Requested</h6>
+                                        </div>
+                                        <p class="mb-1 text-muted"><%= order.returnReason %></p>
+                                    </li>
+                                <% } %>
+                                <% if (order.status === 'Return Rejected' && order.returnRejectionReason) { %>
+                                    <li class="list-group-item px-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 text-danger">Return Rejected</h6>
+                                        </div>
+                                        <p class="mb-1 text-muted">Reason: <%= order.returnRejectionReason %></p>
+                                    </li>
+                                <% } else if (order.status === 'Returned') { %>
+                                    <li class="list-group-item px-0">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 text-success">Return Accepted</h6>
+                                        </div>
+                                        <p class="mb-1 text-muted">Refund processed to wallet.</p>
+                                    </li>
+                                <% } %>
+                            </ul>
                         </div>
                     </div>
                 <% } %>
