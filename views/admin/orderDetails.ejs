@@ -37,16 +37,18 @@
                         </h5>
                     </div>
                     <div class="col-lg-2 col-6 col-md-3">
-                        <%if(orders.status=='Cancelled'){%>
-                            <button class="btn btn-danger" disabled>cancelled</button>
-                        <%}else if(orders.status=='Delivered'){%>
-                            <span class="badge rounded-pill alert-primary"><%=orders.status%></span>
-                        <%}else if(orders.paymentStatus == 'Failed'){%>
-                            <button class="btn btn-secondary" disabled>Status Disabled</button>
-                        <%}else{%>
-                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#statusModal"
-                                onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Status</button>
-                        <%}%>
+                        <% if (orders.status === 'Cancelled' || orders.status === 'Return Rejected') { %>
+                            <span class="badge rounded-pill alert-danger px-3 py-2"><%= orders.status %></span>
+                        <% } else if (orders.status === 'Returned') { %>
+                            <span class="badge rounded-pill alert-success px-3 py-2"><%= orders.status %></span>
+                        <% } else if (orders.status === 'Delivered') { %>
+                            <span class="badge rounded-pill alert-primary px-3 py-2"><%= orders.status %></span>
+                        <% } else if (orders.paymentStatus == 'Failed') { %>
+                            <span class="badge rounded-pill alert-secondary px-3 py-2">Status Disabled (Payment Failed)</span>
+                        <% } else { %>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal"
+                                onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Update Status</button>
+                        <% } %>
                     </div>
                 </div>
             </header>
