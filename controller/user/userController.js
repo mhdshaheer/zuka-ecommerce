@@ -725,14 +725,20 @@ const cancelOrder = async (req, res) => {
 
 const returnOrder = async (req, res) => {
   try {
-    const { orderId } = req.body;
-    const updateStatus = await Order.updateOne({ orderId: orderId }, { $set: { status: 'Return Request' } });
-    if (updateStatus) {
+    const { orderId, reason } = req.body;
+    const updateStatus = await Order.updateOne(
+      { orderId: orderId }, 
+      { $set: { status: 'Return Request', returnReason: reason } }
+    );
+    if (updateStatus.modifiedCount > 0) {
       res.status(httpStatusCode.OK).json({ success: true });
+    } else {
+      res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found or already returned." });
     }
 
   } catch (error) {
-    logger.error(error);
+    logger.error("Error in returnOrder:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 
 };

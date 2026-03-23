@@ -103,6 +103,9 @@ const orderSchema = new Schema({
     },
     cancellationReason:{
         type:String
+    },
+    returnReason: {
+        type: String
     }
 }, { timestamps: true })
 

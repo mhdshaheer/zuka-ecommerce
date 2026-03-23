@@ -268,6 +268,11 @@
                                 Pay Again
                             </button>
                         <% } %>
+                        <% if(order.status=='Delivered'){ %>
+                            <button class="btn btn-secondary btn-block mt-2" onclick="returnOrder('<%= order.orderId %>')">
+                                Return
+                            </button>
+                        <% } %>
                         <a href="/orders" class="btn btn-outline-dark btn-block mt-2">
                              Back to My Orders
                         </a>
@@ -284,10 +289,67 @@
                         </div>
                     </div>
                 <% } %>
+                <% if (order.status === 'Return Request' && order.returnReason) { %>
+                    <div class="card border-warning">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="card-title text-white">Return Reason</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-0"><%= order.returnReason %></p>
+                        </div>
+                    </div>
+                <% } %>
             </div>
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="returnModalLabel">Return Order</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="returnForm">
+            <p>Please select a reason for returning your order:</p>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="returnReason" id="returnReason1"
+                value="Product is damaged">
+              <label class="form-check-label" for="returnReason1">Product is damaged</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="returnReason" id="returnReason2"
+                value="Wrong item received">
+              <label class="form-check-label" for="returnReason2">Wrong item received</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="returnReason" id="returnReason3"
+                value="Found a better product elsewhere">
+              <label class="form-check-label" for="returnReason3">Found a better product elsewhere</label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="returnReason" id="returnReasonOther" value="Other">
+              <label class="form-check-label" for="returnReasonOther">Other (please specify)</label>
+            </div>
+            <div class="mt-2">
+              <textarea class="form-control" id="customReturnReason" name="customReturnReason"
+                placeholder="Type your reason here..." disabled></textarea>
+            </div>
+
+            <input type="hidden" id="returnOrderIdField" name="orderId">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="submitReturn">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -365,6 +427,77 @@
       const rzp = new Razorpay(options);
       rzp.open();
     }
+
+    function returnOrder(orderId) {
+        document.getElementById("returnOrderIdField").value = orderId;
+        const modal = new bootstrap.Modal(document.getElementById("returnModal"));
+        modal.show();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const customReturnReasonRadio = document.getElementById("returnReasonOther");
+        const customReturnReason = document.getElementById("customReturnReason");
+        const submitReturn = document.getElementById("submitReturn");
+        const returnForm = document.getElementById("returnForm");
+
+        if (customReturnReasonRadio) {
+            document.querySelectorAll('input[name="returnReason"]').forEach((input) => {
+                input.addEventListener("change", () => {
+                    customReturnReason.disabled = input.id !== "returnReasonOther";
+                    if (input.id !== "returnReasonOther") {
+                        customReturnReason.value = "";
+                    }
+                });
+            });
+        }
+
+        if (submitReturn) {
+            submitReturn.addEventListener("click", () => {
+                const formData = new FormData(returnForm);
+                const reason = formData.get("returnReason");
+                const customReasonText = formData.get("customReturnReason");
+                const orderId = formData.get("orderId");
+
+                if (!reason) {
+                    alert("Please select a reason for return.");
+                    return;
+                }
+
+                if (reason === "Other" && customReasonText.trim() === "") {
+                    alert("Please specify a reason.");
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Return product?",
+                    text: "Do you want to request a return!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, Request return!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.patch(`/orders/${orderId}/return`, {
+                            orderId: orderId,
+                            reason: reason === "Other" ? customReasonText : reason
+                        }).then(res => {
+                            if (res.status === 200) {
+                                Swal.fire({
+                                    title: "Return Requested!",
+                                    text: "Your return request has been submitted.",
+                                    icon: "success"
+                                }).then(() => {
+                                    bootstrap.Modal.getInstance(document.getElementById("returnModal")).hide();
+                                    window.location.reload()
+                                })
+                            }
+                        })
+                    }
+                });
+            });
+        }
+    });
 </script>
 
 </body>
