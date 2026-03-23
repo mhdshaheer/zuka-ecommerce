@@ -318,31 +318,20 @@ const getStock = async (req, res) => {
 
 const addOrder = async (req, res) => {
   try {
-
     const user = req.session.user || req.session.googleUser;
     const { totalPrice, address, paymentMethod, index } = req.body;
     const userWallet = await Wallet.findOne({ userId: user._id });
 
-    // For blocked product handle:
+    // Get cart content
     const cart = await Cart.findOne({ userId: user._id }).populate('items.productId');
-
-    if (!cart) {
+    if (!cart || cart.items.length === 0) {
       return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_CART_NOT_FOUND });
     }
 
-
-    const cartWithProducts = await Cart.findById(cart._id).populate({
-      path: 'items.productId',
-      select: 'category'
-    });
+    // Block checks
     const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
     const blockedCategoryIds = unblockedCategoryIds.map((category) => category._id.toString());
-    const isAnyCategoryBlocked = cartWithProducts.items.some((item) =>
-    blockedCategoryIds.includes(item.productId.category.toString())
-    );
-
-
-
+    const isAnyCategoryBlocked = cart.items.some((item) => blockedCategoryIds.includes(item.productId.category.toString()));
     const isAnyProductBlocked = cart.items.some((item) => item.productId.isBlocked);
 
     if (isAnyProductBlocked || isAnyCategoryBlocked) {
@@ -351,74 +340,79 @@ const addOrder = async (req, res) => {
       });
     }
 
-    // Insufficient balance 
-    if (paymentMethod == 'Wallet') {
-      if (userWallet.balance < totalPrice) {
+    const totalDiscount = req.session.discountPrice || 0;
+    const finalAmountOverall = totalPrice - totalDiscount;
+
+    // Balance check for Wallet
+    if (paymentMethod === 'Wallet') {
+      if (userWallet.balance < finalAmountOverall) {
         return res.status(httpStatusCode.PAYMENT_REQUIRED).json({ message: constants.MSG_INSUFFICIENT_BALANCE_TO_PROCESS_THE_TRANSACTION });
       }
     }
 
+    const itemCount = cart.items.length;
+    const equalDiscountPerItem = totalDiscount / itemCount;
 
-    const addOrder = await Order.create({
-      cartId: cart._id,
-      userId: user._id,
-      orderedItems: cart.items,
-      totalPrice,
-      finalAmount: totalPrice - (req.session.discountPrice ?? 0),
-      address: address._id,
-      index: Number(index),
-      paymentMethod,
-      couponDiscount: req.session.discountPrice || 0,
-      couponApplied: req.session.discountPrice ? true : false
+    let lastCreatedOrderId = null;
 
-    });
-    if (addOrder) {
-      const order = await Order.findOne({ cartId: cart._id });
-      if (req.session.couponId) {
+    // Loop through each item to create separate orders
+    for (const item of cart.items) {
+      const itemFinalDiscount = equalDiscountPerItem;
+      const itemFinalAmount = item.totalPrice - itemFinalDiscount;
 
-        const addToCoupon = await Coupon.updateOne(
-          { _id: req.session.couponId },
-          {
-            $push: { userId: user._id },
-            $inc: { usedCount: 1 }
-          }
-        );
-      }
-      req.session.order = order;
-
-      // Reduce stocks
-      cart.items.map(async (item) => {
-        await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } });
+      const newOrder = await Order.create({
+        userId: user._id,
+        orderedItems: [item],
+        totalPrice: item.totalPrice,
+        finalAmount: itemFinalAmount,
+        address: address._id,
+        index: Number(index),
+        paymentMethod,
+        couponDiscount: itemFinalDiscount,
+        couponApplied: totalDiscount > 0,
+        paymentStatus: paymentMethod === 'Wallet' ? 'Paid' : 'Pending'
       });
 
-      //====== Debit amount from Wallet ===============
-      if (paymentMethod == 'Wallet') {
-        let transactions = {
-          type: 'Debit',
-          amount: order.finalAmount
+      lastCreatedOrderId = newOrder._id;
 
-        };
-        await Wallet.findOneAndUpdate(
-          { userId: user._id },
-          {
-            $inc: { balance: -order.finalAmount },
-            $push: {
-              transactions: transactions
-            }
-          },
-          { upsert: true, new: true }
-        );
-        await Order.updateOne({ cartId: cart._id }, { $set: { paymentStatus: "Paid" } });
-      }
-      //==================================
-
-      await Cart.deleteOne({ userId: user._id });
-
-
-      res.status(httpStatusCode.OK).json({ orderId: order._id });
+      // Reduce stocks
+      await Product.updateOne({ [`variant._id`]: item.varientId }, { $inc: { 'variant.$.stock': -item.quantity } });
     }
+
+    // Coupon logic
+    if (req.session.couponId) {
+      await Coupon.updateOne(
+        { _id: req.session.couponId },
+        { $push: { userId: user._id }, $inc: { usedCount: 1 } }
+      );
+    }
+
+    // Debit Wallet if applicable
+    if (paymentMethod === 'Wallet') {
+      const transactions = {
+        type: 'debit',
+        amount: finalAmountOverall
+      };
+      await Wallet.findOneAndUpdate(
+        { userId: user._id },
+        {
+          $inc: { balance: -finalAmountOverall },
+          $push: { transactions: transactions }
+        },
+        { upsert: true, new: true }
+      );
+    }
+
+    await Cart.deleteOne({ userId: user._id });
+    
+    // Clear session coupon
+    req.session.discountPrice = 0;
+    req.session.couponId = null;
+
+    res.status(httpStatusCode.OK).json({ orderId: lastCreatedOrderId });
+
   } catch (error) {
-    logger.error(error);
+    logger.error("Error in split-order addOrder:", error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };

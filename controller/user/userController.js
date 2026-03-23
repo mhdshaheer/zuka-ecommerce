@@ -676,6 +676,15 @@ const cancelOrder = async (req, res) => {
     const { orderId, reason } = req.body;
     const user = req.session.user || req.session.googleUser;
 
+    const orders = await Order.findOne({ orderId: orderId });
+    if (!orders) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
+    }
+
+    if (orders.paymentStatus === 'Failed') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cannot cancel order with failed payment status." });
+    }
+
     const result = await Order.updateOne({ orderId: orderId }, {
       $set: {
         status: 'Cancelled',
@@ -683,11 +692,9 @@ const cancelOrder = async (req, res) => {
       }
     });
 
-    const orders = await Order.findOne({ orderId: orderId });
-
     if (orders.paymentStatus === 'Paid') {
       let transactions = {
-        type: 'Refund',
+        type: 'refund',
         amount: orders.finalAmount
       };
       
@@ -720,6 +727,93 @@ const cancelOrder = async (req, res) => {
   } catch (error) {
     logger.error("Error in cancelOrder:", error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+  }
+};
+
+const cancelOrderItem = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.params;
+    const { reason } = req.body;
+    const user = req.session.user || req.session.googleUser;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
+    }
+
+    const itemIndex = order.orderedItems.findIndex(i => i._id.toString() === itemId);
+    if (itemIndex === -1) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Item not found in order" });
+    }
+
+    const item = order.orderedItems[itemIndex];
+    if (item.status === 'Cancelled') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Item already cancelled" });
+    }
+
+    if (order.paymentStatus === 'Failed') {
+        return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cannot cancel item with failed payment status." });
+    }
+
+    // Update item status
+    order.orderedItems[itemIndex].status = 'Cancelled';
+    
+    // Check if ALL items are cancelled now?
+    const allCancelled = order.orderedItems.every(i => i.status === 'Cancelled');
+    if (allCancelled) {
+      order.status = 'Cancelled';
+      order.cancellationReason = "All items cancelled individually: " + reason;
+    }
+
+    // Refund if pre-paid (Paid payment status)
+    if (order.paymentStatus === 'Paid') {
+      // Pro-rate the discount: item's share of the total refund
+      const ratio = item.totalPrice / order.totalPrice;
+      const itemDiscount = (order.couponDiscount || 0) * ratio;
+      const refundAmount = Math.round(item.totalPrice - itemDiscount);
+      
+      const Wallet = require('../../models/walletSchema');
+      await Wallet.findOneAndUpdate(
+        { userId: user._id },
+        {
+          $inc: { balance: refundAmount },
+          $push: {
+            transactions: {
+              type: 'refund',
+              amount: refundAmount,
+              description: `Refund for cancelled item in order #${order.orderId}`
+            }
+          }
+        },
+        { upsert: true }
+      );
+
+      // Reduce the order totals
+      order.totalPrice -= item.totalPrice;
+      order.finalAmount -= refundAmount;
+      order.couponDiscount -= itemDiscount;
+
+      // If all items cancelled, mark order as refunded too
+      if (allCancelled) {
+          order.paymentStatus = 'Refunded';
+      }
+    }
+
+    // Return stock
+    const Product = require('../../models/productSchema');
+    await Product.updateOne(
+        { [`variant._id`]: item.varientId }, 
+        { $inc: { 'variant.$.stock': item.quantity } }
+    );
+
+    // Save order
+    await order.save();
+
+    res.status(httpStatusCode.OK).json({ success: true, message: "Item cancelled successfully" });
+
+  } catch (error) {
+    logger.error("Error in cancelOrderItem:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -942,6 +1036,7 @@ module.exports = {
   loadOrders,
   loadOrderDetails,
   cancelOrder,
+  cancelOrderItem,
   returnOrder,
   invoiceDownload,
 

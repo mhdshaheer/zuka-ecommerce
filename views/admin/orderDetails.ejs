@@ -86,16 +86,15 @@
                         </div>
                         <!-- Shipping Information -->
                         <div class="col-md-4">
-                            <p class="text-dark mb-2"><strong>Status:</strong>
-                                <%if(orders.status==='Cancelled' ){%>
-                                    <span class="badge custom-badge badge-cancel">
-                                        <%=orders.status%>
-                                    </span>
-                                    <%}else{%>
-                                        <span class="badge custom-badge">
-                                            <%=orders.status%>
-                                        </span>
-                                        <%}%>
+                            <p class="text-dark mb-2"><strong>Item Status:</strong>
+                                <span class="badge <%= item.status === 'Cancelled' ? 'bg-danger' : 'bg-primary' %> text-white px-3 py-1">
+                                    <%=item.status%>
+                                </span>
+                            </p>
+                            <p class="text-dark mb-2"><strong>Global Order Status:</strong>
+                                <span class="badge bg-light text-dark border px-3 py-1">
+                                    <%=orders.status%>
+                                </span>
                             </p>
                             <p class="text-dark mb-2"><strong>Payment status:</strong>
                                 <%if(orders.paymentStatus==='Cancelled' || orders.paymentStatus==='Failed'){%>
