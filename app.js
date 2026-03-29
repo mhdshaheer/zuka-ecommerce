@@ -2,7 +2,6 @@ const express = require('express');
 const logger = require('./helpers/logger');
 const app = express();
 const session = require("express-session");
-const nodemailer = require("nodemailer");
 const path = require('path');
 // const morgan = require('morgan')
 const passport = require("./config/passport");
