@@ -73,6 +73,9 @@ router.route('/orders/:id')
 router.route('/orders/:id/return')
   .patch(userAuth, userController.returnOrder);
 
+router.route('/orders/:orderId/items/:itemId/cancel')
+  .patch(userAuth, userController.cancelOrderItem);
+
 router.route('/orders/:id/invoice')
   .get(userAuth, userController.invoiceDownload);
 

@@ -12,8 +12,8 @@ const bcrypt = require('bcrypt');
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
-const nodemailer = require('nodemailer');
 const httpStatusCode = require('../../helpers/httpStatusCode');
+const { sendEmailVerify } = require('../../helpers/mail');
 
 //===================================================
 
@@ -41,7 +41,7 @@ const signup = async (req, res) => {
     }
 
     const otp = generateOtp();
-    await sendEmailVerify(email, otp);
+    await sendEmailVerify(email, otp, 'registration');
     
     req.session.userOtp = otp;
     req.session.userData = { name, email, password };
@@ -141,7 +141,7 @@ const resentOtp = async (req, res) => {
     let otp = generateOtp();
     req.session.userOtp = otp;
 
-    const emailSent = await sendEmailVerify(email, otp);
+    const emailSent = await sendEmailVerify(email, otp, 'registration');
 
     if (emailSent) {
       res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_OTP_RESENT_SUCCESSFULLY });
@@ -154,49 +154,7 @@ const resentOtp = async (req, res) => {
   }
 };
 
-// sent mail to user mail
-async function sendEmailVerify(email, otp) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD
-      }
-    });
-
-    const mailOptions = {
-      from: `Zuka Sports <${process.env.NODEMAILER_EMAIL}>`,
-      to: email,
-      subject: "Verify Your Email - Zuka Sports",
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #ddd; border-top: 5px solid #0d0d0d; border-radius: 10px; max-width: 500px; margin: auto;">
-          <h2 style="color: #0d0d0d; text-align: center;">Welcome to Züka!</h2>
-          <p style="font-size: 16px; color: #555;">To complete your registration, please verify your email addresses by entering the OTP code below:</p>
-          <div style="background: #f4f4f4; padding: 15px; text-align: center; border-radius: 8px; margin: 20px 0;">
-            <b style="font-size: 32px; letter-spacing: 5px; color: #0d0d0d;">${otp}</b>
-          </div>
-          <p style="font-size: 14px; color: #777; text-align: center;">This code expires in <b>10 minutes</b>. If you didn't request this, you can safely ignore this email.</p>
-          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-          <p style="font-size: 12px; color: #999; text-align: center;">Züka Sports &copy; 2024</p>
-        </div>`
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    logger.info("Email sent: %s", info.messageId);
-    return true;
-
-  } catch (error) {
-    logger.error("Error sending email", error);
-    // Log OTP to console as fallback for development
-    console.log("-----------------------------------------");
-    console.log(`!!! EMAIL DELIVERY FAILED !!!`);
-    console.log(`TARGET EMAIL: ${email}`);
-    console.log(`OTP FOR TESTING: ${otp}`);
-    console.log("-----------------------------------------");
-    return true; 
-  }
-}
+// sendEmailVerify is imported from ../../helpers/mail
 
 //==================bcrypt password =====================
 
@@ -394,21 +352,19 @@ const sentOtp = async (req, res) => {
   try {
     const { email } = req.body;
     req.session.email = email;
-    const emailFound = await User.find({ email: email });
-    req.session.user = emailFound;
-    if (emailFound) {
+    const findUser = await User.findOne({ email: email });
+    
+    if (findUser) {
       const otp = generateOtp();
       req.session.forgotOtp = otp;
+      req.session.forgotEmail = email; // Store email separately to avoid mixing up with a logged-in session user
 
-
-      const sentOtp = await sendEmailVerify(email, otp);
+      const sentOtp = await sendEmailVerify(email, otp, 'forgot-password');
       if (sentOtp) {
-        res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
-
+        return res.status(httpStatusCode.OK).json({ message: constants.MSG_SUCCESS });
       }
-
     } else {
-      res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_EMAIL_NOT_MATCH });
+      return res.status(httpStatusCode.UNAUTHORIZED).json({ message: constants.MSG_EMAIL_NOT_MATCH });
     }
 
   } catch (error) {
@@ -444,8 +400,8 @@ const resentForgotOtp = async (req, res) => {
     req.session.forgotOtp = otp;
 
 
-    const email = req.session.user.email;
-    const emailSent = await sendEmailVerify(email, otp);
+    const email = req.session.forgotEmail || req.session.email;
+    const emailSent = await sendEmailVerify(email, otp, 'forgot-password');
 
     if (emailSent) {
       res.status(httpStatusCode.OK).json({ success: true, message: constants.MSG_OTP_RESENT_SUCCESSFULLY });
@@ -676,6 +632,15 @@ const cancelOrder = async (req, res) => {
     const { orderId, reason } = req.body;
     const user = req.session.user || req.session.googleUser;
 
+    const orders = await Order.findOne({ orderId: orderId });
+    if (!orders) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
+    }
+
+    if (orders.paymentStatus === 'Failed') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cannot cancel order with failed payment status." });
+    }
+
     const result = await Order.updateOne({ orderId: orderId }, {
       $set: {
         status: 'Cancelled',
@@ -683,11 +648,9 @@ const cancelOrder = async (req, res) => {
       }
     });
 
-    const orders = await Order.findOne({ orderId: orderId });
-
     if (orders.paymentStatus === 'Paid') {
       let transactions = {
-        type: 'Refund',
+        type: 'refund',
         amount: orders.finalAmount
       };
       
@@ -720,6 +683,93 @@ const cancelOrder = async (req, res) => {
   } catch (error) {
     logger.error("Error in cancelOrder:", error);
     res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false });
+  }
+};
+
+const cancelOrderItem = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.params;
+    const { reason } = req.body;
+    const user = req.session.user || req.session.googleUser;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Order not found" });
+    }
+
+    const itemIndex = order.orderedItems.findIndex(i => i._id.toString() === itemId);
+    if (itemIndex === -1) {
+      return res.status(httpStatusCode.NOT_FOUND).json({ success: false, message: "Item not found in order" });
+    }
+
+    const item = order.orderedItems[itemIndex];
+    if (item.status === 'Cancelled') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Item already cancelled" });
+    }
+
+    if (order.paymentStatus === 'Failed') {
+        return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: "Cannot cancel item with failed payment status." });
+    }
+
+    // Update item status
+    order.orderedItems[itemIndex].status = 'Cancelled';
+    
+    // Check if ALL items are cancelled now?
+    const allCancelled = order.orderedItems.every(i => i.status === 'Cancelled');
+    if (allCancelled) {
+      order.status = 'Cancelled';
+      order.cancellationReason = "All items cancelled individually: " + reason;
+    }
+
+    // Refund if pre-paid (Paid payment status)
+    if (order.paymentStatus === 'Paid') {
+      // Pro-rate the discount: item's share of the total refund
+      const ratio = item.totalPrice / order.totalPrice;
+      const itemDiscount = (order.couponDiscount || 0) * ratio;
+      const refundAmount = Math.round(item.totalPrice - itemDiscount);
+      
+      const Wallet = require('../../models/walletSchema');
+      await Wallet.findOneAndUpdate(
+        { userId: user._id },
+        {
+          $inc: { balance: refundAmount },
+          $push: {
+            transactions: {
+              type: 'refund',
+              amount: refundAmount,
+              description: `Refund for cancelled item in order #${order.orderId}`
+            }
+          }
+        },
+        { upsert: true }
+      );
+
+      // Reduce the order totals
+      order.totalPrice -= item.totalPrice;
+      order.finalAmount -= refundAmount;
+      order.couponDiscount -= itemDiscount;
+
+      // If all items cancelled, mark order as refunded too
+      if (allCancelled) {
+          order.paymentStatus = 'Refunded';
+      }
+    }
+
+    // Return stock
+    const Product = require('../../models/productSchema');
+    await Product.updateOne(
+        { [`variant._id`]: item.varientId }, 
+        { $inc: { 'variant.$.stock': item.quantity } }
+    );
+
+    // Save order
+    await order.save();
+
+    res.status(httpStatusCode.OK).json({ success: true, message: "Item cancelled successfully" });
+
+  } catch (error) {
+    logger.error("Error in cancelOrderItem:", error);
+    res.status(httpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -942,6 +992,7 @@ module.exports = {
   loadOrders,
   loadOrderDetails,
   cancelOrder,
+  cancelOrderItem,
   returnOrder,
   invoiceDownload,
 

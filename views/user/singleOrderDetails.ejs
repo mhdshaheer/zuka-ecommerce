@@ -195,8 +195,21 @@
                                             </div>
                                         </div>
                                     <% } %>
-                                    <div class="product-price">
-                                        ₹<%= (item.price * item.quantity).toFixed(0) %>
+                                    <div class="product-status-cancel d-flex flex-column align-items-end">
+                                        <div class="product-price mb-1">
+                                            ₹<%= (item.price * item.quantity).toFixed(0) %>
+                                        </div>
+                                        <div class="mb-2">
+                                            <span class="badge rounded-pill <%= item.status === 'Cancelled' ? 'bg-danger' : 'bg-light text-dark border' %>">
+                                                <%= item.status %>
+                                            </span>
+                                        </div>
+                                        <% if (['Pending', 'Processing'].includes(order.status) && item.status !== 'Cancelled' && order.paymentStatus !== 'Failed') { %>
+                                            <button class="btn btn-sm btn-outline-danger mt-1" 
+                                                onclick="cancelOrderItem('<%= order._id %>', '<%= item._id %>', '<%= item.totalPrice %>')">
+                                                Cancel Item
+                                            </button>
+                                        <% } %>
                                     </div>
                                 </li>
                             <% }) %>
@@ -522,6 +535,43 @@
             });
         }
     });
+
+    async function cancelOrderItem(orderId, itemId, itemTotal) {
+      const { value: reason } = await Swal.fire({
+          title: 'Cancel Item',
+          input: 'textarea',
+          inputLabel: 'Reason for cancellation',
+          inputPlaceholder: 'Type your reason here...',
+          showCancelButton: true,
+          inputValidator: (value) => {
+              if (!value) {
+                  return 'You need to write something!'
+              }
+          }
+      });
+
+      if (reason) {
+          try {
+              const response = await axios.patch(`/orders/${orderId}/items/${itemId}/cancel`, { reason });
+              if (response.data.success) {
+                  Swal.fire({
+                      title: 'Cancelled!',
+                      text: 'The item has been cancelled successfully.',
+                      icon: 'success',
+                      timer: 2000,
+                      showConfirmButton: false
+                  }).then(() => {
+                      location.reload();
+                  });
+              } else {
+                  Swal.fire('Error', response.data.message || 'Failed to cancel item.', 'error');
+              }
+          } catch (error) {
+              console.error('Error cancelling item:', error);
+              Swal.fire('Error', 'An error occurred while cancelling the item.', 'error');
+          }
+      }
+    }
 </script>
 
 </body>
