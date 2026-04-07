@@ -135,6 +135,14 @@
                                 confirmButtonText: 'Okay'
                             })
                 }
+                if (Number(variantPrice.value) > Number('<%=product.regularPrice%>')) {
+                    return Swal.fire({
+                        title: 'Not valid!',
+                        text: 'Variant price cannot be greater than main product price (₹<%=product.regularPrice%>)',
+                        icon: 'warning',
+                        confirmButtonText: 'Okay'
+                    })
+                }
                 Swal.fire({
                     title: 'Updating...',
                     allowOutsideClick: false,
@@ -254,6 +262,15 @@
                     Swal.fire({
                         title: 'Error!',
                         text: 'Variant price must be a positive number.',
+                        icon: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                    return;
+                }
+                if (Number(variantPrice) > Number('<%=product.regularPrice%>')) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Variant price cannot be greater than main product price (₹<%=product.regularPrice%>)',
                         icon: 'error',
                         confirmButtonText: 'Okay'
                     });

@@ -277,7 +277,7 @@
     <!-- Modal to Edit Product -->
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProductModalLabel">Add Product Variants</h5>
@@ -330,21 +330,24 @@
                                     <option value="US 13">US 13</option>
                                 </optgroup>
                             </select>
+                            <div id="varientSizeError" class="text-danger" style="display: none;"></div>
                         </div>
                         <div class="mb-3">
                             <label for="productStocks" class="form-label">Stocks</label>
                             <input type="number" class="form-control" id="varientStock"
                                 placeholder="Enter stock quantity">
+                            <div id="varientStockError" class="text-danger" style="display: none;"></div>
                         </div>
                         <div class="mb-3">
                             <label for="productPrice" class="form-label">Price</label>
                             <input type="number" class="form-control" id="varientPrice" placeholder="Enter price">
+                            <div id="varientPriceError" class="text-danger" style="display: none;"></div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="saveProductChanges">Save
+                    <button type="button" class="btn btn-primary" id="saveProductChanges">Save
                         changes</button>
                 </div>
             </div>
@@ -375,7 +378,7 @@
     <!-- ======================crop modal======================== -->
     <!-- Crop Modal -->
     <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
@@ -427,7 +430,7 @@
                 dropdownParent: $('#editProductModal')
             });
         });
-        const name = document.getElementById('productName')
+        const productNameInput = document.getElementById('productName')
         const description = document.getElementById('description');
         const category = document.getElementById('category');
         const subcategory = document.getElementById('subcategory');
@@ -435,7 +438,7 @@
         const offerPrice = document.getElementById('offerPrice');
         const colour = document.getElementById('colour');
         const images = document.getElementById('images');
-        const status = document.getElementById('status');
+        const productStatusInput = document.getElementById('status');
 
         const productForm = document.getElementById('productForm');
         const productError = document.getElementById('productError');
@@ -605,7 +608,7 @@
                 let isValid = true;
                 
                 // Call all validation functions to show all errors
-                const v1 = validateProductName(name.value);
+                const v1 = validateProductName(productNameInput.value);
                 const v2 = validateProductDescription(description.value);
                 const v3 = validateCategory(category.value);
                 const v4 = validatePrice(price.value);
@@ -633,7 +636,7 @@
                 let image1 = document.getElementById("images-1").files[0]
                 //form data
                 const formData = new FormData();
-                formData.append('name', name.value);
+                formData.append('name', productNameInput.value);
                 formData.append('description', description.value)
                 formData.append('category', category.value)
                 // formData.append('subcategory', subcategory.value)
@@ -689,30 +692,74 @@
 
 
 
-    </script>
-    <script>
         let variantArray = [];
 
         document.getElementById("saveProductChanges").addEventListener("click", () => {
-
-
-            let obj = {
-                size: document.getElementById("varientSize").value,
-                stock: document.getElementById("varientStock").value,
-                price: document.getElementById("varientPrice").value
+            const size = document.getElementById("varientSize").value;
+            const stock = document.getElementById("varientStock").value;
+            const price = document.getElementById("varientPrice").value;
+            
+            const sizeError = document.getElementById("varientSizeError");
+            const stockError = document.getElementById("varientStockError");
+            const priceError = document.getElementById("varientPriceError");
+            
+            // Reset errors
+            [sizeError, stockError, priceError].forEach(e => {
+                e.style.display = 'none';
+                e.innerHTML = '';
+            });
+            
+            let isValid = true;
+            
+            if (!size) {
+                sizeError.style.display = 'block';
+                sizeError.innerHTML = 'Please select a size';
+                isValid = false;
+            } else if (variantArray.some(v => v.size === size)) {
+                sizeError.style.display = 'block';
+                sizeError.innerHTML = 'This size has already been added';
+                isValid = false;
             }
-
-
-            variantArray.push(obj)
-            saveChanges()
-
+            
+            if (!stock || stock <= 0) {
+                stockError.style.display = 'block';
+                stockError.innerHTML = 'Stock must be greater than zero';
+                isValid = false;
+            }
+            
+            if (!price || price <= 0) {
+                priceError.style.display = 'block';
+                priceError.innerHTML = 'Price must be greater than zero';
+                isValid = false;
+            } else {
+                const mainPrice = document.getElementById('price').value;
+                if (mainPrice && Number(price) > Number(mainPrice)) {
+                    priceError.style.display = 'block';
+                    priceError.innerHTML = `Variant price cannot be greater than main product price (₹${mainPrice})`;
+                    isValid = false;
+                }
+            }
+            
+            if (isValid) {
+                let obj = {
+                    size: size,
+                    stock: stock,
+                    price: price
+                }
+                variantArray.push(obj)
+                saveChanges()
+                
+                // Clear inputs
+                document.getElementById("varientStock").value = '';
+                document.getElementById("varientPrice").value = '';
+                $('#varientSize').val(null).trigger('change');
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+            }
         })
 
-
-
         function saveChanges() {
-            
-
             let tbody = document.getElementById("tbody")
             tbody.innerHTML = ''
             variantArray.map((item, index) => {
@@ -739,9 +786,6 @@
             saveChanges();
         }
 
-    </script>
-    
-    <script>
         let cropper;
         let activeIndex = -1;
 
@@ -815,23 +859,23 @@
         // Save Cropped Image
         document.getElementById('saveCrop').addEventListener('click', function () {
             if (cropper && activeIndex !== -1) {
-                const canvas = cropper.getCroppedCanvas();
-                const croppedImageUrl = canvas.toDataURL('image/jpeg');
+                const canvas = cropper.getCroppedCanvas({
+                    width: 1000, height: 1000 // Higher resolution for quality
+                });
+                const croppedImageUrl = canvas.toDataURL('image/jpeg', 0.9);
 
-                // Update the correct preview
+                // Update the UI preview
                 const previewDiv = document.getElementById(`preview-${activeIndex}`);
-                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
+                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped Preview" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
 
-                // Set the cropped file back to the original input
+                // Convert to blob and set to input for upload
                 canvas.toBlob((blob) => {
-                    const file = new File([blob], `product-image-${activeIndex}.jpg`, { type: 'image/jpeg' });
-                    
+                    const file = new File([blob], `cropped_image_${activeIndex}.jpg`, { type: 'image/jpeg' });
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(file);
                     document.getElementById(`images-${activeIndex}`).files = dataTransfer.files;
-                }, 'image/jpeg');
+                }, 'image/jpeg', 0.9);
 
-                // Close Modal
                 const modalInstance = bootstrap.Modal.getInstance(cropModal);
                 modalInstance.hide();
             }
