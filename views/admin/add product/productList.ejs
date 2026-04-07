@@ -176,7 +176,7 @@
     <!-- modal -->
 
     <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="productModalLabel">Edit Product</h5>
@@ -236,7 +236,7 @@
 
     <div class="modal fade" id="imageUploadModal" tabindex="-1" aria-labelledby="imageUploadModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="imageUploadModalLabel">Manage Images and Variants</h5>
@@ -302,7 +302,7 @@
 
     <!-- Crop Modal -->
     <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
@@ -310,7 +310,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="img-container" style="height: 400px; width: 100%;">
-                        <img id="imageToCrop" style="display: block; max-width: 100%;">
+                        <img id="imageToCrop" style="display: block; max-width: 100%;" crossorigin="anonymous">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -367,92 +367,52 @@
 
         let currentProductId = null;
 
-        // Edit product
-        document.querySelectorAll('.btn-edit-product').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const { id, name, price, offer, color, desc, category } = this.dataset;
-                currentProductId = id;
-                
-                document.getElementById('productName').value = name;
-                document.getElementById('regularPrice').value = price;
-                document.getElementById('description').value = desc;
-                document.getElementById('color').value = color;
-                document.getElementById('category').value = category;
-                
-                // Calculating discount percentage
-                const regPrice = parseFloat(price);
-                const offPrice = parseFloat(offer);
-                document.getElementById('offerPrice').value = Math.floor(((regPrice - offPrice) / regPrice) * 100);
-                
-                var modal = new bootstrap.Modal(document.getElementById('productModal'));
-                modal.show();
-            });
-        });
-
-        document.getElementById('saveChangesBtn').addEventListener('click', (e) => {
-            e.preventDefault();
-            const offerPerc = document.getElementById('offerPrice').value;
-
-            if(offerPerc > 100 || offerPerc < 0){
-                return Swal.fire({
-                    title: 'Warning!',
-                    text: 'Offer must be between 0 and 100!',
-                    icon: 'warning',
-                    confirmButtonText: 'Okay'
-                });
-            }
-
-            const options = {
-                productName: document.getElementById('productName').value,
-                description: document.getElementById('description').value,
-                category: document.getElementById('category').value,
-                regularPrice: document.getElementById('regularPrice').value,
-                offerPrice: offerPerc,
-                color: document.getElementById('color').value
-            };
-
-            Swal.fire({
-                title: 'Updating...',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
+        function attachActionListeners() {
+            // Re-bind Edit Product
+            document.querySelectorAll('.btn-edit-product').forEach(btn => {
+                btn.onclick = function() {
+                    const { id, name, price, offer, color, desc, category } = this.dataset;
+                    currentProductId = id;
+                    document.getElementById('productName').value = name;
+                    document.getElementById('regularPrice').value = price;
+                    document.getElementById('description').value = desc;
+                    document.getElementById('color').value = color;
+                    document.getElementById('category').value = category;
+                    const regPrice = parseFloat(price);
+                    const offPrice = parseFloat(offer);
+                    document.getElementById('offerPrice').value = Math.floor(((regPrice - offPrice) / regPrice) * 100);
+                    new bootstrap.Modal(document.getElementById('productModal')).show();
+                };
             });
 
-            fetch(`/admin/products/${currentProductId}`, {
-                method: "PUT",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(options)
-            })
-            .then(res => res.json())
-            .then(data => {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Product Updated successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                }).then(() => window.location.reload());
-            })
-            .catch(err => {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Failed to update product.',
-                    icon: 'error',
-                    confirmButtonText: 'Okay'
-                });
+            // Re-bind Edit Images
+            document.querySelectorAll('.btn-edit-images').forEach(btn => {
+                btn.onclick = function() {
+                    currentProductId = this.dataset.id;
+                    try {
+                        const images = JSON.parse(this.dataset.images);
+                        for(let i=0; i<4; i++){
+                            const imgEl = document.getElementById(`imgDiv${i+1}`);
+                            if(imgEl) {
+                                if(images[i]) { imgEl.src = images[i]; imgEl.style.display = "block"; }
+                                else { imgEl.src = ""; imgEl.style.display = "none"; }
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error parsing images data", e);
+                    }
+                    new bootstrap.Modal(document.getElementById('imageUploadModal')).show();
+                };
             });
-        });
 
-        // Block/Unblock
-        document.querySelectorAll('.btn-block-product').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                confirmBlock(e, this.dataset.id);
+            // Re-bind Block/Unblock
+            document.querySelectorAll('.btn-block-product').forEach(btn => {
+                btn.onclick = function(e) { confirmBlock(e, this.dataset.id); };
             });
-        });
-
-        document.querySelectorAll('.btn-unblock-product').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                confirmUnBlock(e, this.dataset.id);
+            document.querySelectorAll('.btn-unblock-product').forEach(btn => {
+                btn.onclick = function(e) { confirmUnBlock(e, this.dataset.id); };
             });
-        });
+        }
 
         async function confirmBlock(event, id) {
             Swal.fire({
@@ -472,6 +432,7 @@
                     });
                     let response = await fetch('/admin/products/' + id + '/block', { method: 'PATCH' });
                     if(response.ok) window.location.reload();
+                    else Swal.fire('Error', 'Failed to block product', 'error');
                 }
             });
         }
@@ -494,72 +455,10 @@
                     });
                     let response = await fetch('/admin/products/' + id + '/unblock', { method: 'PATCH' });
                     if(response.ok) window.location.reload();
+                    else Swal.fire('Error', 'Failed to unblock product', 'error');
                 }
             });
         }
-
-        // Image managed
-        document.querySelectorAll('.btn-edit-images').forEach(btn => {
-            btn.addEventListener('click', function() {
-                currentProductId = this.dataset.id;
-                const images = JSON.parse(this.dataset.images);
-                
-                for(let i=0; i<4; i++){
-                    const imgEl = document.getElementById(`imgDiv${i+1}`);
-                    if(images[i]) {
-                        imgEl.src = images[i];
-                        imgEl.style.display = "block";
-                    } else {
-                        imgEl.src = "";
-                        imgEl.style.display = "none";
-                    }
-                }
-                
-                var modal = new bootstrap.Modal(document.getElementById('imageUploadModal'));
-                modal.show();
-            });
-        });
-
-        document.getElementById('updateImageId').addEventListener('click', (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            const imageInputs = [
-                document.getElementById('image1'),
-                document.getElementById('image2'),
-                document.getElementById('image3'),
-                document.getElementById('image4'),
-            ];
-
-            imageInputs.forEach((input, index) => {
-                if(input.files.length > 0) {
-                    formData.append('images', input.files[0]);
-                    formData.append('indexes', index);
-                }
-            });
-
-            Swal.fire({
-                title: 'Uploading...',
-                allowOutsideClick: false,
-                didOpen: () => Swal.showLoading()
-            });
-
-            fetch(`/admin/products/${currentProductId}/images`, {
-                method: 'PATCH',
-                body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-                Swal.fire({
-                    title: 'Success!',
-                    text: 'Images updated successfully!',
-                    icon: 'success',
-                    confirmButtonText: 'Okay'
-                }).then(() => window.location.reload());
-            })
-            .catch(err => {
-                Swal.fire({ title: 'Error!', text: 'Failed to update images.', icon: 'error' });
-            });
-        });
 
         function previewImage(input, previewId) {
             const previewDiv = document.getElementById(previewId);
@@ -571,36 +470,6 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
-
-        // Pagination AJAX
-        document.addEventListener('click', (e) => {
-            const target = e.target.closest('.page-link');
-            if (target) {
-                e.preventDefault();
-                const url = new URL(target.href);
-                url.searchParams.set('ajax', 'true');
-
-                Swal.fire({
-                    title: 'Loading Products...',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                axios.get(url.toString())
-                    .then(response => {
-                        const { products, currentPage, totalPages, limit } = response.data;
-                        const search = url.searchParams.get('search') || '';
-                        updateTable(products, currentPage, limit);
-                        updatePagination(currentPage, totalPages, search);
-                        window.history.pushState({}, '', target.href);
-                        Swal.close();
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        window.location.href = target.href;
-                    });
-            }
-        });
 
         function updateTable(products, currentPage, limit) {
             const tbody = document.getElementById('productTableBody');
@@ -663,21 +532,16 @@
                     </td>
                 </tr>
             `).join('');
-            
-            // Re-bind listeners for newly created buttons
             attachActionListeners();
         }
 
         function updatePagination(currentPage, totalPages, search = "") {
             const paginationArea = document.getElementById('paginationArea');
             let paginationHtml = '<nav aria-label="Page navigation example"><ul class="pagination justify-content-start">';
-            
             const searchParam = search ? `&search=${search}` : '';
-
             if (currentPage > 1) {
                 paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage - 1}${searchParam}">Previous</a></li>`;
             }
-
             for (let i = 1; i <= totalPages; i++) {
                 paginationHtml += `
                     <li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -685,58 +549,139 @@
                     </li>
                 `;
             }
-
             if (currentPage < totalPages) {
                 paginationHtml += `<li class="page-item"><a class="page-link" href="?page=${currentPage + 1}${searchParam}">Next</a></li>`;
             }
-
             paginationHtml += '</ul></nav>';
             paginationArea.innerHTML = paginationHtml;
         }
 
-        function attachActionListeners() {
-            // Re-bind Edit Product
-            document.querySelectorAll('.btn-edit-product').forEach(btn => {
-                btn.onclick = function() {
-                    const { id, name, price, offer, color, desc, category } = this.dataset;
-                    currentProductId = id;
-                    document.getElementById('productName').value = name;
-                    document.getElementById('regularPrice').value = price;
-                    document.getElementById('description').value = desc;
-                    document.getElementById('color').value = color;
-                    document.getElementById('category').value = category;
-                    const regPrice = parseFloat(price);
-                    const offPrice = parseFloat(offer);
-                    document.getElementById('offerPrice').value = Math.floor(((regPrice - offPrice) / regPrice) * 100);
-                    new bootstrap.Modal(document.getElementById('productModal')).show();
-                };
-            });
+        // AJAX Pagination support
+        document.addEventListener('click', (e) => {
+            const target = e.target.closest('.page-link');
+            if (target) {
+                e.preventDefault();
+                const url = new URL(target.href);
+                url.searchParams.set('ajax', 'true');
+                Swal.fire({ title: 'Loading...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                axios.get(url.toString())
+                    .then(response => {
+                        const { products, currentPage, totalPages, limit } = response.data;
+                        const search = url.searchParams.get('search') || '';
+                        updateTable(products, currentPage, limit);
+                        updatePagination(currentPage, totalPages, search);
+                        window.history.pushState({}, '', target.href);
+                        Swal.close();
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        window.location.href = target.href;
+                    });
+            }
+        });
 
-            // Re-bind Edit Images
-            document.querySelectorAll('.btn-edit-images').forEach(btn => {
-                btn.onclick = function() {
-                    currentProductId = this.dataset.id;
-                    const images = JSON.parse(this.dataset.images);
-                    for(let i=0; i<4; i++){
-                        const imgEl = document.getElementById(`imgDiv${i+1}`);
-                        if(images[i]) { imgEl.src = images[i]; imgEl.style.display = "block"; }
-                        else { imgEl.src = ""; imgEl.style.display = "none"; }
-                    }
-                    new bootstrap.Modal(document.getElementById('imageUploadModal')).show();
-                };
-            });
+        attachActionListeners();
 
-            // Re-bind Block/Unblock
-            document.querySelectorAll('.btn-block-product').forEach(btn => {
-                btn.onclick = function(e) { confirmBlock(e, this.dataset.id); };
-            });
-            document.querySelectorAll('.btn-unblock-product').forEach(btn => {
-                btn.onclick = function(e) { confirmUnBlock(e, this.dataset.id); };
-            });
+        // Separate listener for the Modal's 'Save Changes' button (outside the loop)
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        if (saveChangesBtn) {
+            saveChangesBtn.onclick = function(e) {
+                e.preventDefault();
+                const offerPerc = document.getElementById('offerPrice').value;
+
+                if (offerPerc > 100 || offerPerc < 0) {
+                    return Swal.fire({
+                        title: 'Warning!',
+                        text: 'Offer must be between 0 and 100!',
+                        icon: 'warning',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                const options = {
+                    productName: document.getElementById('productName').value,
+                    description: document.getElementById('description').value,
+                    category: document.getElementById('category').value,
+                    regularPrice: document.getElementById('regularPrice').value,
+                    offerPrice: offerPerc,
+                    color: document.getElementById('color').value
+                };
+
+                Swal.fire({
+                    title: 'Updating...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                fetch(`/admin/products/${currentProductId}`, {
+                    method: "PUT",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(options)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Product Updated successfully!',
+                        icon: 'success'
+                    }).then(() => window.location.reload());
+                })
+                .catch(err => {
+                    Swal.fire({ title: 'Error!', text: 'Failed to update product.', icon: 'error' });
+                });
+            };
         }
 
-        // Initialize listeners
-        attachActionListeners();
+        // Image Update Submission
+        const updateImageBtn = document.getElementById('updateImageId');
+        if (updateImageBtn) {
+            updateImageBtn.onclick = function(e) {
+                e.preventDefault();
+                const formData = new FormData();
+                const imageInputs = [
+                    document.getElementById('image1'),
+                    document.getElementById('image2'),
+                    document.getElementById('image3'),
+                    document.getElementById('image4'),
+                ];
+
+                let hasFile = false;
+                imageInputs.forEach((input, index) => {
+                    if (input && input.files && input.files.length > 0) {
+                        formData.append('images', input.files[0]);
+                        formData.append('indexes', index);
+                        hasFile = true;
+                    }
+                });
+
+                if (!hasFile) {
+                    return Swal.fire('Wait!', 'Please select at least one image to update.', 'info');
+                }
+
+                Swal.fire({
+                    title: 'Uploading...',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                fetch(`/admin/products/${currentProductId}/images`, {
+                    method: 'PATCH',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Images updated successfully!',
+                        icon: 'success'
+                    }).then(() => window.location.reload());
+                })
+                .catch(err => {
+                    Swal.fire({ title: 'Error!', text: 'Failed to update images.', icon: 'error' });
+                });
+            };
+        }
+
 
         // Image Cropping Logic
         let cropper;
@@ -747,16 +692,19 @@
 
         function openCropModal(inputId) {
             const input = document.getElementById(inputId);
-            if (!input.files || !input.files[0]) {
+            const previewId = 'preview' + inputId.replace('image', '');
+            const previewDiv = document.getElementById(previewId);
+            const existingImg = previewDiv ? previewDiv.querySelector('img') : null;
+
+            // Allow cropping if there's either a new file OR an existing image preview
+            if ((!input.files || !input.files[0]) && (!existingImg || !existingImg.src || existingImg.src === window.location.href)) {
                 Swal.fire('Error', 'Please select an image first', 'error');
                 return;
             }
             
             currentInputId = inputId;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageToCrop.src = e.target.result;
-                // Re-initialize cropper after modal is shown
+            const startCropper = (src) => {
+                imageToCrop.src = src;
                 const onShown = () => {
                     if (cropper) cropper.destroy();
                     cropper = new Cropper(imageToCrop, {
@@ -769,20 +717,34 @@
                 cropModalEl.addEventListener('shown.bs.modal', onShown);
                 cropModal.show();
             };
-            reader.readAsDataURL(input.files[0]);
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => startCropper(e.target.result);
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                startCropper(existingImg.src);
+            }
         }
 
         document.getElementById('saveCrop').addEventListener('click', () => {
             if (!cropper) return;
-            const canvas = cropper.getCroppedCanvas();
-            const croppedDataUrl = canvas.toDataURL('image/jpeg');
+            const canvas = cropper.getCroppedCanvas({
+                width: 1000, height: 1000 // High res
+            });
+            const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.9);
             
-            // Update the UI preview with the cropped image so the user sees their feedback
             const previewId = 'preview' + currentInputId.replace('image', '');
             document.getElementById(previewId).innerHTML = `<img src="${croppedDataUrl}" style="max-width: 100%; height: auto;">`;
             
-            // We NO LONGER overwrite the input.files with the cropped blob.
-            // This ensures Cloudinary receives the full, original high-quality image.
+            // Convert to file so the cropped version is actually uploaded
+            canvas.toBlob((blob) => {
+                const file = new File([blob], `cropped_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                const input = document.getElementById(currentInputId);
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                input.files = dataTransfer.files;
+            }, 'image/jpeg', 0.9);
             
             cropModal.hide();
         });

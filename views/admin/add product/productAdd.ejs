@@ -277,7 +277,7 @@
     <!-- Modal to Edit Product -->
     <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProductModalLabel">Add Product Variants</h5>
@@ -378,7 +378,7 @@
     <!-- ======================crop modal======================== -->
     <!-- Crop Modal -->
     <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
@@ -859,18 +859,23 @@
         // Save Cropped Image
         document.getElementById('saveCrop').addEventListener('click', function () {
             if (cropper && activeIndex !== -1) {
-                const canvas = cropper.getCroppedCanvas();
-                const croppedImageUrl = canvas.toDataURL('image/jpeg');
+                const canvas = cropper.getCroppedCanvas({
+                    width: 1000, height: 1000 // Higher resolution for quality
+                });
+                const croppedImageUrl = canvas.toDataURL('image/jpeg', 0.9);
 
-                // Update the UI preview with the cropped image so the user sees their edit
+                // Update the UI preview
                 const previewDiv = document.getElementById(`preview-${activeIndex}`);
                 previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped Preview" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
 
-                // IMPORTANT: We DO NOT overwrite the file input with the cropped blob anymore.
-                // This ensures the FULL high-quality original image is sent to Cloudinary.
-                // The cropped portion was just for the user's visual confirmation.
+                // Convert to blob and set to input for upload
+                canvas.toBlob((blob) => {
+                    const file = new File([blob], `cropped_image_${activeIndex}.jpg`, { type: 'image/jpeg' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById(`images-${activeIndex}`).files = dataTransfer.files;
+                }, 'image/jpeg', 0.9);
 
-                // Close Modal
                 const modalInstance = bootstrap.Modal.getInstance(cropModal);
                 modalInstance.hide();
             }

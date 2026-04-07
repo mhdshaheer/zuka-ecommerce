@@ -18,6 +18,17 @@
     />
     <!-- Template CSS -->
     <link href="/admin/assets/css/main.css?v=1.1" rel="stylesheet" type="text/css" />
+    <style>
+      /* Fix modal scrolling and background scroll leakage */
+      body.modal-open {
+        height: 100vh;
+        overflow-y: hidden !important;
+        padding-right: 0 !important;
+      }
+      .modal {
+        overflow-y: auto !important;
+      }
+    </style>
     <!-- Vendor JS (Loaded first for SPA) -->
     <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
