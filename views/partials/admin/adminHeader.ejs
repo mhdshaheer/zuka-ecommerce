@@ -170,32 +170,51 @@
                         if (currentMain && newMain) {
                             currentMain.innerHTML = newMain.innerHTML;
                             document.querySelectorAll('.appended-ajax-script').forEach(s => s.remove());
-                            const newScripts = doc.querySelectorAll('script');
-                            newScripts.forEach(script => {
-                                if (script.src) {
-                                    if (!document.querySelector(`script[src="${script.src}"]`)) {
+                            const newScripts = Array.from(doc.querySelectorAll('script'));
+                            
+                            const injectScripts = async (scripts) => {
+                                for (const script of scripts) {
+                                    if (script.src) {
+                                        const scriptUrl = new URL(script.getAttribute('src'), window.location.origin).href;
+                                        const isLoaded = Array.from(document.scripts).some(s => s.src === scriptUrl);
+                                        if (!isLoaded) {
+                                            await new Promise((resolve, reject) => {
+                                                const s = document.createElement('script');
+                                                s.src = scriptUrl;
+                                                s.className = 'appended-ajax-script';
+                                                s.onload = resolve;
+                                                s.onerror = reject;
+                                                document.body.appendChild(s);
+                                            });
+                                        }
+                                    } else if (script.innerHTML.trim() !== '' && !script.innerHTML.includes('document.write')) {
                                         const s = document.createElement('script');
-                                        s.src = script.src;
+                                        let content = script.innerHTML;
+                                        
+                                        // Wrap in IIFE to isolate const/let declarations and allow multi-run without SyntaxError
+                                        // Automatically export top-level function declarations to window for HTML accessibility
+                                        const functionNames = [...content.matchAll(/(?:^|;|\n)\s*function\s+([a-zA-Z0-9_]+)\s*\(/g)].map(m => m[1]);
+                                        const exports = functionNames.map(name => `try { window.${name} = ${name}; } catch(e) {}`).join('\n');
+                                        
+                                        s.innerHTML = `(function() {\n${content}\n${exports}\n})();`;
                                         s.className = 'appended-ajax-script';
                                         document.body.appendChild(s);
                                     }
-                                } else if (script.innerHTML.trim() !== '' && !script.innerHTML.includes('document.write')) {
-                                    const s = document.createElement('script');
-                                      let content = script.innerHTML;
-                                      content = content.replace(/\bconst\s+/g, 'var ').replace(/\blet\s+/g, 'var ');
-                                      s.innerHTML = content;
-                                      s.className = 'appended-ajax-script';
-                                      document.body.appendChild(s);
                                 }
-                            });
+                            };
 
-                            window.history.pushState({}, '', url);
-                            updateActiveMenu();
-                            setTimeout(() => {
-                                document.dispatchEvent(new Event('DOMContentLoaded'));
-                                window.dispatchEvent(new Event('load'));
-                            }, 50);
-                            Swal.close();
+                            injectScripts(newScripts).then(() => {
+                                window.history.pushState({}, '', url);
+                                updateActiveMenu();
+                                setTimeout(() => {
+                                    document.dispatchEvent(new Event('DOMContentLoaded'));
+                                    window.dispatchEvent(new Event('load'));
+                                }, 50);
+                                Swal.close();
+                            }).catch(err => {
+                                console.error('Script injection error:', err);
+                                window.location.href = url;
+                            });
                         } else {
                             window.location.href = url;
                         }

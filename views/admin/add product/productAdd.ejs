@@ -427,7 +427,7 @@
                 dropdownParent: $('#editProductModal')
             });
         });
-        const name = document.getElementById('productName')
+        const productNameInput = document.getElementById('productName')
         const description = document.getElementById('description');
         const category = document.getElementById('category');
         const subcategory = document.getElementById('subcategory');
@@ -435,7 +435,7 @@
         const offerPrice = document.getElementById('offerPrice');
         const colour = document.getElementById('colour');
         const images = document.getElementById('images');
-        const status = document.getElementById('status');
+        const productStatusInput = document.getElementById('status');
 
         const productForm = document.getElementById('productForm');
         const productError = document.getElementById('productError');
@@ -605,7 +605,7 @@
                 let isValid = true;
                 
                 // Call all validation functions to show all errors
-                const v1 = validateProductName(name.value);
+                const v1 = validateProductName(productNameInput.value);
                 const v2 = validateProductDescription(description.value);
                 const v3 = validateCategory(category.value);
                 const v4 = validatePrice(price.value);
@@ -633,7 +633,7 @@
                 let image1 = document.getElementById("images-1").files[0]
                 //form data
                 const formData = new FormData();
-                formData.append('name', name.value);
+                formData.append('name', productNameInput.value);
                 formData.append('description', description.value)
                 formData.append('category', category.value)
                 // formData.append('subcategory', subcategory.value)
@@ -689,30 +689,19 @@
 
 
 
-    </script>
-    <script>
         let variantArray = [];
 
         document.getElementById("saveProductChanges").addEventListener("click", () => {
-
-
             let obj = {
                 size: document.getElementById("varientSize").value,
                 stock: document.getElementById("varientStock").value,
                 price: document.getElementById("varientPrice").value
             }
-
-
             variantArray.push(obj)
             saveChanges()
-
         })
 
-
-
         function saveChanges() {
-            
-
             let tbody = document.getElementById("tbody")
             tbody.innerHTML = ''
             variantArray.map((item, index) => {
@@ -739,9 +728,6 @@
             saveChanges();
         }
 
-    </script>
-    
-    <script>
         let cropper;
         let activeIndex = -1;
 
