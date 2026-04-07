@@ -330,21 +330,24 @@
                                     <option value="US 13">US 13</option>
                                 </optgroup>
                             </select>
+                            <div id="varientSizeError" class="text-danger" style="display: none;"></div>
                         </div>
                         <div class="mb-3">
                             <label for="productStocks" class="form-label">Stocks</label>
                             <input type="number" class="form-control" id="varientStock"
                                 placeholder="Enter stock quantity">
+                            <div id="varientStockError" class="text-danger" style="display: none;"></div>
                         </div>
                         <div class="mb-3">
                             <label for="productPrice" class="form-label">Price</label>
                             <input type="number" class="form-control" id="varientPrice" placeholder="Enter price">
+                            <div id="varientPriceError" class="text-danger" style="display: none;"></div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="saveProductChanges">Save
+                    <button type="button" class="btn btn-primary" id="saveProductChanges">Save
                         changes</button>
                 </div>
             </div>
@@ -692,13 +695,68 @@
         let variantArray = [];
 
         document.getElementById("saveProductChanges").addEventListener("click", () => {
-            let obj = {
-                size: document.getElementById("varientSize").value,
-                stock: document.getElementById("varientStock").value,
-                price: document.getElementById("varientPrice").value
+            const size = document.getElementById("varientSize").value;
+            const stock = document.getElementById("varientStock").value;
+            const price = document.getElementById("varientPrice").value;
+            
+            const sizeError = document.getElementById("varientSizeError");
+            const stockError = document.getElementById("varientStockError");
+            const priceError = document.getElementById("varientPriceError");
+            
+            // Reset errors
+            [sizeError, stockError, priceError].forEach(e => {
+                e.style.display = 'none';
+                e.innerHTML = '';
+            });
+            
+            let isValid = true;
+            
+            if (!size) {
+                sizeError.style.display = 'block';
+                sizeError.innerHTML = 'Please select a size';
+                isValid = false;
+            } else if (variantArray.some(v => v.size === size)) {
+                sizeError.style.display = 'block';
+                sizeError.innerHTML = 'This size has already been added';
+                isValid = false;
             }
-            variantArray.push(obj)
-            saveChanges()
+            
+            if (!stock || stock <= 0) {
+                stockError.style.display = 'block';
+                stockError.innerHTML = 'Stock must be greater than zero';
+                isValid = false;
+            }
+            
+            if (!price || price <= 0) {
+                priceError.style.display = 'block';
+                priceError.innerHTML = 'Price must be greater than zero';
+                isValid = false;
+            } else {
+                const mainPrice = document.getElementById('price').value;
+                if (mainPrice && Number(price) > Number(mainPrice)) {
+                    priceError.style.display = 'block';
+                    priceError.innerHTML = `Variant price cannot be greater than main product price (₹${mainPrice})`;
+                    isValid = false;
+                }
+            }
+            
+            if (isValid) {
+                let obj = {
+                    size: size,
+                    stock: stock,
+                    price: price
+                }
+                variantArray.push(obj)
+                saveChanges()
+                
+                // Clear inputs
+                document.getElementById("varientStock").value = '';
+                document.getElementById("varientPrice").value = '';
+                $('#varientSize').val(null).trigger('change');
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('editProductModal')).hide();
+            }
         })
 
         function saveChanges() {
