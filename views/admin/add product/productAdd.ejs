@@ -862,18 +862,13 @@
                 const canvas = cropper.getCroppedCanvas();
                 const croppedImageUrl = canvas.toDataURL('image/jpeg');
 
-                // Update the correct preview
+                // Update the UI preview with the cropped image so the user sees their edit
                 const previewDiv = document.getElementById(`preview-${activeIndex}`);
-                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
+                previewDiv.innerHTML = `<img src="${croppedImageUrl}" alt="Cropped Preview" style="max-width: 100%; height: auto; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
 
-                // Set the cropped file back to the original input
-                canvas.toBlob((blob) => {
-                    const file = new File([blob], `product-image-${activeIndex}.jpg`, { type: 'image/jpeg' });
-                    
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(file);
-                    document.getElementById(`images-${activeIndex}`).files = dataTransfer.files;
-                }, 'image/jpeg');
+                // IMPORTANT: We DO NOT overwrite the file input with the cropped blob anymore.
+                // This ensures the FULL high-quality original image is sent to Cloudinary.
+                // The cropped portion was just for the user's visual confirmation.
 
                 // Close Modal
                 const modalInstance = bootstrap.Modal.getInstance(cropModal);

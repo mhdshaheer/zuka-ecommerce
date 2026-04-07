@@ -777,37 +777,16 @@
             const canvas = cropper.getCroppedCanvas();
             const croppedDataUrl = canvas.toDataURL('image/jpeg');
             
-            // Helper to convert Data URL to File
-            const byteString = atob(croppedDataUrl.split(',')[1]);
-            const mimeString = croppedDataUrl.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            const blob = new Blob([ab], { type: mimeString });
-            const file = new File([blob], `cropped_${Date.now()}.jpg`, { type: 'image/jpeg' });
-
-            const input = document.getElementById(currentInputId);
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            input.files = dataTransfer.files;
-            
-            // Update preview
+            // Update the UI preview with the cropped image so the user sees their feedback
             const previewId = 'preview' + currentInputId.replace('image', '');
             document.getElementById(previewId).innerHTML = `<img src="${croppedDataUrl}" style="max-width: 100%; height: auto;">`;
+            
+            // We NO LONGER overwrite the input.files with the cropped blob.
+            // This ensures Cloudinary receives the full, original high-quality image.
             
             cropModal.hide();
         });
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    <script src="/admin/assets/js/vendors/jquery-3.6.0.min.js"></script>
-    <script src="/admin/assets/js/vendors/bootstrap.bundle.min.js"></script>
-    <script src="/admin/assets/js/vendors/select2.min.js"></script>
-    <script src="/admin/assets/js/vendors/perfect-scrollbar.js"></script>
-    <script src="/admin/assets/js/vendors/jquery.fullscreen.min.js"></script>
-    <!-- Main Script -->
-    <script src="/admin/assets/js/main.js" type="text/javascript"></script>
 
 
 
