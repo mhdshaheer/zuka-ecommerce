@@ -235,14 +235,15 @@
                     </div>
                     <div class="order-body">
                       <div class="order-detail">
-                        <strong>Address:</strong>
                         <p>
-                          <%= address[order.index].address || 'Address details here' %> <br>
-                            <%= address[order.index].city %> , <%= address[order.index].state %> , <%=
-                                  address[order.index].country %> <br>
-                                  <%= address[order.index].phone %> <br>
-                                    <%= address[order.index].altPhone %>
-
+                          <% if (address && address[order.index]) { %>
+                            <%= address[order.index].address %><br>
+                            <%= address[order.index].city %>, <%= address[order.index].state %>, <%= address[order.index].country %><br>
+                            <%= address[order.index].phone %><br>
+                            <%= address[order.index].altPhone %>
+                          <% } else { %>
+                            <span class="text-muted small">Address information unavailable</span>
+                          <% } %>
                         </p>
                       </div>
                       <div class="order-detail">
@@ -264,10 +265,14 @@
                         <div class="product-grid">
                           <% order.orderedItems.slice(0, 2).forEach((item,index)=> { %>
                             <div class="product-box">
-                              <img src="<%= item.productId.images[0] %>" alt="" />
-                              <p class="cart__price">₹ <%=item.productId.regularPrice.toFixed(0)%></p>
+                              <% if (item.productId) { %>
+                                <img src="<%= (item.productId.images && item.productId.images[0]) ? item.productId.images[0] : '/js/main.js' %>" alt="" />
+                                <p class="cart__price">₹ <%= (item.productId.regularPrice || 0).toFixed(0) %></p>
+                              <% } else { %>
+                                <div class="p-2 border rounded bg-white text-danger small">Product Deleted</div>
+                              <% } %>
                             </div>
-                            <% }); %>
+                          <% }); %>
                         </div>
                       </div>
                       <!--  -->
