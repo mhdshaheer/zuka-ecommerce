@@ -412,8 +412,20 @@
                             icon: 'warning',
                             confirmButtonText: 'Okay'
                         });
+                    } else if (error.response && error.response.status === 401) {
+                        Swal.fire({
+                            title: 'Unavailable Item!',
+                            text: error.response.data.message,
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
                     } else {
-
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An unexpected error occurred. Please try again.',
+                            icon: 'error',
+                            confirmButtonText: 'Okay'
+                        });
                     }
                 })
         }
