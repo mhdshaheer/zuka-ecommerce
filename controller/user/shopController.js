@@ -404,6 +404,10 @@ const addOrder = async (req, res) => {
     const totalDiscount = req.session.discountPrice || 0;
     const finalAmountOverall = totalPrice - totalDiscount;
 
+    if (paymentMethod === 'Cash on Delivery') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ message: "Cash on Delivery is currently unavailable." });
+    }
+
     // Balance check for Wallet
     if (paymentMethod === 'Wallet') {
       if (userWallet.balance < finalAmountOverall) {
