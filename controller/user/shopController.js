@@ -126,24 +126,41 @@ const loadProductInfo = async (req, res) => {
       return res.redirect('/login');
     }
     const productId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.redirect('/pageNotFound');
+    }
+
+    const listedCategories = await Category.find({ isListed: true }).select('_id');
+    const categoryIds = listedCategories.map((c) => c._id.toString());
+
     const productData = await Product.findOne({
       _id: productId,
       isBlocked: false,
-      variant: { $elemMatch: { isBlocked: false } }
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     });
-    if (!productData) {
+
+    if (!productData || !categoryIds.includes(productData.category.toString())) {
       return res.redirect('/shop');
     }
+
     const product = [productData];
-    const category = await Category.find({ _id: productData.category });
+    const category = await Category.findOne({ _id: productData.category });
     const relatedProduct = await Product.find({
       category: productData.category,
       _id: { $ne: productId },
       isBlocked: false,
-      variant: { $elemMatch: { isBlocked: false } }
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     }).limit(4);
+
+    // Build a safe images array with at least 4 slots
+    const images = productData.images || [];
+    const baseImage = images[0] || '';
+    const safeImages = Array.from({ length: 4 }, (_, i) => images[i] || baseImage);
+
     res.render('productDetail', {
       product,
+      safeImages,
       category,
       activePage: '',
       user,
@@ -151,6 +168,7 @@ const loadProductInfo = async (req, res) => {
     });
   } catch (error) {
     logger.error("error in product info page load", error);
+    res.redirect('/pageNotFound');
   }
 };
 

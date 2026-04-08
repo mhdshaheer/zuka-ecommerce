@@ -241,32 +241,7 @@ const loadHomePage = async (req, res) => {
 
 };
 
-const loadProductInfo = async (req, res) => {
-  try {
-    const user = req.session.user || req.session.googleUser;
-    if (user?.isBlocked == true) {
-      return res.redirect('/login');
-    }
-    const productId = req.params.id.trim();
-    const product = await Product.find({ _id: productId });
-    const category = await Category.find({ _id: product[0].category });
-    const relatedProduct = await Product.find({
-      category: product[0].category,
-      _id: { $ne: productId },
-      isBlocked: false,
-      variant: { $elemMatch: { isBlocked: false } }
-    }).limit(4);
-    res.render('productDetail', {
-      product,
-      category,
-      activePage: '',
-      user,
-      relatedProduct
-    });
-  } catch (error) {
-    logger.error("error in product info page load", error);
-  }
-};
+
 //=============== page not found ======================
 
 
@@ -960,7 +935,6 @@ module.exports = {
   loadSignup, //load
   loadLogin, //load
   loadHomePage, //load
-  loadProductInfo, // Added loadProductInfo
   pageNotFound,
   verifyOtp,
   resentOtp,
