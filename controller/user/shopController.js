@@ -28,7 +28,11 @@ const loadShop = async (req, res) => {
 
     const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
     const categoryIds = unblockedCategoryIds.map((category) => category._id);
-    let query = { isBlocked: false, category: { $nin: categoryIds } };
+    let query = { 
+      isBlocked: false, 
+      category: { $nin: categoryIds },
+      variant: { $elemMatch: { isBlocked: false } }
+    };
 
     if (search) {
       query.productName = { $regex: new RegExp(search, 'i') };
@@ -116,7 +120,11 @@ const loadProductInfo = async (req, res) => {
       return res.redirect('/login');
     }
     const productId = req.params.id;
-    const productData = await Product.findById(productId);
+    const productData = await Product.findOne({
+      _id: productId,
+      isBlocked: false,
+      variant: { $elemMatch: { isBlocked: false } }
+    });
     if (!productData) {
       return res.redirect('/shop');
     }
@@ -125,7 +133,8 @@ const loadProductInfo = async (req, res) => {
     const relatedProduct = await Product.find({
       category: productData.category,
       _id: { $ne: productId },
-      isBlocked: false
+      isBlocked: false,
+      variant: { $elemMatch: { isBlocked: false } }
     }).limit(4);
     res.render('productDetail', {
       product,

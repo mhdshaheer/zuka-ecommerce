@@ -220,7 +220,8 @@ const loadHomePage = async (req, res) => {
     const categoryIds = unblockedCategoryIds.map((category) => category._id);
     const products = await Product.find({
       isBlocked: false,
-      category: { $nin: categoryIds }
+      category: { $nin: categoryIds },
+      variant: { $elemMatch: { isBlocked: false } }
     }).
     limit(8).
     sort({ createdAt: -1 });
@@ -252,7 +253,8 @@ const loadProductInfo = async (req, res) => {
     const relatedProduct = await Product.find({
       category: product[0].category,
       _id: { $ne: productId },
-      isBlocked: false
+      isBlocked: false,
+      variant: { $elemMatch: { isBlocked: false } }
     }).limit(4);
     res.render('productDetail', {
       product,
