@@ -63,7 +63,7 @@
                     <th>ID</th>
                     <th>Name</th>
                     <th>Description</th>
-                    <th>Offer Price</th>
+                    <th>Offer Percentage</th>
                     <th>Add Offer</th>
                     <th>Status</th>
                     <th>Edit</th>
@@ -160,7 +160,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 class="modal-title" id="addPriceModalLabel">Add New Offer</h3>
+            <h3 class="modal-title" id="addPriceModalLabel">Add Category Offer</h3>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
@@ -168,7 +168,7 @@
               <input type="hidden" id="categoryIdInput">
 
               <div class="mb-3">
-                <label for="price" class="form-label">Offer Price</label>
+                <label for="price" class="form-label">Offer Percentage (%)</label>
                 <input type="number" class="form-control" id="offerPrice" name="price" required value="" min="0" max="100">
               </div>
             </form>
@@ -357,51 +357,62 @@
       saveOfferButton.onclick = (e) => {
         e.preventDefault();
 
-        if (price.value !== '0' && price.value !== '' && price.value) {
-          const offerVal = price.value;
+        const offerVal = Number(price.value);
 
-          Swal.fire({
-            title: 'Adding offer...',
-            allowOutsideClick: false,
-            didOpen: () => {
-              Swal.showLoading();
-            }
-          });
-
-          axios.patch(`/admin/categories/${id}/offer`, {
-              newPrice: offerVal
-          })
-            .then(response => {
-              modal.hide();
-              Swal.fire({
-                title: 'Success!',
-                text: 'Offer added successfully!',
-                icon: 'success',
-                confirmButtonText: 'Okay'
-              }).then(() => {
-                const row = document.getElementById(`categoryRow-${id}`);
-                if (row) {
-                  row.children[4].textContent = `${offerVal}%`;
-                  row.children[5].innerHTML = `<a class="btn btn-danger btn-sm" href="javascript:void(0)" onclick="removeOffer('${id}')">Remove</a>`;
-                }
-              });
-            })
-            .catch(err => {
-              Swal.fire({
-                title: 'Error!',
-                text: err.response?.data?.message || 'Failed to add the offer.',
-                icon: 'error',
-                confirmButtonText: 'Okay'
-              });
-            });
-        } else {
+        if (price.value === '' || isNaN(offerVal)) {
           Swal.fire({
             title: 'Error!',
-            text: 'Please enter an offer price.',
+            text: 'Please enter a valid offer percentage.',
             icon: 'error',
             confirmButtonText: 'Okay'
           });
+          return;
         }
+
+        if (offerVal < 1 || offerVal > 99) {
+          Swal.fire({
+            title: 'Invalid Offer!',
+            text: 'Category offer must be between 1% and 99%.',
+            icon: 'error',
+            confirmButtonText: 'Okay'
+          });
+          return;
+        }
+
+        Swal.fire({
+          title: 'Adding offer...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        axios.patch(`/admin/categories/${id}/offer`, {
+            newPrice: offerVal
+        })
+          .then(response => {
+            modal.hide();
+            Swal.fire({
+              title: 'Success!',
+              text: 'Offer added successfully!',
+              icon: 'success',
+              confirmButtonText: 'Okay'
+            }).then(() => {
+              const row = document.getElementById(`categoryRow-${id}`);
+              if (row) {
+                row.children[4].textContent = `${offerVal}%`;
+                row.children[5].innerHTML = `<a class="btn btn-danger btn-sm" href="javascript:void(0)" onclick="removeOffer('${id}')">Remove</a>`;
+              }
+            });
+          })
+          .catch(err => {
+            Swal.fire({
+              title: 'Error!',
+              text: err.response?.data?.message || 'Failed to add the offer.',
+              icon: 'error',
+              confirmButtonText: 'Okay'
+            });
+          });
       }
     }
 

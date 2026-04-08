@@ -46,12 +46,15 @@ const addCategory = async (req, res) => {
   try {
     const { name, description } = req.body;
 
-    const existingCategory = await Category.findOne({ name: { $regex: new RegExp("^" + name + "$", "i") } });
+    // Capitalize first letter of each word
+    const formattedName = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+
+    const existingCategory = await Category.findOne({ name: { $regex: new RegExp("^" + formattedName + "$", "i") } });
     if (existingCategory) {
       return res.status(httpStatusCode.CONFLICT).json({ error: constants.MSG_CATEGORY_ALREADY_EXISTS });
     }
     const newCategory = new Category({
-      name,
+      name: formattedName,
       description
     });
     await newCategory.save();
@@ -70,7 +73,17 @@ const addOffer = async (req, res) => {
   try {
     const categoryId = req.params.id;
     const { newPrice } = req.body;
-    await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: newPrice } });
+
+    // Validation: Offer must be between 1 and 99
+    const percentage = Number(newPrice);
+    if (isNaN(percentage) || percentage < 1 || percentage > 99) {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ 
+        success: false, 
+        message: "Offer percentage must be between 1 and 99" 
+      });
+    }
+
+    await Category.updateOne({ _id: categoryId }, { $set: { categoryOffer: percentage } });
     const products = await Product.find({ category: categoryId });
 
     for (const product of products) {
@@ -115,7 +128,10 @@ const editCategory = async (req, res) => {
     const categoryId = req.params.id;
 
     let updatedFields = { isListed };
-    if (name !== undefined && name.trim() !== '') updatedFields.name = name;
+    if (name !== undefined && name.trim() !== '') {
+      // Capitalize first letter of each word
+      updatedFields.name = name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+    }
     if (description !== undefined && description.trim() !== '') updatedFields.description = description;
 
     const updateCategory = await Category.findOneAndUpdate({ _id: categoryId }, updatedFields, { new: true });
