@@ -183,10 +183,10 @@
                                     <%=item.altPhone%><br>
                     </p>
                     <div class="col">
-                      <a href="/addresses/<%=index%>"><button
+                      <a href="/addresses/<%=item._id%>"><button
                            class="btn btn-secondary">Edit</button></a>
                       <button class="btn btn-danger" id="deleteBtn"
-                        onclick="softDeleteAddress('<%=index%>','<%=item._id%>')">Delete</button>
+                        onclick="softDeleteAddress('<%=item._id%>')">Delete</button>
                     </div>
                   </div>
                 </div>
@@ -347,7 +347,7 @@
 
           </script>
           <script>
-            function softDeleteAddress(index,addressId) {
+            function softDeleteAddress(addressId) {
               Swal.fire({
                 title: 'Are you sure!',
                 text: 'Do you want to delete address!',
@@ -357,8 +357,7 @@
                 cancelButtonText: 'Cancel'
               }).then((result) => {
                 if (result.isConfirmed) {
-
-                  axios.delete(`/addresses/${index}`).then(res => {
+                  axios.delete(`/addresses/${addressId}`).then(res => {
                     if (res.status == 200) {
                       Swal.fire({
                         title: 'Success!',
@@ -372,7 +371,6 @@
                   })
                 }
               })
-
             }
           </script>
 

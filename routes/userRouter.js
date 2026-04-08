@@ -49,12 +49,12 @@ router.route('/forgot-password')
 router.route('/forgot-password/verify').post(userController.verifyForgot);
 router.route('/forgot-password/resend').post(userController.resentForgotOtp);
 
-// Addresses
-router.route('/addresses')
+// Addresses (support both singular and plural)
+router.route(['/address', '/addresses'])
   .get(userAuth, userController.loadAddress)
   .post(userAuth, userController.addAddress);
 
-router.route('/addresses/:addressId')
+router.route(['/address/:addressId', '/addresses/:addressId'])
   .get(userAuth, userController.LoadEditAddress)
   .put(userAuth, userController.editAddressData)
   .delete(userAuth, userController.softDeleteAddress);

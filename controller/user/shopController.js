@@ -26,21 +26,27 @@ const loadShop = async (req, res) => {
     const categoryId = req.query.category || '';
 
 
-    const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
-    const categoryIds = unblockedCategoryIds.map((category) => category._id);
+    const listedCategories = await Category.find({ isListed: true }).select('_id');
+    const categoryIds = listedCategories.map((category) => category._id);
+    
     let query = { 
       isBlocked: false, 
-      category: { $nin: categoryIds },
-      variant: { $elemMatch: { isBlocked: false } }
+      category: { $in: categoryIds },
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     };
 
     if (search) {
       query.productName = { $regex: new RegExp(search, 'i') };
     }
 
-
     if (categoryId) {
-      query.category = categoryId;
+      // If a specific category is requested, ensure it's among the listed ones
+      if (categoryIds.some(id => id.toString() === categoryId)) {
+        query.category = categoryId;
+      } else {
+        // If they requested a blocked category, return no results
+        query.category = new mongoose.Types.ObjectId(); 
+      }
     }
 
     let sortOptions = {};
@@ -75,7 +81,7 @@ const loadShop = async (req, res) => {
       skip(skip).
       limit(limit),
       Product.countDocuments(query),
-      Category.find()
+      Category.find({ isListed: true }) // Only show listed categories in sidebar
     ]);
 
     const totalPages = Math.ceil(totalProducts / limit);
@@ -120,24 +126,41 @@ const loadProductInfo = async (req, res) => {
       return res.redirect('/login');
     }
     const productId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.redirect('/pageNotFound');
+    }
+
+    const listedCategories = await Category.find({ isListed: true }).select('_id');
+    const categoryIds = listedCategories.map((c) => c._id.toString());
+
     const productData = await Product.findOne({
       _id: productId,
       isBlocked: false,
-      variant: { $elemMatch: { isBlocked: false } }
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     });
-    if (!productData) {
+
+    if (!productData || !categoryIds.includes(productData.category.toString())) {
       return res.redirect('/shop');
     }
+
     const product = [productData];
-    const category = await Category.find({ _id: productData.category });
+    const category = await Category.findOne({ _id: productData.category });
     const relatedProduct = await Product.find({
       category: productData.category,
       _id: { $ne: productId },
       isBlocked: false,
-      variant: { $elemMatch: { isBlocked: false } }
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     }).limit(4);
+
+    // Build a safe images array with at least 4 slots
+    const images = productData.images || [];
+    const baseImage = images[0] || '';
+    const safeImages = Array.from({ length: 4 }, (_, i) => images[i] || baseImage);
+
     res.render('productDetail', {
       product,
+      safeImages,
       category,
       activePage: '',
       user,
@@ -145,6 +168,7 @@ const loadProductInfo = async (req, res) => {
     });
   } catch (error) {
     logger.error("error in product info page load", error);
+    res.redirect('/pageNotFound');
   }
 };
 
@@ -186,6 +210,27 @@ const loadCheckout = async (req, res) => {
     if (!userCart || userCart.items.length === 0) {
       return res.redirect('/cart');
     }
+    
+    // Check if any product, category, or VARIANT in the cart is blocked
+    const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+    const blockedCategoryIds = unblockedCategoryIds.map((category) => category._id.toString());
+    
+    const isAnyBlocked = userCart.items.some((item) => {
+        // Category check
+        const isCatBlocked = blockedCategoryIds.includes(item.productId.category.toString());
+        // Product parent check
+        const isProdBlocked = item.productId.isBlocked;
+        // Variant specific check
+        const variantFound = item.productId.variant.id(item.varientId);
+        const isVarBlocked = variantFound ? variantFound.isBlocked : true; // Treat missing variant as blocked
+        
+        return isCatBlocked || isProdBlocked || isVarBlocked;
+    });
+
+    if (isAnyBlocked) {
+        return res.redirect('/cart'); // Send them back to cart to see what's wrong
+    }
+
     const wallet = await Wallet.findOne({ userId: user._id });
 
     res.render('checkout', {
@@ -337,20 +382,31 @@ const addOrder = async (req, res) => {
       return res.status(httpStatusCode.BAD_REQUEST).json({ success: false, message: constants.MSG_CART_NOT_FOUND });
     }
 
-    // Block checks
+    // Block checks (Product, Category, and specific Variant)
     const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
     const blockedCategoryIds = unblockedCategoryIds.map((category) => category._id.toString());
-    const isAnyCategoryBlocked = cart.items.some((item) => blockedCategoryIds.includes(item.productId.category.toString()));
-    const isAnyProductBlocked = cart.items.some((item) => item.productId.isBlocked);
+    
+    const isAnyStatusBlocked = cart.items.some((item) => {
+        const isCatBlocked = blockedCategoryIds.includes(item.productId.category.toString());
+        const isProdBlocked = item.productId.isBlocked;
+        const variantObj = item.productId.variant.id(item.varientId);
+        const isVarBlocked = variantObj ? variantObj.isBlocked : true;
+        
+        return isCatBlocked || isProdBlocked || isVarBlocked;
+    });
 
-    if (isAnyProductBlocked || isAnyCategoryBlocked) {
+    if (isAnyStatusBlocked) {
       return res.status(httpStatusCode.UNAUTHORIZED).json({
-        message: constants.MSG_YOUR_CART_CONTAINS_BLOCKED_PRODUCTS_CATEGORY_PLEASE_REMOVE_THEM_TO_PROCEED
+        message: "Your cart contains blocked products, categories, or variants. Please remove them to proceed."
       });
     }
 
     const totalDiscount = req.session.discountPrice || 0;
     const finalAmountOverall = totalPrice - totalDiscount;
+
+    if (paymentMethod === 'Cash on Delivery') {
+      return res.status(httpStatusCode.BAD_REQUEST).json({ message: "Cash on Delivery is currently unavailable." });
+    }
 
     // Balance check for Wallet
     if (paymentMethod === 'Wallet') {
@@ -566,6 +622,25 @@ const manageCartStock = async (req, res) => {
     const { userId } = req.body;
 
     const userCart = await Cart.findOne({ userId: userId }, { items: 1 }).populate('items.productId');
+    
+    // 1. Check for Blocked Status (Product, Category, or Variant)
+    const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
+    const blockedCategoryIds = unblockedCategoryIds.map((category) => category._id.toString());
+
+    for (const item of userCart.items) {
+        const isCatBlocked = blockedCategoryIds.includes(item.productId.category.toString());
+        const isProdBlocked = item.productId.isBlocked;
+        const variantObj = item.productId.variant.id(item.varientId);
+        const isVarBlocked = variantObj ? variantObj.isBlocked : true;
+
+        if (isCatBlocked || isProdBlocked || isVarBlocked) {
+            return res.status(httpStatusCode.UNAUTHORIZED).json({ 
+                message: `The product '${item.productId.productName}' (Size: ${item.size}) is currently unavailable. Please remove it from your cart.` 
+            });
+        }
+    }
+
+    // 2. Check for Stock
     for (const item of userCart.items) {
       const stockCheck = await Product.findOne(
         {
@@ -579,7 +654,6 @@ const manageCartStock = async (req, res) => {
         },
         { 'variant.$': 1 }
       );
-
 
       if (stockCheck) {
         let message = `Product ${item.productId.productName} with size '${item.size}' has only ${stockCheck.variant[0].stock} stocks left.`;

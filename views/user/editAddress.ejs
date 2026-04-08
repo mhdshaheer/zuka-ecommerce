@@ -179,9 +179,7 @@
             const pincode = document.getElementById('pincode');
 
             //access value from the query ===================
-            const addressId = "<%=address._id%>";
-             const index = "<%=index%>";
-
+            const addressId = "<%=addressId%>";
             //===============================================
 
             addBtn.addEventListener('click', (e) => {
@@ -203,7 +201,6 @@
                 const cityRegex = /^[a-zA-Z\s]+$/;
                 const pincodeRegex = /^[0-9]{6}$/;
 
-
                 if (!nameRegex.test(name.value.trim())) {
                   nameError.style.color = "red";
                   nameError.innerHTML = "Invalid name. Please enter only alphabets";
@@ -211,7 +208,6 @@
                   return false;
                 } else {
                   nameError.innerHTML = "";
-
                 }
 
                 if (!phoneRegex.test(phone.value.trim())) {
@@ -219,7 +215,7 @@
                   phoneError.innerHTML = "Invalid phone number. Please enter a 10-digit number.";
                   phone.focus();
                   return false;
-                }else{
+                } else {
                   phoneError.innerHTML = "";
                 }
 
@@ -228,7 +224,7 @@
                   addressTypeError.innerHTML = "Please select an address type.";
                   addressType.focus();
                   return false;
-                }else{
+                } else {
                   addressTypeError.innerHTML = "";
                 }
 
@@ -237,7 +233,7 @@
                   addressError.innerHTML = "Invalid address. Please check for special characters.";
                   address.focus();
                   return false;
-                }else{
+                } else {
                   addressError.innerHTML = "";
                 }
 
@@ -246,7 +242,7 @@
                   countryError.innerHTML = "Please select a country.";
                   country.focus();
                   return false;
-                }else{
+                } else {
                   countryError.innerHTML = "";
                 }
 
@@ -255,7 +251,7 @@
                   stateError.innerHTML = "Please select a state.";
                   state.focus();
                   return false;
-                }else{
+                } else {
                   stateError.innerHTML = "";
                 }
 
@@ -264,7 +260,7 @@
                   cityError.innerHTML = "Invalid city. Please enter only alphabets.";
                   city.focus();
                   return false;
-                }else{
+                } else {
                   cityError.innerHTML = "";
                 }
 
@@ -273,12 +269,12 @@
                   pincodeError.innerHTML = "Invalid pincode. Please enter a 6-digit number.";
                   pincode.focus();
                   return false;
-                }else{
+                } else {
                   pincodeError.innerHTML = "";
                 }
                 return true;
               }
-              // console.log(index.value)
+
               const editedData = {
                 name: name.value,
                 phone: phone.value,
@@ -290,11 +286,10 @@
                 city: city.value,
                 pincode: pincode.value
               }
-              if(validateAddressForm()){
 
-                axios.put(`/addresses/${index}`, {
-                   editedData
-                 
+              if (validateAddressForm()) {
+                axios.put(`/addresses/${addressId}`, {
+                  editedData
                 }).then(res => {
                   if (res.status == 200) {
                     Swal.fire({

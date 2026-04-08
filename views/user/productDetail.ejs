@@ -116,25 +116,25 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link active" data-toggle="tab" href="#tabs-1" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="<%=product[0].images[0]%>">
+                                    <div class="product__thumb__pic set-bg" data-setbg="<%=safeImages[0]%>">
                                     </div>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tabs-2" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="<%=product[0].images[1]%>">
+                                    <div class="product__thumb__pic set-bg" data-setbg="<%=safeImages[1]%>">
                                     </div>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tabs-3" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="<%=product[0].images[2]%>">
+                                    <div class="product__thumb__pic set-bg" data-setbg="<%=safeImages[2]%>">
                                     </div>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" data-toggle="tab" href="#tabs-4" role="tab">
-                                    <div class="product__thumb__pic set-bg" data-setbg="<%=product[0].images[3]%>">
+                                    <div class="product__thumb__pic set-bg" data-setbg="<%=safeImages[3]%>">
                                     </div>
                                 </a>
                             </li>
@@ -144,22 +144,22 @@
                         <div class="tab-content">
                             <div class="tab-pane active" id="tabs-1" role="tabpanel">
                                 <div class="product__details__pic__item">
-                                    <img src="<%=product[0].images[0]%>" alt="" class="zoomable">
+                                    <img src="<%=safeImages[0]%>" alt="" class="zoomable">
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabs-2" role="tabpanel">
                                 <div class="product__details__pic__item">
-                                    <img src="<%=product[0].images[1]%>" alt="" class="zoomable">
+                                    <img src="<%=safeImages[1]%>" alt="" class="zoomable">
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabs-3" role="tabpanel">
                                 <div class="product__details__pic__item">
-                                    <img src="<%=product[0].images[2]%>" alt="" class="zoomable">
+                                    <img src="<%=safeImages[2]%>" alt="" class="zoomable">
                                 </div>
                             </div>
                             <div class="tab-pane" id="tabs-4" role="tabpanel">
                                 <div class="product__details__pic__item">
-                                    <img src="<%=product[0].images[3]%>" alt="" class="zoomable">
+                                    <img src="<%=safeImages[3]%>" alt="" class="zoomable">
                                 </div>
                             </div>
 
@@ -175,81 +175,82 @@
                     <div class="col-lg-8">
                         <div class="product__details__text">
                             <h3>
-                                <%=product[0].productName%><span class="badge rounded-pill bg-secondary text-light"
-                                        style="text-decoration: none;">
-                                        <%=product[0].status%>
-                                    </span>
+                                <%= (product[0] && product[0].productName) || 'Product Name' %><span class="badge rounded-pill bg-secondary text-light"
+                                         style="text-decoration: none;">
+                                         <%= (product[0] && product[0].status) || 'Available' %>
+                                     </span>
                             </h3>
-                            <%if(product[0].offerPrice!==0){%>
-                                <h3>RS: <%=product[0].offerPrice.toFixed(0)%>/- <span>
-                                            <%=product[0].regularPrice.toFixed(0)%>/-
-                                        </span></h3>
-                                <%}else{%>
-                                    <h3>RS: <%=product[0].regularPrice.toFixed(0)%>/-</h3>
-                                    <%}%>
-                                        <p>
-                                            <%=product[0].description%>
-                                        </p>
-                                        <div class="product-rating">
-                                            <span id="average-rating">4.2</span>
-                                            <div class="stars">
-                                                <!-- Dynamically add stars based on average rating -->
-                                                <span class="star" data-value="1">★</span>
-                                                <span class="star" data-value="2">★</span>
-                                                <span class="star" data-value="3">★</span>
-                                                <span class="star" data-value="4">★</span>
-                                                <span class="star" data-value="5">★</span>
-                                            </div>
-                                            <span id="rating-count">(123 ratings)</span>
-                                        </div>
-                                        <br>
-                                        <div class="product__details__option">
-                                            <div class="product__details__option__size">
-                                                <span>Size:</span>
-                                                <%for(let i=0;i<product[0].variant.length;i++){%>
-                                                    <%if(product[0].variant[i].stock>0 && !product[0].variant[i].isBlocked){%>
+                            <%if(product[0] && product[0].offerPrice !== 0 && product[0].offerPrice != null){%>
+                                <h3>RS: <%= (product[0].offerPrice || 0).toFixed(0) %>/- <span>
+                                             <%= (product[0].regularPrice || 0).toFixed(0) %>/-
+                                         </span></h3>
+                                 <%}else{%>
+                                     <h3>RS: <%= (product[0] && product[0].regularPrice || 0).toFixed(0) %>/-</h3>
+                                     <%}%>
+                                         <p>
+                                             <%= (product[0] && product[0].description) || 'No description available for this product.' %>
+                                         </p>
+                                         <div class="product-rating">
+                                             <span id="average-rating"><%= (product[0] && product[0].rating && product[0].rating.average) || 4.2 %></span>
+                                             <div class="stars">
+                                                 <!-- Dynamically add stars based on average rating -->
+                                                 <span class="star" data-value="1">★</span>
+                                                 <span class="star" data-value="2">★</span>
+                                                 <span class="star" data-value="3">★</span>
+                                                 <span class="star" data-value="4">★</span>
+                                                 <span class="star" data-value="5">★</span>
+                                             </div>
+                                             <span id="rating-count">(<%= (product[0] && product[0].rating && product[0].rating.count) || 123 %> ratings)</span>
+                                         </div>
+                                         <br>
+                                         <div class="product__details__option">
+                                             <div class="product__details__option__size">
+                                                 <span>Size:</span>
+                                                 <% const variants = (product[0] && product[0].variant) || [] %>
+                                                 <%for(let i=0;i<variants.length;i++){%>
+                                                     <%if(variants[i].stock>0 && !variants[i].isBlocked){%>
 
-                                                        <label id="sizeLabel" for="xl"
-                                                            onclick="itemSizeFun('<%=product[0].variant[i].size%>','<%=product[0].variant[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
-                                                            <%=product[0].variant[i].size%>
+                                                         <label id="sizeLabel" for="xl"
+                                                             onclick="itemSizeFun('<%=variants[i].size%>','<%=variants[i].stock%>',`<%= JSON.stringify(product[0]) %>`)">
+                                                             <%=variants[i].size%>
 
-                                                                <input type="radio" id="itemSize" name="variant">
-                                                                <span> </span>
-                                                                <span class="badge rounded-pill bg-dark text-light"
-                                                                    id="itemStock">
-                                                                    <%if(product[0].variant[i].stock>=10){%>
-                                                                            10
-                                                                        <%}else{%>
-                                                                            <%=product[0].variant[i].stock%>
-                                                                    <%}%>
-                                                                </span>
-                                                        </label>
-                                                        <%}%>
-                                                            <%}%>
-                                            </div>
+                                                                 <input type="radio" id="itemSize" name="variant">
+                                                                 <span> </span>
+                                                                 <span class="badge rounded-pill bg-dark text-light"
+                                                                     id="itemStock">
+                                                                     <%if(variants[i].stock>=10){%>
+                                                                             10
+                                                                         <%}else{%>
+                                                                             <%=variants[i].stock%>
+                                                                     <%}%>
+                                                                 </span>
+                                                         </label>
+                                                         <%}%>
+                                                             <%}%>
+                                             </div>
 
-                                            <div class="mt-2">
-                                                <p><b>COLOR: </b><span id="itemColor">
-                                                        <%=product[0].color%>
-                                                    </span></p>
-                                            </div>
-                                        </div>
-                                        <div class="product__details__cart__option">
-                                            <div class="quantity">
-                                                <div class="pro-qty">
-                                                    <input id="itemQuantity" type="text" value="1" readonly>
-                                                </div>
-                                            </div>
-                                            <a onclick="selectSize()" class="primary-btn text-light" style="cursor: pointer;" id="addToCart">add to cart</a>
-                                        </div>
-                                        <div class="product__details__btns__option mt-3">
-                                            <a href="#" onclick="addToWishlist('<%= product[0]._id %>', event)" class="text-dark text-decoration-none">
-                                                <i class="<%= wishlistProductIds.includes(product[0]._id.toString()) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> wishlist-icon-<%= product[0]._id %>"></i>
-                                                <span class="wishlist-text-<%= product[0]._id %> ms-1">
-                                                    <%= wishlistProductIds.includes(product[0]._id.toString()) ? 'Remove from wishlist' : 'Add to wishlist' %>
-                                                </span>
-                                            </a>
-                                        </div>
+                                             <div class="mt-2">
+                                                 <p><b>COLOR: </b><span id="itemColor">
+                                                         <%= (product[0] && product[0].color) || 'Default' %>
+                                                     </span></p>
+                                             </div>
+                                         </div>
+                                         <div class="product__details__cart__option">
+                                             <div class="quantity">
+                                                 <div class="pro-qty">
+                                                     <input id="itemQuantity" type="text" value="1" readonly>
+                                                 </div>
+                                             </div>
+                                             <a onclick="selectSize()" class="primary-btn text-light" style="cursor: pointer;" id="addToCart">add to cart</a>
+                                         </div>
+                                         <div class="product__details__btns__option mt-3">
+                                             <a href="#" onclick="addToWishlist('<%= (product[0] && product[0]._id) %>', event)" class="text-dark text-decoration-none">
+                                                 <i class="<%= (product[0] && wishlistProductIds.includes(product[0]._id.toString())) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> wishlist-icon-<%= (product[0] && product[0]._id) %>"></i>
+                                                 <span class="wishlist-text-<%= (product[0] && product[0]._id) %> ms-1">
+                                                     <%= (product[0] && wishlistProductIds.includes(product[0]._id.toString())) ? 'Remove from wishlist' : 'Add to wishlist' %>
+                                                 </span>
+                                             </a>
+                                         </div>
 
 
                         </div>
@@ -345,11 +346,11 @@
 
                         <div class="col-lg-3 col-md-6 col-sm-6 col-sm-6">
                             <div class="product__item">
-                                <div class="product__item__pic set-bg" data-setbg="<%=product.images[0]%>">
-                                    <% if (product.offerPrice !=0) { %>
+                                <div class="product__item__pic set-bg" data-setbg="<%= (product.images && product.images[0]) || '' %>">
+                                    <% if (product.offerPrice !=0 && product.offerPrice != null) { %>
                                         <span class="label text-light bg-dark">
-                                            <%= Math.round(((product.regularPrice - product.offerPrice) /
-                                                product.regularPrice) * 100) %> % Off
+                                            <%= Math.round((( (product.regularPrice || 0) - product.offerPrice) /
+                                                (product.regularPrice || 1)) * 100) %> % Off
                                         </span>
                                         <% } %>
                                             <ul class="product__hover">
@@ -361,12 +362,12 @@
                                         <%= product.productName %>
                                     </h6>
                                     <a href="/products/<%= product._id %>" class="add-cart">View Product</a>
-                                    <% if (product.offerPrice !==0) { %>
-                                        <h5>Rs: <%= product.offerPrice.toFixed(0) %>/-</h5>
-                                        <h6 style="text-decoration: line-through;">Rs: <%= product.regularPrice.toFixed(0) %>/-
+                                    <% if (product.offerPrice !== 0 && product.offerPrice != null) { %>
+                                        <h5>Rs: <%= (product.offerPrice || 0).toFixed(0) %>/-</h5>
+                                        <h6 style="text-decoration: line-through;">Rs: <%= (product.regularPrice || 0).toFixed(0) %>/-
                                         </h6>
                                         <% } else { %>
-                                            <h5>Rs: <%= product.regularPrice.toFixed(0) %>/-</h5>
+                                            <h5>Rs: <%= (product.regularPrice || 0).toFixed(0) %>/-</h5>
                                             <% } %>
                                 </div>
                             </div>
