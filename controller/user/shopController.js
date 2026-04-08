@@ -26,21 +26,27 @@ const loadShop = async (req, res) => {
     const categoryId = req.query.category || '';
 
 
-    const unblockedCategoryIds = await Category.find({ isListed: false }).select('_id');
-    const categoryIds = unblockedCategoryIds.map((category) => category._id);
+    const listedCategories = await Category.find({ isListed: true }).select('_id');
+    const categoryIds = listedCategories.map((category) => category._id);
+    
     let query = { 
       isBlocked: false, 
-      category: { $nin: categoryIds },
-      variant: { $elemMatch: { isBlocked: false } }
+      category: { $in: categoryIds },
+      variant: { $elemMatch: { isBlocked: { $ne: true } } }
     };
 
     if (search) {
       query.productName = { $regex: new RegExp(search, 'i') };
     }
 
-
     if (categoryId) {
-      query.category = categoryId;
+      // If a specific category is requested, ensure it's among the listed ones
+      if (categoryIds.some(id => id.toString() === categoryId)) {
+        query.category = categoryId;
+      } else {
+        // If they requested a blocked category, return no results
+        query.category = new mongoose.Types.ObjectId(); 
+      }
     }
 
     let sortOptions = {};
@@ -75,7 +81,7 @@ const loadShop = async (req, res) => {
       skip(skip).
       limit(limit),
       Product.countDocuments(query),
-      Category.find()
+      Category.find({ isListed: true }) // Only show listed categories in sidebar
     ]);
 
     const totalPages = Math.ceil(totalProducts / limit);
