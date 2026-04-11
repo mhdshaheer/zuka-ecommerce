@@ -76,9 +76,29 @@ const getPaymentStatusClassServer = (status) => {
                                         <td><span class="badge rounded-pill <%= getPaymentStatusClassServer(item.paymentStatus) %>"><%=item.paymentStatus%></span></td>
                                         <td>₹<%=item.finalAmount.toFixed(0)%></td>
                                         <td id="status-<%=item._id%>">
-                                            <span class="badge rounded-pill <%= item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClassServer(item.status) %> text-dark">
-                                                <%=item.status%>
-                                            </span>
+                                            <% if (['Failed', 'Pending', 'Cancelled'].includes(item.paymentStatus)) { %>
+                                                <span class="badge rounded-pill alert-danger text-dark">
+                                                    <%=item.status%>
+                                                </span>
+                                            <% } else if (item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.status === 'Return Rejected') { %>
+                                                <span class="badge rounded-pill <%= getStatusClassServer(item.status) %> text-dark">
+                                                    <%=item.status%>
+                                                </span>
+                                            <% } else { %>
+                                                <select class="form-select form-select-sm" onchange="updateOrderStatus('<%=item._id%>', this.value)" style="min-width: 120px;">
+                                                    <% if (item.status === 'Return Request') { %>
+                                                        <option value="Return Request" selected>Return Request</option>
+                                                        <option value="Returned">Returned</option>
+                                                        <option value="Return Rejected">Return Rejected</option>
+                                                    <% } else { %>
+                                                        <% ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].forEach(statusOption => { %>
+                                                            <option value="<%= statusOption %>" <%= item.status === statusOption ? 'selected' : '' %>>
+                                                                <%= statusOption %>
+                                                            </option>
+                                                        <% }) %>
+                                                    <% } %>
+                                                </select>
+                                            <% } %>
                                         </td>
                                         <td><%=item.createdAt.toLocaleDateString()%></td>
                                         <td class="text-end">
@@ -183,9 +203,22 @@ const getPaymentStatusClassServer = (status) => {
                     <td><span class="badge rounded-pill ${getPaymentStatusClass(item.paymentStatus)}">${item.paymentStatus}</span></td>
                     <td>₹${item.finalAmount.toFixed(0)}</td>
                     <td id="status-${item._id}">
-                        <span class="badge rounded-pill ${item.paymentStatus === 'Failed' ? 'alert-danger' : getStatusClass(item.status)} text-dark">
-                            ${item.status}
-                        </span>
+                        ${['Failed', 'Pending', 'Cancelled'].includes(item.paymentStatus) ? 
+                            `<span class="badge rounded-pill alert-danger text-dark">${item.status}</span>` :
+                            (item.status === 'Cancelled' || item.status === 'Delivered' || item.status === 'Returned' || item.status === 'Return Rejected' ?
+                                `<span class="badge rounded-pill ${getStatusClass(item.status)} text-dark">${item.status}</span>` :
+                                `<select class="form-select form-select-sm" onchange="updateOrderStatus('${item._id}', this.value)" style="min-width: 120px;">
+                                    ${item.status === 'Return Request' ? 
+                                        `<option value="Return Request" selected>Return Request</option>
+                                         <option value="Returned">Returned</option>
+                                         <option value="Return Rejected">Return Rejected</option>` :
+                                        ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'].map(s => 
+                                            `<option value="${s}" ${item.status === s ? 'selected' : ''}>${s}</option>`
+                                        ).join('')
+                                    }
+                                </select>`
+                            )
+                        }
                     </td>
                     <td>${new Date(item.createdAt).toLocaleDateString()}</td>
                     <td class="text-end">
@@ -195,7 +228,25 @@ const getPaymentStatusClassServer = (status) => {
             `).join('');
         }
 
-        function updateOrderStatus(orderId, newStatus) {
+        async function updateOrderStatus(orderId, newStatus) {
+            let reason = '';
+            if (newStatus === 'Return Rejected') {
+                const { value: text, isConfirmed } = await Swal.fire({
+                    input: 'textarea',
+                    inputLabel: 'Return Rejection Reason',
+                    inputPlaceholder: 'Type your message here...',
+                    showCancelButton: true
+                });
+                if (!isConfirmed) return;
+                if (!text || !text.trim()) {
+                    Swal.fire('Error', 'Please provide a reason for rejecting the return.', 'error');
+                    // Reset dropdown to previous value by re-fetching or simplistic reload
+                    fetchOrders(new URLSearchParams(window.location.search).get('page') || 1);
+                    return;
+                }
+                reason = text;
+            }
+
             Swal.fire({
                 title: 'Updating Status...',
                 text: `Changing status to ${newStatus}`,
@@ -203,7 +254,7 @@ const getPaymentStatusClassServer = (status) => {
                 didOpen: () => Swal.showLoading()
             });
 
-            axios.patch(`/admin/orders/${orderId}/status`, { status: newStatus })
+            axios.patch(`/admin/orders/${orderId}/status`, { status: newStatus, reason: reason })
                 .then(response => {
                     if (response.data.success) {
                         Swal.fire({
