@@ -43,8 +43,8 @@
                             <span class="badge rounded-pill alert-success px-3 py-2"><%= orders.status %></span>
                         <% } else if (orders.status === 'Delivered') { %>
                             <span class="badge rounded-pill alert-primary px-3 py-2"><%= orders.status %></span>
-                        <% } else if (orders.paymentStatus == 'Failed') { %>
-                            <span class="badge rounded-pill alert-secondary px-3 py-2">Status Disabled (Payment Failed)</span>
+                        <% } else if (['Failed', 'Pending', 'Cancelled'].includes(orders.paymentStatus)) { %>
+                            <span class="badge rounded-pill alert-secondary px-3 py-2">Status Disabled (Payment <%= orders.paymentStatus %>)</span>
                         <% } else { %>
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#statusModal"
                                 onclick="updateStatus('<%=orders._id%>','<%=orders.status%>')">Update Status</button>

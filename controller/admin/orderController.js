@@ -98,10 +98,10 @@ const changeOrderStatus = async (req, res) => {
     const { status, reason } = req.body;
 
     const order = await Order.findById(order_id);
-    if (order && order.paymentStatus === 'Failed') {
+    if (order && ['Failed', 'Pending', 'Cancelled'].includes(order.paymentStatus)) {
       return res.status(httpStatusCode.BAD_REQUEST).json({ 
         success: false, 
-        message: "Cannot change status of an order with failed payment." 
+        message: `Cannot change status of an order when payment is ${order.paymentStatus.toLowerCase()}.` 
       });
     }
 
